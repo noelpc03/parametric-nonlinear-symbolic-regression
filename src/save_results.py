@@ -52,7 +52,7 @@ def save_results_json(results, output_dir):
         
         serializable_result = {
             'iteration': int(result['iteration']),
-            'equation': result['equation'],
+            'equation': str(result['equation']),  # Asegurar que sea string
             'num_matched': int(result['num_matched']),
             'matched_points': matched_points
         }
@@ -81,8 +81,11 @@ def save_equations_txt(results, output_dir):
         f.write("=" * 70 + "\n\n")
         
         for result in results:
+            # La ecuación ya viene como string limpio desde symbolic_regression.py
+            equation_str = result['equation']
+            
             f.write(f"Iteración {result['iteration']}:\n")
-            f.write(f"  Ecuación: {result['equation']}\n")
+            f.write(f"  Ecuación: {equation_str}\n")
             f.write(f"  Puntos matcheados: {result['num_matched']}\n")
             f.write(f"  Índices: {result['matched_indices'].tolist()}\n\n")
             

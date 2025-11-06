@@ -41,6 +41,8 @@ def train_symbolic_model(X, y, k=K, epsilon=EPSILON, niterations=NITERATIONS):
         variable_names=["x"],
         unary_operators=UNARY_OPERATORS,
         binary_operators=BINARY_OPERATORS,
+        temp_equation_file=True,   # Usar archivos temporales en lugar de outputs/
+        delete_tempfiles=True,     # Borrar archivos temporales al finalizar
     )
     
     model.fit(X, y)
@@ -131,14 +133,21 @@ def iterative_symbolic_regression(
         # Mapear índices locales a índices originales
         matched_indices_original = original_indices[matched_indices_local]
         
-        # Obtener la ecuación
-        equation = model.get_best()
+        # Obtener la ecuación y extraer información
+        equation_series = model.get_best()
+        
+        # Extraer la ecuación en formato legible (sympy_format si está disponible)
+        if hasattr(equation_series, 'get'):
+            equation_str = equation_series.get('sympy_format', str(equation_series.get('equation', equation_series)))
+        else:
+            equation_str = str(equation_series)
         
         # Guardar resultados
         result = {
             'iteration': iteration,
             'model': model,
-            'equation': str(equation),
+            'equation': equation_str,  # Guardar como string limpio
+            'equation_series': equation_series,  # Guardar el objeto completo por si se necesita
             'matched_indices': matched_indices_original,
             'X_matched': X[matched_indices_original],
             'y_matched': y[matched_indices_original],
@@ -146,7 +155,7 @@ def iterative_symbolic_regression(
         }
         results.append(result)
         
-        print_iteration_result(equation, len(matched_indices_original))
+        print_iteration_result(equation_str, len(matched_indices_original))
         
         # Eliminar puntos matcheados del conjunto restante
         mask = np.ones(len(X_remaining), dtype=bool)

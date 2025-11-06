@@ -95,14 +95,17 @@ Funciones auxiliares para identificación de puntos y formateo de salida.
 El algoritmo genera automáticamente un directorio con timestamp en `outputs/` que contiene:
 
 ### Archivos generados:
-- **`results.json`**: Todas las funciones encontradas con sus metadatos en formato JSON
-- **`equations.txt`**: Lista legible de todas las ecuaciones encontradas
+- **`results.json`**: Todas las funciones encontradas con sus metadatos y puntos matcheados en formato JSON
+- **`equations.txt`**: Lista legible de todas las ecuaciones encontradas con sus puntos (x, y)
 - **`matched_points.csv`**: Tabla con todos los puntos y qué función los matcheó
 - **`summary.txt`**: Resumen estadístico del experimento (puntos matcheados, iteraciones, etc.)
 - **`config_used.json`**: Configuración de parámetros utilizada en esta ejecución
-- **`plots_combined.png`**: Ambas gráficas en una sola imagen
+- **`plots_combined.png`**: Ambas gráficas principales en una sola imagen (alta resolución)
 - **`plot_all_functions.png`**: Todas las funciones superpuestas con puntos matcheados
 - **`plot_iterations.png`**: Distribución de puntos por iteración
+- **`individual_functions/`**: Carpeta con PNG individual por cada función encontrada
+  - `function_iter_01.png`, `function_iter_02.png`, etc.
+  - Cada imagen muestra solo esa función con sus puntos matcheados
 
 ### Visualización interactiva:
 - Muestra las gráficas en ventanas de matplotlib para análisis en tiempo real
