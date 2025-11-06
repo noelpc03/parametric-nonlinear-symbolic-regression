@@ -1,5 +1,8 @@
 # python environment
-tesis_venv
+.venv
 
 # Result files
 outputs
+
+# Python cache files
+__pycache__
