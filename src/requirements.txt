@@ -1,0 +1,7 @@
+# --- Dependencias principales para regresión simbólica ---
+
+numpy           # Manejo eficiente de arrays y operaciones numéricas
+scikit-learn    # Herramientas de machine learning (útil para dividir datos y métricas)
+pandas          # Manipulación de datos en forma de tablas (DataFrames)
+matplotlib      # Visualización de datos y resultados
+pysr            # PySR: librería de regresión simbólica (descubre fórmulas a partir de datos)
