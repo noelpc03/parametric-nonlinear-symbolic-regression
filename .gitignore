@@ -6,3 +6,11 @@ outputs
 
 # Python cache files
 __pycache__
+
+# State of the art
+estadoDelArte.aux
+estadoDelArte.log
+estadoDelArte.out
+estadoDelArte.fls 
+estadoDelArte.fdb_latexmk
+estadoDelArte.synctex.gz
