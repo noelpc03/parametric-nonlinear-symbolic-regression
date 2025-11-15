@@ -13,13 +13,13 @@ EPSILON = 0.05  # Tolerancia para considerar un punto como "matcheado"
 K = 10  # Pendiente de la transición sigmoidal (qué tan suave es la transición)
 
 # Parámetros del modelo PySR
-NITERATIONS = 20  # Número de iteraciones evolutivas por modelo (reducido para pruebas)
-POPULATIONS = 4  # Número de poblaciones
-UNARY_OPERATORS = ["sin", "cos", "exp", "log"]
-BINARY_OPERATORS = ["+", "-", "*", "/"]
+NITERATIONS = 20  # Número de iteraciones evolutivas por modelo
+POPULATIONS = 6  # Número de poblaciones
+UNARY_OPERATORS = ["sin", "cos", "tan", "exp", "log", "abs", "sign", "tan", "asin", "acos", "atan"]
+BINARY_OPERATORS = ["+", "-", "*", "/", "^"]
 
 # Parámetros del algoritmo iterativo
-MIN_POINTS = 1  # Mínimo de puntos para continuar (1 = procesa hasta el último punto)
+MIN_POINTS = 1  # Mínimo de puntos para continuar 
 MAX_ITERATIONS = 100  # Número máximo de iteraciones del algoritmo (None = sin límite, limitado para pruebas)
 MAX_CONSECUTIVE_NO_MATCH = 3  # Máximo de intentos consecutivos sin matchear antes de detenerse
 
