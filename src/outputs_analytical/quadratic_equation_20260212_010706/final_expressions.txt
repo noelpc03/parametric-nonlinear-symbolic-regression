@@ -1,0 +1,117 @@
+EXPRESIONES ANALÍTICAS DESCUBIERTAS
+======================================================================
+
+Ecuación original: a*x**2 + b*x + c = 0
+Variables: ['x']
+Parámetros: ['a', 'b', 'c']
+
+
+RAMA 1 (raíz #1):
+----------------------------------------------------------------------
+Múltiples funciones encontradas (11):
+
+  Función 1:
+    x = 1.50916**x1*x2
+    Puntos cubiertos: 198
+
+  Función 2:
+    x = (-x1 + x2)/x0
+    Puntos cubiertos: 91
+
+  Función 3:
+    x = x2/1.7613374 + (-(x1 + exp(x1)) - 1.0027057)*0.19282001/x0
+    Puntos cubiertos: 148
+
+  Función 4:
+    x = -x1/Abs(x0) + x2/(x1 - 1*(-0.47786555))
+    Puntos cubiertos: 86
+
+  Función 5:
+    x = x2/Abs(x1 + x2)
+    Puntos cubiertos: 42
+
+  Función 6:
+    x = x2 - 0.27596736
+    Puntos cubiertos: 15
+
+  Función 7:
+    x = -1*0.39132902 + ((-x1 - 0.79448426) + cos(x2 + cos(Abs(x1)) - 1.883973))/(2.04379*x0)
+    Puntos cubiertos: 38
+
+  Función 8:
+    x = (-0.3037923/x0)*exp(x1) + x2
+    Puntos cubiertos: 14
+
+  Función 9:
+    x = x2 - 0.5238795/(x0*(1.8827558 - x1))
+    Puntos cubiertos: 10
+
+  Función 10:
+    x = x2/(-1*x1*0.6628418 - 1*(-0.35645667))
+    Puntos cubiertos: 9
+
+  Función 11:
+    x = x1*(x2 - 1*3.2701821)/2.1173348 - 1*0.65957266
+    Puntos cubiertos: 7
+
+  Expresión simplificada (más puntos):
+    x = 1.50916**x1*x2
+
+RAMA 2 (raíz #2):
+----------------------------------------------------------------------
+Múltiples funciones encontradas (13):
+
+  Función 1:
+    x = exp((-x2 + (-x0 - x1))*exp(sin(x0*x2)))
+    Puntos cubiertos: 383
+
+  Función 2:
+    x = -x2
+    Puntos cubiertos: 40
+
+  Función 3:
+    x = -0.57709134*x2 + Abs(x1/x0)
+    Puntos cubiertos: 90
+
+  Función 4:
+    x = x2*(-0.627685)
+    Puntos cubiertos: 36
+
+  Función 5:
+    x = -sin(x2) + ((-0.7031954**exp(x1))*x1 + 0.27774844)*0.8273731/x0
+    Puntos cubiertos: 41
+
+  Función 6:
+    x = (-x1 + x2/(-1.8226789))/x0
+    Puntos cubiertos: 9
+
+  Función 7:
+    x = (-x2 - 0.40191832 - 1*0.042897567 + exp(x1*(-0.64848566))/x0)*0.5839286
+    Puntos cubiertos: 19
+
+  Función 8:
+    x = -x2 - sin(x0 + x1) + 0.92596775
+    Puntos cubiertos: 10
+
+  Función 9:
+    x = x0**(x1/0.72609556) - 1*(-0.3326032)
+    Puntos cubiertos: 6
+
+  Función 10:
+    x = x1/((-1*x0*2.078614)) + (x1*x1/((x0*2.4559548)) - x2 - 1*(-0.14488135))*0.63159025
+    Puntos cubiertos: 8
+
+  Función 11:
+    x = x0**x1 + 0.33011898
+    Puntos cubiertos: 2
+
+  Función 12:
+    x = 0.4860169*Abs(x2) - 0.9373518/(x1 - 0.20102891)
+    Puntos cubiertos: 4
+
+  Función 13:
+    x = x2*(-0.61736995) - (0.09233153 + x1/x0)
+    Puntos cubiertos: 5
+
+  Expresión simplificada (más puntos):
+    x = exp((-x2 + (-x0 - x1))*exp(sin(x0*x2)))
