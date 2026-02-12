@@ -21,7 +21,7 @@ BINARY_OPERATORS = ["+", "-", "*", "/", "^"]
 # Parámetros del algoritmo iterativo
 MIN_POINTS = 1  # Mínimo de puntos para continuar 
 MAX_ITERATIONS = 100  # Número máximo de iteraciones del algoritmo (None = sin límite, limitado para pruebas)
-MAX_CONSECUTIVE_NO_MATCH = 3  # Máximo de intentos consecutivos sin matchear antes de detenerse
+MAX_CONSECUTIVE_NO_MATCH = 100  # Máximo de intentos consecutivos sin matchear antes de detenerse
 
 # Parámetros de visualización
 FIGURE_SIZE = (16, 6)
