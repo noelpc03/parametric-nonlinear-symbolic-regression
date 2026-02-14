@@ -1,6 +1,7 @@
 """
 Parseo y definición de ecuaciones simbólicas
 """
+import os
 import sympy as sp
 from typing import List, Tuple
 
@@ -57,6 +58,8 @@ def get_equation_info(equation: sp.Expr, symbols_dict: dict) -> dict:
 
 if __name__ == "__main__":
     # Ejemplo de uso
+    import sys
+    sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
     from config import EQUATION_STRING, VARIABLES, PARAMETERS
     
     equation, symbols = parse_equation(EQUATION_STRING, VARIABLES, PARAMETERS)

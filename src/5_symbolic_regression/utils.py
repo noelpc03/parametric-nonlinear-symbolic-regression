@@ -7,19 +7,21 @@ import numpy as np
 def find_matched_points(X, y, y_pred, epsilon=0.05):
     """
     Identifica los índices de los puntos que son matcheados por la función.
-    Un punto es matcheado si |y - y_pred| < epsilon
+    Usa tolerancia relativa: un punto matchea si |y - y_pred| < epsilon * (1 + |y|)
+    Esto adapta la tolerancia al orden de magnitud de los valores.
     
     Args:
         X: Valores de entrada (no usado, pero se mantiene por consistencia)
         y: Valores verdaderos
         y_pred: Valores predichos
-        epsilon: Tolerancia para matcheo
+        epsilon: Tolerancia relativa para matcheo
     
     Returns:
         matched_indices: Array con los índices de los puntos matcheados
     """
     diff = np.abs(y - y_pred)
-    matched_indices = np.where(diff < epsilon)[0]
+    threshold = epsilon * (1.0 + np.abs(y))
+    matched_indices = np.where(diff < threshold)[0]
     return matched_indices
 
 

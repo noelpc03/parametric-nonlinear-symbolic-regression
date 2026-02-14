@@ -71,6 +71,8 @@ def generate_grid(parameter_ranges: Dict[str, Tuple[float, float, int]],
 
 
 if __name__ == "__main__":
+    import os, sys
+    sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
     from config import PARAMETER_RANGES, SAMPLING_METHOD, NUM_SAMPLES, RANDOM_SEED
     
     grid, names = generate_grid(

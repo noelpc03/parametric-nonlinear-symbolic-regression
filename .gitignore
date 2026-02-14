@@ -17,3 +17,6 @@ estadoDelArte.synctex.gz
 
 # docs 
 docs/.obsidian
+
+# results 
+src/outputs_analytical

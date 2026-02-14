@@ -14,54 +14,22 @@ Pipeline:
 import os
 import sys
 import json
-import importlib.util
 from datetime import datetime
 import numpy as np
 
-
-def _load_config(config_path, module_name):
-    """Carga un config.py desde una ruta específica con un nombre de módulo único."""
-    spec = importlib.util.spec_from_file_location(module_name, config_path)
-    mod = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(mod)
-    return mod
-
-
+# ── Añadir src/ al path para que config sea importable ──
 base_dir = os.path.dirname(os.path.abspath(__file__))
+if base_dir not in sys.path:
+    sys.path.insert(0, base_dir)
 
-# ── Configuración global ──
-_global_cfg = _load_config(os.path.join(base_dir, 'config.py'), 'global_config')
-OUTPUT_DIR = _global_cfg.OUTPUT_DIR
-VERBOSE = _global_cfg.VERBOSE
-SAVE_INTERMEDIATE = _global_cfg.SAVE_INTERMEDIATE
-EXPERIMENT_NAME = _global_cfg.EXPERIMENT_NAME
-
-# ── Configuración de ecuación ──
-_eq_cfg = _load_config(os.path.join(base_dir, '1_equation_definition', 'config.py'), 'eq_config')
-EQUATION_STRING = _eq_cfg.EQUATION_STRING
-VARIABLES = _eq_cfg.VARIABLES
-PARAMETERS = _eq_cfg.PARAMETERS
-
-# ── Configuración de grid ──
-_grid_cfg = _load_config(os.path.join(base_dir, '2_parameter_grid', 'config.py'), 'grid_config')
-PARAMETER_RANGES = _grid_cfg.PARAMETER_RANGES
-SAMPLING_METHOD = _grid_cfg.SAMPLING_METHOD
-NUM_SAMPLES = _grid_cfg.NUM_SAMPLES
-RANDOM_SEED = _grid_cfg.RANDOM_SEED
-
-# ── Configuración del solver ──
-_solver_cfg = _load_config(os.path.join(base_dir, '3_zero_finding', 'config.py'), 'solver_config')
-SOLVER_METHOD = _solver_cfg.SOLVER_METHOD
-FILTER_COMPLEX = _solver_cfg.FILTER_COMPLEX
-COMPLEX_TOLERANCE = _solver_cfg.COMPLEX_TOLERANCE
-SORT_ROOTS = _solver_cfg.SORT_ROOTS
-
-# ── Configuración de regresión simbólica ──
-_reg_cfg = _load_config(os.path.join(base_dir, '5_symbolic_regression', 'config.py'), 'regression_config')
-EPSILON = _reg_cfg.EPSILON
-K = _reg_cfg.K
-NITERATIONS = _reg_cfg.NITERATIONS
-MIN_POINTS = _reg_cfg.MIN_POINTS
+# ── Configuración unificada ──
+from config import (
+    OUTPUT_DIR, VERBOSE, SAVE_INTERMEDIATE, EXPERIMENT_NAME,
+    EQUATION_STRING, VARIABLES, PARAMETERS,
+    PARAMETER_RANGES, SAMPLING_METHOD, NUM_SAMPLES, RANDOM_SEED,
+    SOLVER_METHOD, FILTER_COMPLEX, COMPLEX_TOLERANCE, SORT_ROOTS,
+    EPSILON, K, NITERATIONS, MIN_POINTS,
+)
 
 # ── Añadir subdirectorios al path para importar módulos ──
 for subdir in ['1_equation_definition', '2_parameter_grid', '3_zero_finding',

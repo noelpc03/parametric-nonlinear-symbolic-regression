@@ -130,14 +130,19 @@ def solve_for_all_parameter_tuples(equation: sp.Expr,
 
 
 if __name__ == "__main__":
-    from config import SOLVER_METHOD, FILTER_COMPLEX, COMPLEX_TOLERANCE, SORT_ROOTS
-    import sys
-    sys.path.append('..')
-    
-    from equation_definition.equation_parser import parse_equation
-    from equation_definition.config import EQUATION_STRING, VARIABLES, PARAMETERS
-    from parameter_grid.grid_generator import generate_grid
-    from parameter_grid.config import PARAMETER_RANGES, SAMPLING_METHOD, NUM_SAMPLES, RANDOM_SEED
+    import os, sys
+    _parent = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
+    sys.path.insert(0, _parent)
+    from config import (SOLVER_METHOD, FILTER_COMPLEX, COMPLEX_TOLERANCE, SORT_ROOTS,
+                        EQUATION_STRING, VARIABLES, PARAMETERS,
+                        PARAMETER_RANGES, SAMPLING_METHOD, NUM_SAMPLES, RANDOM_SEED)
+
+    # Añadir carpetas hermanas al path
+    sys.path.insert(0, os.path.join(_parent, '1_equation_definition'))
+    sys.path.insert(0, os.path.join(_parent, '2_parameter_grid'))
+
+    from equation_parser import parse_equation
+    from grid_generator import generate_grid
     
     # Parsear ecuación
     equation, symbols = parse_equation(EQUATION_STRING, VARIABLES, PARAMETERS)
