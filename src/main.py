@@ -26,7 +26,7 @@ if base_dir not in sys.path:
 from config import (
     OUTPUT_DIR, VERBOSE, SAVE_INTERMEDIATE, EXPERIMENT_NAME,
     EQUATION_STRING, VARIABLES, PARAMETERS,
-    PARAMETER_RANGES, SAMPLING_METHOD, NUM_SAMPLES, RANDOM_SEED,
+    PARAMETER_RANGES,
     SOLVER_METHOD, FILTER_COMPLEX, COMPLEX_TOLERANCE, SORT_ROOTS,
     EPSILON, K, NITERATIONS, MIN_POINTS,
 )
@@ -71,7 +71,7 @@ def save_results(output_dir, equation_info, branches, all_results, param_names):
         'variables': VARIABLES,
         'parameters': PARAMETERS,
         'parameter_ranges': {k: list(v) for k, v in PARAMETER_RANGES.items()},
-        'sampling_method': SAMPLING_METHOD,
+        'sampling_method': 'grid',
         'solver_method': SOLVER_METHOD,
         'timestamp': datetime.now().isoformat()
     }
@@ -160,12 +160,7 @@ def main():
     # ============================================================
     print_section("PASO 2: Generación de grid de parámetros")
     
-    grid, param_names = generate_grid(
-        PARAMETER_RANGES, 
-        method=SAMPLING_METHOD,
-        num_samples=NUM_SAMPLES,
-        random_seed=RANDOM_SEED
-    )
+    grid, param_names = generate_grid(PARAMETER_RANGES)
     
     print(f"Grid generado: {grid.shape[0]} tuplas de parámetros")
     print(f"Dimensiones: {grid.shape[1]} parámetros")

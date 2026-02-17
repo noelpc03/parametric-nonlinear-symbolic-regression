@@ -23,17 +23,17 @@ VERBOSE = True
 SAVE_INTERMEDIATE = True
 
 # Nombre del experimento (para organizar outputs)
-EXPERIMENT_NAME = "quadratic_test"
+EXPERIMENT_NAME = "linear_test"
 
 # ============================================================
 # 2. DEFINICIÓN DE LA ECUACIÓN
 # ============================================================
 
 # Ecuación a resolver: f(x; params) = 0
-# Ejemplo: ax² + bx + c = 0
-EQUATION_STRING = "a*x**2 + b*x + c"
+# Ejemplo: x + a - 2 = 0  →  x = 2 - a
+EQUATION_STRING = "x + a - 2"
 VARIABLES = ["x"]
-PARAMETERS = ["a", "b", "c"]
+PARAMETERS = ["a"]
 
 # Para ecuaciones con múltiples variables, por ejemplo:
 # EQUATION_STRING = "(x - a**2) * (y - a*b)"
@@ -47,22 +47,13 @@ PARAMETERS = ["a", "b", "c"]
 # Rangos para cada parámetro
 # Formato: {nombre_parametro: (min, max, num_puntos)}
 PARAMETER_RANGES = {
-    "a": (1, 3, 12),    # a positivo, evitar 0
-    "b": (-3, 3, 12),   # b en rango moderado
-    "c": (-2, 2, 12),   # c en rango moderado
+    "a": (-5, 5, 50),
 }
 
-# Método de muestreo
-# 'grid': Grid completo (producto cartesiano) - puede ser muy grande
-# 'random': Muestreo aleatorio uniforme
-# 'lhs': Latin Hypercube Sampling (mejor cobertura que random)
-SAMPLING_METHOD = 'grid'
-
-# Número de muestras (solo para 'random' y 'lhs')
-NUM_SAMPLES = 10000
-
-# Semilla para reproducibilidad
-RANDOM_SEED = 42
+# Método: producto cartesiano (grid regular)
+# Para cada parámetro se divide [min, max] en (num_points - 1) partes iguales,
+# tomando los extremos y los puntos de corte. Luego se generan todas las
+# combinaciones posibles.
 
 # ============================================================
 # 4. RESOLUCIÓN (ZERO-FINDING)

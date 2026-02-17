@@ -83,20 +83,16 @@ El sistema se organiza como un pipeline de 6 etapas secuenciales, más un módul
 ```
 src/
 ├── main.py                          # Orquestador del pipeline
-├── config.py                        # Configuración global
+├── config.py                        # Configuración unificada (todas las etapas)
 ├── 1_equation_definition/           # Paso 1
-│   ├── config.py
 │   └── equation_parser.py
 ├── 2_parameter_grid/                # Paso 2
-│   ├── config.py
 │   └── grid_generator.py
 ├── 3_zero_finding/                  # Paso 3
-│   ├── config.py
 │   └── solver.py
 ├── 4_data_preparation/              # Paso 4
 │   └── root_grouping.py
 ├── 5_symbolic_regression/           # Paso 5
-│   ├── config.py
 │   ├── symbolic_regression.py
 │   ├── regression_adapter.py
 │   ├── loss_functions.py
@@ -107,19 +103,17 @@ src/
     └── verify.py
 ```
 
-### 2.2 Carga de Configuración
+### 2.2 Configuración Unificada
 
-Dado que las carpetas numeradas (`1_equation_definition`, etc.) no son nombres válidos de paquete Python, la importación de módulos `config.py` desde distintas carpetas se realiza mediante **`importlib.util`** con nombres de módulo únicos para evitar colisiones de caché:
+Toda la configuración del pipeline se centraliza en un único archivo `config.py` en la raíz de `src/`, organizado en 5 secciones:
 
-```python
-def _load_config(config_path, module_name):
-    spec = importlib.util.spec_from_file_location(module_name, config_path)
-    mod = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(mod)
-    return mod
-```
+1. **Opciones globales:** directorio de salida, nombre del experimento
+2. **Definición de la ecuación:** string, variables, parámetros
+3. **Grid de parámetros:** rangos y número de puntos por parámetro
+4. **Resolución:** método del solver, filtrado de raíces complejas
+5. **Regresión simbólica:** parámetros de PySR, tolerancias, estrategia iterativa
 
-Esto permite cargar `1_equation_definition/config.py` como módulo `'eq_config'`, `2_parameter_grid/config.py` como `'grid_config'`, etc., sin conflictos.
+Los módulos de cada subcarpeta importan directamente desde este `config.py` añadiendo `src/` al `sys.path`.
 
 ---
 
@@ -127,7 +121,7 @@ Esto permite cargar `1_equation_definition/config.py` como módulo `'eq_config'`
 
 ### 3.1 Descripción
 
-El usuario especifica la ecuación a resolver en `1_equation_definition/config.py`:
+El usuario especifica la ecuación a resolver en `config.py`:
 
 ```python
 EQUATION_STRING = "a*x**2 + b*x + c"   # F(x; a,b,c) = ax² + bx + c
@@ -161,25 +155,17 @@ El sistema soporta cualquier ecuación expresable en SymPy:
 
 Generar un conjunto $\mathcal{G} = \{(\alpha_1^{(k)}, \ldots, \alpha_n^{(k)})\}_{k=1}^{N}$ de tuplas de parámetros que cubran densamente el dominio de interés.
 
-### 4.2 Métodos de Muestreo
+### 4.2 Método de Generación
 
-Se implementan tres estrategias:
+Se utiliza un **grid regular (producto cartesiano)**:
 
-**Grid Regular (Producto Cartesiano):**
-
-Para cada parámetro $\alpha_i$ se define un rango $[\alpha_i^{\min}, \alpha_i^{\max}]$ discretizado en $m_i$ puntos equiespaciados. El grid completo es:
+Para cada parámetro $\alpha_i$ se define un rango $[\alpha_i^{\min}, \alpha_i^{\max}]$ que se divide en $m_i - 1$ partes iguales, generando $m_i$ puntos equiespaciados (incluidos ambos extremos). El grid completo es el producto cartesiano:
 
 $$\mathcal{G} = \{(\alpha_1^{(j_1)}, \ldots, \alpha_n^{(j_n)}) : j_i = 1, \ldots, m_i\}$$
 
 con $N = \prod_{i=1}^{n} m_i$ puntos totales.
 
-**Muestreo Aleatorio Uniforme:**
-
-$N$ puntos generados uniformemente en el hipercubo $\prod_{i=1}^{n} [\alpha_i^{\min}, \alpha_i^{\max}]$.
-
-**Latin Hypercube Sampling (LHS):**
-
-Garantiza mejor cobertura que el aleatorio puro dividiendo cada dimensión en $N$ estratos equiprobables.
+Este método garantiza cobertura uniforme, es determinista y reproducible.
 
 ### 4.3 Configuración para el Caso de Estudio
 
@@ -187,11 +173,10 @@ Para la ecuación cuadrática $ax^2 + bx + c = 0$:
 
 ```python
 PARAMETER_RANGES = {
-    "a": (1, 3, 12),     # a ∈ [1, 3], 12 puntos (se evita a=0)
+    "a": (1, 3, 12),     # a ∈ [1, 3], 12 puntos
     "b": (-3, 3, 12),    # b ∈ [-3, 3], 12 puntos
     "c": (-2, 2, 12),    # c ∈ [-2, 2], 12 puntos
 }
-SAMPLING_METHOD = 'grid'  # Grid regular
 ```
 
 Esto produce $N = 12 \times 12 \times 12 = 1728$ tuplas de parámetros.
@@ -654,7 +639,7 @@ La verificación con variante de signo negado demostró que `safe_sqrt(4ac - b²
 | 9 | Multi-intento por iteración | Single-shot | PySR es estocástico: una ejecución logra 100%, otra solo 15%. Con 3 intentos se toma el mejor |
 | 10 | Iterativo + Multi-intento | Multi-intento envolvente | El proceso iterativo descubre funciones Piecewise; el multi-intento da robustez. Combinados: máxima flexibilidad |
 | 11 | Evaluación de todo el Hall of Fame | Solo `model.predict()` (la "mejor") | PySR selecciona por loss MSE, pero una ecuación con loss ligeramente mayor puede matchear exactamente más puntos |
-| 12 | Grid regular $12^3$ | LHS o Random | Determinista, reproducible, cobertura uniforme garantizada |
+| 12 | Grid regular (producto cartesiano) | LHS o Random | Determinista, reproducible, cobertura uniforme garantizada. Se descartaron las alternativas por innecesarias |
 | 13 | `nsimplify` con tolerancia $10^{-4}$ | Usar constantes float directamente | Las constantes de PySR son aproximadas; racionalizar permite cancelaciones algebraicas exactas en la verificación |
 | 14 | Variables auxiliares + Gröbner | Simplificación directa con SymPy | SymPy no siempre simplifica expresiones con $\sqrt{|h|}$; Gröbner decide algorítmicamente la pertenencia al ideal |
 
