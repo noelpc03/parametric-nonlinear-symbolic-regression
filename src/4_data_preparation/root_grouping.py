@@ -76,26 +76,29 @@ def group_by_root_branch(results: List[Dict[str, Any]],
 
 
 if __name__ == "__main__":
-    import sys
-    sys.path.append('..')
-    
-    from equation_definition.equation_parser import parse_equation
-    from equation_definition.config import EQUATION_STRING, VARIABLES, PARAMETERS
-    from parameter_grid.grid_generator import generate_grid
-    from parameter_grid.config import PARAMETER_RANGES, SAMPLING_METHOD, NUM_SAMPLES, RANDOM_SEED
-    from zero_finding.solver import solve_for_all_parameter_tuples
-    from zero_finding.config import SOLVER_METHOD, FILTER_COMPLEX, COMPLEX_TOLERANCE, SORT_ROOTS
-    
+    import os, sys
+    _src = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
+    sys.path.insert(0, _src)
+    sys.path.insert(0, os.path.join(_src, '1_equation_definition'))
+    sys.path.insert(0, os.path.join(_src, '2_parameter_grid'))
+    sys.path.insert(0, os.path.join(_src, '3_zero_finding'))
+
+    from config import (EQUATION_STRING, VARIABLES, PARAMETERS, PARAMETER_RANGES,
+                        SOLVER_METHOD, FILTER_COMPLEX, COMPLEX_TOLERANCE, SORT_ROOTS)
+    from equation_parser import parse_equation
+    from grid_generator import generate_grid
+    from solver import solve_for_all_parameter_tuples
+
     # Pipeline completo hasta este punto
     equation, symbols = parse_equation(EQUATION_STRING, VARIABLES, PARAMETERS)
-    grid, param_names = generate_grid(PARAMETER_RANGES, SAMPLING_METHOD, NUM_SAMPLES, RANDOM_SEED)
-    
+    grid, param_names = generate_grid(PARAMETER_RANGES)
+
     # Usar subset para prueba
     grid_test = grid[:100]
-    
+
     var_symbols = [symbols[v] for v in VARIABLES]
     param_symbols = {p: symbols[p] for p in PARAMETERS}
-    
+
     results = solve_for_all_parameter_tuples(
         equation, var_symbols, param_names, param_symbols, grid_test,
         SOLVER_METHOD, FILTER_COMPLEX, COMPLEX_TOLERANCE, SORT_ROOTS

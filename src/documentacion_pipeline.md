@@ -99,8 +99,13 @@ src/
 │   └── utils.py
 ├── 6_expression_builder/            # Paso 6
 │   └── piecewise_builder.py
-└── grobner_verification/            # Comprobación
-    └── verify.py
+├── grobner_verification/            # Comprobación
+│   └── verify.py
+└── benchmark/                       # Sistema de benchmarking
+    ├── test_cases.py                # Catálogo de 43 casos de prueba
+    ├── runner.py                    # Ejecutor de casos individuales
+    ├── metrics.py                   # Comparación y métricas
+    └── run_benchmark.py             # Orquestador con CLI
 ```
 
 ### 2.2 Configuración Unificada
@@ -114,6 +119,8 @@ Toda la configuración del pipeline se centraliza en un único archivo `config.p
 5. **Regresión simbólica:** parámetros de PySR, tolerancias, estrategia iterativa
 
 Los módulos de cada subcarpeta importan directamente desde este `config.py` añadiendo `src/` al `sys.path`.
+
+> **Nota:** En `config.py`, `UNARY_OPERATORS` se define como `["sqrt", "neg"]` por legibilidad. Sin embargo, `symbolic_regression.py` transforma `sqrt` en la definición inline `safe_sqrt(x) = sqrt(abs(x))` al construir el modelo PySR (ver §7.3.1).
 
 ---
 
@@ -282,17 +289,19 @@ PySR implementa un algoritmo de **programación genética multi-población** don
 
 ### 7.3 Configuración de PySR
 
+A continuación se muestra la configuración exacta del modelo tal como aparece en el código (`symbolic_regression.py`):
+
 ```python
 model = PySRRegressor(
     niterations=500,              # Iteraciones evolutivas
-    populations=30,               # Poblaciones paralelas
+    populations=30,               # Poblaciones paralelas (islas)
     population_size=50,           # Individuos por población
-    ncycles_per_iteration=550,    # Ciclos genéticos por iteración
-    maxsize=25,                   # Máximo de nodos por expresión
+    ncycles_per_iteration=550,    # Ciclos genéticos por iteración interna
+    maxsize=25,                   # Máximo de nodos por árbol de expresión
     parsimony=0.0,                # Sin penalización por complejidad
-    turbo=True,                   # Optimizaciones agresivas
-    procs=0,                      # Un solo proceso Julia
-    model_selection="accuracy",   # Seleccionar por precisión, no parsimonia
+    turbo=True,                   # Optimizaciones SIMD en Julia
+    procs=0,                      # Un solo proceso Julia (ahorra RAM)
+    model_selection="accuracy",   # Seleccionar por precisión pura
     batching=True,                # Evaluación por mini-batches
     batch_size=200,               # 200 puntos por batch
     unary_operators=["safe_sqrt(x) = sqrt(abs(x))", "neg"],
@@ -303,10 +312,12 @@ model = PySRRegressor(
         "+": 1, "-": 1, "*": 1, "/": 2,
         "safe_sqrt": 2, "neg": 1
     },
+    temp_equation_file=True,      # Archivos temporales para ecuaciones
+    delete_tempfiles=True,        # Limpiar archivos temporales al terminar
 )
 ```
 
-A continuación se justifica cada decisión:
+A continuación se justifica cada decisión de diseño:
 
 #### 7.3.1 `safe_sqrt`: La Decisión Crítica
 
@@ -340,35 +351,116 @@ Inicialmente se incluyó el operador `square(x) = x²`. Sin embargo, PySR tratab
 
 #### 7.3.3 `parsimony = 0.0` y `model_selection = "accuracy"`
 
-La fórmula cuadrática tiene **complejidad 18** (18 nodos en el árbol de expresión). Si se penaliza la complejidad (`parsimony > 0`), PySR prefiere expresiones simples pero inexactas. Al eliminar la penalización, se permite que la evolución explore expresiones complejas hasta alcanzar la fórmula exacta.
+La fórmula cuadrática tiene **complejidad ~18** (18 nodos en el árbol de expresión). Si se penaliza la complejidad (`parsimony > 0`), PySR prefiere expresiones simples pero inexactas. Al eliminar la penalización, se permite que la evolución explore expresiones complejas hasta alcanzar la fórmula exacta.
 
-`model_selection = "accuracy"` instruye a PySR a devolver la ecuación con menor loss del Hall of Fame, independientemente de su complejidad.
+`model_selection = "accuracy"` instruye a PySR a devolver la ecuación con menor loss del Hall of Fame, independientemente de su complejidad. La alternativa `"best"` usa un balance entre complejidad y loss (similar al criterio de información de Akaike), que descartaría la fórmula exacta en favor de aproximaciones más simples.
 
-#### 7.3.4 `batching=True` y `batch_size=200`
+#### 7.3.4 `niterations=500` y `ncycles_per_iteration=550`: Esfuerzo Computacional
+
+Estos dos parámetros multiplicados determinan el **esfuerzo total de búsqueda**:
+
+$$\text{Ciclos totales} = 500 \times 550 = 275{,}000$$
+
+En cada ciclo, PySR aplica operaciones genéticas (mutación, cruzamiento, simplificación algebraica) a cada individuo de cada población. Para contexto, los valores por defecto de PySR son `niterations=40` y `ncycles_per_iteration=55`, lo que da $40 \times 55 = 2{,}200$ ciclos. Nuestra configuración usa **~125 veces más esfuerzo computacional** que el default.
+
+Este esfuerzo es necesario porque:
+- La fórmula cuadrática requiere descubrir una composición de 15-18 nodos — una expresión rara en un espacio combinatoriamente vasto.
+- Con `batching=True`, la RAM no crece con más iteraciones (solo el tiempo), por lo que es rentable explorar más.
+- Expresiones complejas como $\frac{-b + \sqrt{b^2 - 4ac}}{2a}$ necesitan muchas generaciones para ensamblarse pieza a pieza.
+
+#### 7.3.5 `populations=30` y `population_size=50`: Diversidad Evolutiva
+
+PySR implementa un modelo de **islas** (multi-población):
+
+- **30 poblaciones (islas):** Cada isla evoluciona de forma independiente, explorando una zona diferente del espacio de expresiones. Periódicamente, las mejores expresiones migran entre islas.
+- **50 individuos por isla:** Suficiente variedad genética dentro de cada isla para evitar convergencia prematura.
+
+En total, $30 \times 50 = 1{,}500$ expresiones candidatas evolucionan simultáneamente. Esto maximiza la diversidad de la búsqueda: mientras una isla puede explorar expresiones lineales, otra puede estar construyendo composiciones con `safe_sqrt`, y una tercera puede estar optimizando fracciones con `/`.
+
+#### 7.3.6 `maxsize=25`: Tamaño Máximo del Árbol
+
+Cada expresión en PySR es un **árbol de sintaxis abstracta** (AST) donde cada operador y cada variable/constante es un nodo. El parámetro `maxsize` limita el número máximo de nodos.
+
+Referencia de complejidades:
+
+| Expresión | Nodos |
+|---|---|
+| `a` | 1 |
+| `a + b` | 3 |
+| `sqrt(a)` | 2 |
+| `a * b + c` | 5 |
+| `(-b + sqrt(b*b - 4*a*c)) / (2*a)` | ~15-18 |
+
+Con `maxsize=25` hay margen para que PySR represente la fórmula cuadrática incluso en formas no simplificadas (por ejemplo, `((b + safe_sqrt((b * b) + (a * (c * -4.0)))) / a) * -0.5` tiene ~20 nodos). Si se usara `maxsize=10`, sería imposible representar la fórmula cuadrática y PySR nunca la encontraría.
+
+#### 7.3.7 `batching=True` y `batch_size=200`
 
 **Problema de RAM:** Con 1056 puntos de datos, 30 poblaciones y 50 individuos cada una, PySR evaluaba $30 \times 50 \times 1056 = 1{,}584{,}000$ predicciones por ciclo evolutivo, consumiendo RAM excesiva.
 
-**Solución:** `batching=True` hace que cada ciclo evalúe un **mini-batch aleatorio** de 200 puntos en lugar de los 1056 completos. Esto reduce el consumo de memoria por un factor de $\sim$5 sin degradar significativamente la calidad de la búsqueda, ya que los batches cambian aleatoriamente en cada ciclo.
+**Solución:** `batching=True` hace que cada ciclo evalúe un **mini-batch aleatorio** de 200 puntos en lugar de los 1056 completos. Esto reduce el consumo de memoria por un factor de $\sim$5.
 
-#### 7.3.5 `procs=0`: Un Solo Proceso Julia
+**Efecto secundario positivo — regularización estocástica:** Al igual que el mini-batch en deep learning, evaluar diferentes subconjuntos aleatorios en cada ciclo evita que PySR se sobreajuste a un subconjunto particular de puntos. La expresión debe ser correcta en *todo* el dominio, no solo en un grupo de puntos favorables. Esto **mejora la generalización** de las expresiones descubiertas.
+
+#### 7.3.8 `procs=0`: Un Solo Proceso Julia
 
 PySR puede lanzar múltiples procesos Julia para evolución paralela. Sin embargo, cada proceso duplica el runtime de Julia en memoria. Con `procs=0`, toda la evolución ocurre en un único proceso, ahorrando centenares de MB de RAM a costa de velocidad.
 
-#### 7.3.6 Función de Pérdida: MSE vs. Sigmoide
+#### 7.3.9 `turbo=True`: Optimizaciones en Julia
+
+`turbo=True` activa optimizaciones agresivas en el backend de Julia, incluyendo operaciones SIMD (Single Instruction, Multiple Data) y evaluación vectorizada. Esto **acelera la evaluación de expresiones ~2-3 veces** sin afectar la calidad de los resultados. Dado el alto esfuerzo computacional configurado (275,000 ciclos), esta aceleración es importante para mantener los tiempos de ejecución en el rango de minutos y no de horas por rama.
+
+#### 7.3.10 `complexity_of_operators`: Costos de Complejidad
+
+El diccionario de costos asigna a cada operador un peso que contribuye al conteo de nodos del árbol:
+
+```python
+complexity_of_operators = {
+    "+": 1, "-": 1, "*": 1,     # Operaciones básicas: 1 nodo
+    "/": 2,                       # División: 2 nodos (más costosa)
+    "safe_sqrt": 2,               # Raíz cuadrada: 2 nodos
+    "neg": 1                      # Negación: 1 nodo
+}
+```
+
+Asignar costo 2 a `/` y `safe_sqrt` refleja que son operaciones más "caras" conceptualmente. Esto influye en cuándo PySR alcanza `maxsize`: una expresión con muchas divisiones y raíces consumirá su presupuesto de nodos más rápido, guiando la evolución a usarlas solo cuando realmente reducen el error.
+
+#### 7.3.11 `temp_equation_file=True` y `delete_tempfiles=True`
+
+PySR comunica las ecuaciones del Hall of Fame entre Julia y Python mediante archivos temporales. `temp_equation_file=True` crea estos archivos en un directorio temporal del sistema en lugar del directorio de trabajo, evitando ensuciar el proyecto. `delete_tempfiles=True` los borra al finalizar.
+
+#### 7.3.12 Función de Pérdida: MSE vs. Sigmoide
 
 Se implementaron dos funciones de pérdida:
 
-**Sigmoide (descartada):**
+**Sigmoide (descartada, `USE_SIGMOID_LOSS=False`):**
 
 $$\ell_{\sigma}(y, \hat{y}) = \frac{1}{1 + e^{-k(|y - \hat{y}| - \varepsilon)}}$$
 
-Diseñada para producir un corte abrupto en $\varepsilon$: si $|y - \hat{y}| < \varepsilon$, la pérdida $\approx 0$; si $|y - \hat{y}| > \varepsilon$, la pérdida $\approx 1$. Esto fragmentaba las expresiones porque PySR encontraba fórmulas que matcheaban *regiones* del espacio de parámetros en lugar de la fórmula global.
+Diseñada para producir un corte abrupto en $\varepsilon$: si $|y - \hat{y}| < \varepsilon$, la pérdida $\approx 0$; si $|y - \hat{y}| > \varepsilon$, la pérdida $\approx 1$.
+
+**¿Por qué se descartó la sigmoide?** El problema fundamental es que la sigmoide **no distingue entre estar lejos y estar muy lejos** de un punto. Si una expresión candidata falla un punto por 0.5 o por 500, la pérdida es la misma ($\approx 1$). Esto elimina el gradiente informativo para los puntos no matcheados y crea un incentivo perverso: a PySR le resulta igualmente "rentable" matchear perfectamente una **región** del espacio de parámetros (por ejemplo, solo donde $a > 0$ y $b < 1$) que buscar la fórmula global. En la práctica, PySR encontraba constantes o expresiones simples que cubrían subconjuntos locales, fragmentando la búsqueda en lugar de descubrir $\frac{-b + \sqrt{b^2 - 4ac}}{2a}$.
+
+En términos de optimización: la superficie de pérdida sigmoide tiene grandes **mesetas planas** (gradiente $\approx 0$) lejos de $\varepsilon$, lo que impide que la evolución genética y BFGS "vean" la dirección hacia la expresión correcta. El MSE, en cambio, tiene un gradiente proporcional al error, lo que siempre indica la dirección de mejora.
 
 **MSE (adoptada):**
 
 $$\mathcal{L}_{\text{MSE}} = \frac{1}{N} \sum_{k=1}^{N} (y^{(k)} - \hat{y}^{(k)})^2$$
 
-La pérdida estándar guía a PySR hacia la expresión globalmente más precisa. Se complementa con matcheo post-entrenamiento para evaluar la calidad.
+La pérdida estándar guía a PySR hacia la expresión globalmente más precisa. Se complementa con matcheo post-entrenamiento usando tolerancia relativa para evaluar la calidad.
+
+#### ¿Por qué MSE no produce expresiones "promedio" que no pasen por ningún punto?
+
+Un riesgo teórico del MSE es que minimice el error global mediante una expresión "media" que no pase exactamente por ningún dato — un problema habitual en regresión clásica con datos ruidosos. En nuestro sistema este riesgo no se materializa, por cuatro razones que se complementan:
+
+1. **Los datos no tienen ruido.** Los pares $(\boldsymbol{\alpha}^{(k)}, x^{(k)})$ provienen de resolver $F(x; \boldsymbol{\alpha}) = 0$ numéricamente. Son relaciones matemáticas exactas, no mediciones experimentales. Esto implica que **existe** una expresión con $\mathcal{L}_{\text{MSE}} \approx 0$ (del orden de $10^{-15}$ por precisión de punto flotante). Cualquier expresión "promedio" que no pase por los puntos tendría $\mathcal{L}_{\text{MSE}} \gg 0$, por lo que la presión evolutiva la descarta en favor de la expresión exacta.
+
+2. **BFGS ajusta las constantes hacia la solución exacta.** PySR no solo evoluciona la estructura del árbol de expresión — para cada candidata, aplica el optimizador **BFGS** (método cuasi-Newton) para ajustar las constantes numéricas minimizando el MSE. Por ejemplo, si la evolución genética descubre la estructura `(b + sqrt(b*b + a*c*C₁)) / (a * C₂)`, BFGS ajusta $C_1$ y $C_2$ y, dado que los datos son exactos, converge a $C_1 \approx -4.0$ y $C_2 \approx -2.0$. Una estructura incorrecta nunca puede alcanzar $\mathcal{L}_{\text{MSE}} \approx 0$ por mucho que BFGS optimice sus constantes.
+
+3. **La selección final usa $\varepsilon$-matching, no MSE.** Tras entrenar PySR, no se selecciona la ecuación con menor MSE sino la que **matchea más puntos** con la tolerancia relativa $|y - \hat{y}| < \varepsilon(1 + |y|)$ (ver §7.4). Esto actúa como red de seguridad: incluso si el Hall of Fame contiene una expresión "media" con MSE moderado, nunca será seleccionada porque matchea pocos puntos comparada con la expresión exacta.
+
+4. **El proceso iterativo maneja la dispersión.** Si los datos de una rama son dispersos (una raíz con comportamiento diferente en distintas regiones), el proceso iterativo (§7.6) lo resuelve: en la iteración 1, PySR encuentra una expresión que cubre una porción de los puntos; en las siguientes iteraciones, descubre las expresiones restantes. El umbral `MIN_MATCH_FRACTION = 0.05` garantiza que cada expresión aceptada cubre al menos el 5% de los puntos restantes, rechazando expresiones que no pasan por casi ningún dato.
+
+En resumen, MSE actúa como **motor de búsqueda** durante la evolución: guía a PySR hacia el vecindario de la expresión correcta. La **decisión final** la toma el $\varepsilon$-matching punto a punto, que verifica que la expresión pasa efectivamente por los datos.
 
 ### 7.4 Evaluación del Hall of Fame
 
@@ -631,9 +723,9 @@ La verificación con variante de signo negado demostró que `safe_sqrt(4ac - b²
 | 1 | `safe_sqrt(x) = sqrt(abs(x))` | `sqrt` con `bumper=True` | `bumper` mata las expresiones intermedias con $\sqrt{(\text{negativo})}$ antes de que puedan componerse. `safe_sqrt` siempre produce valores finitos |
 | 2 | Remover operador `square` | Incluir `square(x) = x²` | PySR trata `square` como atómico y no descubre que $b^2 = b \cdot b$ dentro de $\sqrt{b^2 - 4ac}$ |
 | 3 | MSE loss | Sigmoide loss | Sigmoide fragmenta el espacio de parámetros en regiones, encontrando fórmulas locales en vez de la global |
-| 4 | `parsimony = 0.0` | `parsimony > 0` | La fórmula cuadrática tiene 18 nodos. La penalización de complejidad impide que PySR la explore |
+| 4 | `parsimony = 0.0` | `parsimony > 0` | La fórmula cuadrática tiene ~18 nodos. La penalización de complejidad impide que PySR la explore |
 | 5 | `model_selection = "accuracy"` | `"best"` (balance complejidad/loss) | Queremos la expresión más precisa del Hall of Fame, no la más simple |
-| 6 | `batching=True, batch_size=200` | Evaluar todos los 1056 puntos | Controla RAM: evalúa mini-batches aleatorios en cada ciclo, reduciendo memoria por factor ~5 |
+| 6 | `batching=True, batch_size=200` | Evaluar todos los puntos | Controla RAM (factor ~5), y además actúa como regularización estocástica (mini-batch) que mejora generalización |
 | 7 | `procs=0` | Multiprocessing | Cada proceso Julia duplica el consumo de RAM. Un solo proceso ahorra centenares de MB |
 | 8 | Tolerancia relativa $\varepsilon(1+\|y\|)$ | Tolerancia absoluta $\varepsilon$ | Adaptación al orden de magnitud: un error de 0.01 es despreciable para $y=100$ pero significativo para $y=0.001$ |
 | 9 | Multi-intento por iteración | Single-shot | PySR es estocástico: una ejecución logra 100%, otra solo 15%. Con 3 intentos se toma el mejor |
@@ -642,6 +734,12 @@ La verificación con variante de signo negado demostró que `safe_sqrt(4ac - b²
 | 12 | Grid regular (producto cartesiano) | LHS o Random | Determinista, reproducible, cobertura uniforme garantizada. Se descartaron las alternativas por innecesarias |
 | 13 | `nsimplify` con tolerancia $10^{-4}$ | Usar constantes float directamente | Las constantes de PySR son aproximadas; racionalizar permite cancelaciones algebraicas exactas en la verificación |
 | 14 | Variables auxiliares + Gröbner | Simplificación directa con SymPy | SymPy no siempre simplifica expresiones con $\sqrt{|h|}$; Gröbner decide algorítmicamente la pertenencia al ideal |
+| 15 | `niterations=500` × `ncycles=550` | Defaults de PySR (40 × 55) | ~275,000 ciclos totales (~125x más que default). Necesario para descubrir expresiones complejas de 15-18 nodos |
+| 16 | `populations=30`, `population_size=50` | Menos poblaciones | 30 islas × 50 individuos = 1,500 candidatas simultáneas. Maximiza diversidad con modelo de islas y migración |
+| 17 | `maxsize=25` | Default (20) | La fórmula cuadrática tiene ~15-18 nodos; formas no simplificadas de PySR pueden alcanzar ~20. 25 da margen suficiente |
+| 18 | `turbo=True` | `turbo=False` | Activa SIMD y evaluación vectorizada en Julia, ~2-3x más rápido. Esencial para hacer viables 275,000 ciclos |
+| 19 | `complexity_of_operators`: `/`=2, `safe_sqrt`=2 | Costo uniforme (todo=1) | Refleja que `sqrt` y `/` son más costosas; guía a PySR a usarlas solo cuando reducen el error significativamente |
+| 20 | `nested_constraints`: prohibir sqrt-en-sqrt | Sin restricción | Evita expresiones inútiles como $\sqrt{|\sqrt{|x|}|}$ que consumen nodos sin aportar precisión |
 
 ### 11.2 Evolución del Diseño
 

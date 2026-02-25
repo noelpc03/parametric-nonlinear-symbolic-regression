@@ -20,3 +20,4 @@ docs/.obsidian
 
 # results 
 src/outputs_analytical
+src/benchmark_results
