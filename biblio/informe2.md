@@ -282,20 +282,19 @@ In assembling a bibliography for a thesis focused on search for zeros and Gröbn
 The evolution of root-finding from simple iterative approximations to the sophisticated manipulation of polynomial ideals via signature-based Gröbner algorithms represents a significant arc in mathematical history. For the contemporary researcher, the integration of these symbolic techniques with numerical stability and hardware acceleration is the current frontier. The bibliographical landscape described herein provides the comprehensive foundation required to contribute to this expanding field.
 --------------------------------------------------------------------------------
 
-    References — Fundamentals of Numerical Computation - Toby Driscoll, https://tobydriscoll.net/fnc-julia/refs.html
-    Numerical Methods for Special Functions | SIAM Publications Library, https://epubs.siam.org/doi/10.1137/1.9780898717822
+    
     Numerical_Methods__Faires&Bu, https://uodiyala.edu.iq/uploads/PDF%20ELIBRARY%20UODIYALA/collect%20EL3/Numerical_Methods__Faires&Burden.pdf
     Numerical - Methods, https://blasingame.engr.tamu.edu/z_zCourse_Archive/P620_15C/P620_15C_zReference/PDF_Txt_Hnbk_Num_Meth.pdf
     Gröbner basis - Wikipedia, https://en.wikipedia.org/wiki/Gr%C3%B6bner_basis
     On Gröbner Bases and Their Uses in Solving System of Polynomial Equations and Graph Coloring, https://thescipub.com/pdf/jmssp.2018.175.182.pdf
-    Buchberger's algorithm - Scholarpedia, http://www.scholarpedia.org/article/Buchberger%27s_algorithm
+    
     Gr??bner Bases: A Short Introduction for Systems Theorists - ResearchGate, https://www.researchgate.net/publication/221432610_Grbner_Bases_A_Short_Introduction_for_Systems_Theorists
-    Gröbner Bases Bibliography, https://www.risc.jku.at/Groebner-Bases-Bibliography/details.php?details_id=443
-    An Introduction to Grobner Bases - American Mathematical Society, https://www.ams.org/books/gsm/003/gsm003-endmatter.pdf
+   
+    
     Gröbner Bases: A Computational Approach To Commutative Algebra (Graduate Texts In Mathematics) - Thomas Becker, http://www.iri.csic.es/people/thomas/Collection/details/17562.html
     Gröbner Basis -- from Wolfram MathWorld, https://mathworld.wolfram.com/GroebnerBasis.html
     Solving Systems of Polynomial Equations Bernd Sturmfels, https://math.berkeley.edu/~bernd/cbms.pdf
-    Ideals, Varieties, and Algorithms, https://www.nzdr.ru/data/media/biblio/kolxoz/M/MA/MAco/Cox%20D.,%20Little%20J.,%20O'Shea%20D.%20Ideals,%20Varieties,%20and%20Algorithms(3ed.,%20Springer,%202007)(ISBN%200387356509)(565s)MAco.pdf
+    
     OPERA TIONS RESEARCH CENTER Working Paper MASSACHUSETTS INSTITUTE OF TECHNOLOGY - DSpace@MIT, http://dspace.mit.edu/bitstream/handle/1721.1/5359/OR-329-98-43940446.pdf;sequence=1
     Gröbner Bases: A Computational Approach to Commutative Algebra - Thomas Becker, Volker Weispfenning, Heinz Kredel - Google Books, https://books.google.com/books/about/Gr%C3%B6bner_Bases.html?id=qoU_AQAAIAAJ
     Solving systems of polynomial equations - University of California Santa Barbara, https://search.library.ucsb.edu/discovery/fulldisplay?vid=01UCSB_INST%3AUCSB&docid=alma990024134250203776&context=L

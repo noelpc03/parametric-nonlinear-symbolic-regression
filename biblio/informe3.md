@@ -157,19 +157,12 @@ En un mundo cada vez más dependiente de la automatización y la precisión, el 
     Analytical Vs Numerical - Mathematical Model - Scribd, https://www.scribd.com/doc/315380359/Analytical-vs-Numerical
     Analytical vs Numerical Solutions in Machine Learning - MachineLearningMastery.com, https://machinelearningmastery.com/analytical-vs-numerical-solutions-in-machine-learning/
     Comparison between numerical analysis methods and methods for ..., https://www.mathsjournal.com/pdf/2025/vol10issue12/PartA/10-12-1-445.pdf
-    Sistemas de ecuaciones lineales - Unidad de Apoyo Para el Aprendizaje, http://uapas2.bunam.unam.mx/matematicas/sistemas_ecuaciones_7
-    Untitled, http://www.ugr.es/~phbe/Docencia/Gfico/Apuntes3/resumen6.pdf
-    10.1 sistemas de ecuaciones lineales con dos incógnitas - UNL, https://www.unl.edu.ar/ingreso/cursos/matematica/wp-content/uploads/sites/7/2017/07/M%C3%B3dulo-5-Sistemas-de-ecuaciones.pdf
+   
     Sistema de ecuaciones lineales - Wikipedia, la enciclopedia libre, https://es.wikipedia.org/wiki/Sistema_de_ecuaciones_lineales
-    Mathematical methods for economic theory: 1.3 Solving systems of linear equations: matrix inversion and Cramer's rule - mjo, https://mjo.osborne.economics.utoronto.ca/index.php/tutorial/index/1/5
-    Los sistemas de ecuaciones lineales y el Teorema de Rouché-Fröbenius - Tus clases, https://www.tusclases.co/blog/sistemas-ecuaciones-lineales-teorema-rouche-frobenius
-    TEOREMA DE ROUCHÉ-FROBENIUS, http://todomates.com/actividades/wp-content/uploads/2017/09/1.-Teorema-de-Rouch%C3%A9-Frobenius.pdf
-    Tema 8: Teorema de Rouché-Frobenius - Intergranada, https://selectividad.intergranada.com/Bach/mate2ccnn/Clase/Tema_08-Teorema_Rouche.pdf
+    
+   
     Teorema de Rouché–Frobenius - Wikipedia, la enciclopedia libre, https://es.wikipedia.org/wiki/Teorema_de_Rouch%C3%A9%E2%80%93Frobenius
-    Resolver analíticamente y gráficamente un sistema de ecuaciones lineales (2x2) - YouTube, https://www.youtube.com/watch?v=jWow6OWvmjA
-    Cramer's Rule and Matrix Inverses | Abstract Linear... - Fiveable, https://fiveable.me/abstract-linear-algebra-i/unit-5/cramers-rule-matrix-inverses/study-guide/yVZ3df1N8JpciLKR
-    Cramer's rule - Wikipedia, https://en.wikipedia.org/wiki/Cramer%27s_rule
-    Lec 17: Inverse of a matrix and Cramer's rule We are aware of algorithms that allow to solve linear systems and invert a matri, https://pi.math.cornell.edu/~andreim/Lec17.pdf
+    
     What's the difference between analytical and numerical approaches to problems?, https://math.stackexchange.com/questions/935405/what-s-the-difference-between-analytical-and-numerical-approaches-to-problems
     What are the advantages of numerical method over analyatical method? - ResearchGate, https://www.researchgate.net/post/What_are_the_advantages_of_numerical_method_over_analyatical_method2
     What kind of problem solutions do you rate higher: analytical or numerical? - ResearchGate, https://www.researchgate.net/post/What-kind-of-problem-solutions-do-you-rate-higher-analytical-or-numerical

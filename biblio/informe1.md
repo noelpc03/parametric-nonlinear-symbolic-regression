@@ -219,31 +219,24 @@ La regresión simbólica no es simplemente una técnica de ajuste de curvas; es 
     (PDF) Symbolic Regression - ResearchGate, https://www.researchgate.net/publication/382152886_Symbolic_Regression
     Prior-Guided Symbolic Regression: Towards Scientific Consistency in Equation Discovery, https://arxiv.org/html/2602.13021v1
     Contemporary Symbolic Regression Methods and their Relative Performance - PMC, https://pmc.ncbi.nlm.nih.gov/articles/PMC11074949/
-    PySR: Symbolic Regression for Scientific Discovery - Emergent Mind, https://www.emergentmind.com/topics/pysr-method
-    Symbolic Regression is NP-hard - CWI, https://ir.cwi.nl/pub/35126/35126.pdf
     GSR: A Generalized Symbolic Regression Approach - Mitsubishi Electric Research Laboratories, https://www.merl.com/publications/docs/TR2023-002.pdf
-    JOHN R. KOZA - Genetic Programming, http://www.genetic-programming.com/jkpdf/scjournallong.pdf
-    Symbolic regression via genetic programming - Semantic Scholar, https://www.semanticscholar.org/paper/Symbolic-regression-via-genetic-programming-Augusto-Barbosa/339b9a017e308cf6cca027f6f1b1da5a0d2dc9a0
     Have your spaghetti and eat it too: Evolutionary algorithmics and post-evolutionary analysis, https://www.researchgate.net/publication/220285940_Have_your_spaghetti_and_eat_it_too_Evolutionary_algorithmics_and_post-evolutionary_analysis
     Finetuning Large Language Model as an Effective Symbolic Regressor - arXiv, https://arxiv.org/html/2508.09897v2
+    
     Epsilon-Lexicase Selection for Regression | Request PDF - ResearchGate, https://www.researchgate.net/publication/305685736_Epsilon-Lexicase_Selection_for_Regression
-    Genetic Programming by John R. Koza: 9780262527910 | PenguinRandomHouse.com: Books, https://www.penguinrandomhouse.com/books/662031/genetic-programming-by-john-r-koza/
-    Genetic Programming: On the Programming of Computers by Means of Natural Selection, https://books.google.com/books/about/Genetic_Programming.html?hl=de&id=Bhtxo60BV0EC
-    Genetic Programming III - 1st Edition | Elsevier Shop, https://shop.elsevier.com/books/genetic-programming-iii/koza/978-0-08-050726-2
-    Contemporary Symbolic Regression Methods and their ... - Cava Lab, http://cavalab.org/assets/papers/La%20Cava%20et%20al.%20-%202021%20-%20Contemporary%20Symbolic%20Regression%20Methods%20and%20their.pdf
-    Computación Evolutiva - Amexcomp, https://amexcomp.mx/media/publicaciones/comp-evolutiva.pdf
-    Symbolic Regression Problem: Introduction to GP - DEAP documentation - Read the Docs, https://deap.readthedocs.io/en/stable/examples/gp_symbreg.html
-    A Practical Comparison Between MSE Loss and Cauchy Loss in Linear Regression with Noisy Data | by A. Rafli Pamungkas | Medium, https://medium.com/@ajirafli30/a-practical-comparison-between-mse-loss-and-cauchy-loss-in-linear-regression-with-noisy-data-60943047f76a
+    
+    
+    
     Controlling overfitting in symbolic regression based on a bias/variance error decomposition - SciSpace, https://scispace.com/pdf/controlling-overfitting-in-symbolic-regression-based-on-a-hry49hibkj.pdf
-    What is the problem with epsilon=0 in regression problems with Support Vector Regression?, https://www.researchgate.net/post/What_is_the_problem_with_epsilon0_in_regression_problems_with_Support_Vector_Regression2
+    
     Multi-View Symbolic Regression - arXiv.org, https://arxiv.org/pdf/2402.04298
-    FINETUNING LARGE LANGUAGE MODEL AS AN EF- FECTIVE SYMBOLIC REGRESSOR - OpenReview, https://openreview.net/pdf/fd9582ca3f87537f5b3067f1ad00438dc4e17c10.pdf
+    
     The Inefficiency of Genetic Programming for Symbolic Regression – Extended Version - arXiv.org, https://arxiv.org/html/2404.17292v1
     [PDF] Population Diversity Leads to Short Running Times of Lexicase Selection, https://www.semanticscholar.org/paper/Population-Diversity-Leads-to-Short-Running-Times-Helmuth-Lengler/036ab1a71e248f8659d2942301a1a4024e6e0ae3
-    Population Diversity Leads to Short Running Times of Lexicase Selection - ResearchGate, https://www.researchgate.net/publication/362697527_Population_Diversity_Leads_to_Short_Running_Times_of_Lexicase_Selection
+    
     A Performance Analysis of Lexicase-Based and Traditional Selection Methods in GP for Symbolic Regression - arXiv.org, https://arxiv.org/html/2407.21632v2
     Down-Sampled Epsilon-Lexicase Selection for Real-World Symbolic Regression Problems - arXiv, https://arxiv.org/pdf/2302.04301
-    Support Vector Regression (SVR) - FARSHAD K - Medium, https://farshadabdulazeez.medium.com/support-vector-regression-svr-8cb1966ff5a0
+    
     For regression, what loss functions do people actually use besides MSE and MAE? - Reddit, https://www.reddit.com/r/MLQuestions/comments/1q18u5d/for_regression_what_loss_functions_do_people/
     MilesCranmer/PySR: High-Performance Symbolic ... - GitHub, https://github.com/MilesCranmer/PySR
     Interpretable Machine Learning for Science with PySR and ... - arXiv, https://arxiv.org/pdf/2305.01582
