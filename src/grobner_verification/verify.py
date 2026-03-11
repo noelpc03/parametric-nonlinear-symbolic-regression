@@ -61,24 +61,29 @@ def load_results(results_dir):
 
 def parse_expression(expr_str, params):
     """
-    Parsea una expresión del pipeline (puede contener safe_sqrt)
+    Parsea una expresión del pipeline (puede contener safe_pow, safe_sqrt)
     y devuelve la expresión SymPy + lista de sustituciones auxiliares.
 
-    safe_sqrt(arg) → sqrt(abs(arg))
+    safe_pow(x, y) → abs(x)^y
+    safe_sqrt(arg) → sqrt(abs(arg))  (retrocompatibilidad)
     Para la verificación con Gröbner, necesitamos eliminar abs() y sqrt()
     introduciendo variables auxiliares.
 
     Retorna:
-        sympy_expr: expresión con sqrt (sin safe_sqrt)
+        sympy_expr: expresión SymPy
     """
-    # Reemplazar safe_sqrt por sqrt para parsing
+    # Retrocompatibilidad: safe_sqrt → sqrt
     clean_expr = expr_str.replace("safe_sqrt", "sqrt")
 
     # Crear símbolos para los parámetros
     param_symbols = {p: symbols(p) for p in params}
 
+    # safe_pow(x, y) = sign(x) * abs(x)^y
+    _safe_pow = lambda x, y: sp.sign(x) * sp.Pow(sp.Abs(x), y)
+    _neg = lambda x: -x
+
     # Parsear con SymPy
-    local_dict = {**param_symbols, 'sqrt': sqrt}
+    local_dict = {**param_symbols, 'sqrt': sqrt, 'safe_pow': _safe_pow, 'neg': _neg}
     expr = sympify(clean_expr, locals=local_dict)
 
     return expr
@@ -376,15 +381,18 @@ def verify_numerically(equation_str, expr_str, params, variable="x",
     # Sustituir x por la candidata
     f_of_g = eq.subs(x, candidate)
 
-    # Crear función numérica usando numpy con safe_sqrt
+    # Crear función numérica usando numpy con safe_sqrt/safe_pow
     param_list = list(param_syms.values())
 
     def safe_sqrt_np(x):
         return np.sqrt(np.abs(x))
 
+    def safe_pow_np(x, y):
+        return np.sign(x) * np.power(np.abs(x), y)
+
     f_numeric = sp.lambdify(
         param_list, f_of_g,
-        modules=[{'sqrt': safe_sqrt_np}, 'numpy']
+        modules=[{'sqrt': safe_sqrt_np, 'Abs': np.abs, 'safe_pow': safe_pow_np}, 'numpy']
     )
 
     # Generar puntos aleatorios

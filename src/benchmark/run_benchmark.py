@@ -11,11 +11,18 @@ Uso:
     python run_benchmark.py --case linear_01   # Un caso específico
     python run_benchmark.py --max 5            # Solo los primeros 5
     python run_benchmark.py --dry-run          # Solo listar, no ejecutar
-"""
+Ejecución por batches (para evitar llenado de RAM):
+    python run_benchmark.py --from-index 0 --to-index 10   # Casos 1-10
+    python run_benchmark.py --from-index 10 --to-index 20  # Casos 11-20
+    ...
+
+Combinar resultados de batches:
+    python run_benchmark.py --merge benchmark_results/batch_*"""
 
 import os
 import sys
 import json
+import glob
 import argparse
 import time
 from datetime import datetime
@@ -35,7 +42,8 @@ from metrics import evaluate_case, compute_global_metrics, print_metrics_report
 
 def run_benchmark(cases=None, category=None, difficulty=None, 
                   case_name=None, max_cases=None, sr_config=None,
-                  output_dir=None, dry_run=False):
+                  output_dir=None, dry_run=False,
+                  from_index=None, to_index=None):
     """
     Ejecuta el benchmark completo.
     
@@ -48,6 +56,8 @@ def run_benchmark(cases=None, category=None, difficulty=None,
         sr_config: override de config de SR
         output_dir: directorio para guardar resultados
         dry_run: solo listar, no ejecutar
+        from_index: índice inicial (inclusive, 0-based)
+        to_index: índice final (exclusive, 0-based)
     
     Returns:
         (evaluations, metrics) si no es dry_run
@@ -63,6 +73,12 @@ def run_benchmark(cases=None, category=None, difficulty=None,
     
     if max_cases is not None:
         cases = cases[:max_cases]
+    
+    # Filtrar por rango de índices (para ejecución por batches)
+    if from_index is not None or to_index is not None:
+        fi = from_index if from_index is not None else 0
+        ti = to_index if to_index is not None else len(cases)
+        cases = cases[fi:ti]
     
     print("\n" + "=" * 70)
     print("  BENCHMARK DEL PIPELINE DE DESCUBRIMIENTO DE RAÍCES")
@@ -194,6 +210,121 @@ def run_benchmark(cases=None, category=None, difficulty=None,
     return evaluations, metrics
 
 
+def merge_batch_results(batch_dirs, output_dir=None):
+    """
+    Combina resultados de múltiples ejecuciones por batch en un reporte unificado.
+    
+    Args:
+        batch_dirs: lista de directorios con resultados de batches
+        output_dir: directorio de salida para resultados combinados
+    """
+    all_evaluations = []
+    all_raw_results = []
+    total_time = 0
+    
+    for bd in sorted(batch_dirs):
+        eval_path = os.path.join(bd, "evaluations.json")
+        raw_path = os.path.join(bd, "raw_results.json")
+        
+        if not os.path.exists(eval_path):
+            print(f"  ⚠ No se encontró {eval_path}, saltando...")
+            continue
+        
+        with open(eval_path, 'r') as f:
+            evals = json.load(f)
+        all_evaluations.extend(evals)
+        
+        if os.path.exists(raw_path):
+            with open(raw_path, 'r') as f:
+                raws = json.load(f)
+            all_raw_results.extend(raws)
+        
+        # Sumar tiempos
+        metrics_path = os.path.join(bd, "metrics.json")
+        if os.path.exists(metrics_path):
+            with open(metrics_path, 'r') as f:
+                m = json.load(f)
+            total_time += m.get("total_time_seconds", 0)
+        
+        print(f"  ✓ {bd}: {len(evals)} casos cargados")
+    
+    if len(all_evaluations) == 0:
+        print("  ✗ No se encontraron resultados para combinar")
+        return
+    
+    # Recalcular métricas globales
+    metrics = compute_global_metrics(all_evaluations)
+    metrics["total_time_seconds"] = total_time
+    
+    # Imprimir reporte
+    print(f"\n{'='*70}")
+    print(f"  RESULTADOS COMBINADOS DE {len(batch_dirs)} BATCHES")
+    print(f"{'='*70}")
+    print_metrics_report(metrics, all_evaluations)
+    
+    # Guardar
+    if output_dir is None:
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        output_dir = os.path.join(_src_dir, "benchmark_results", f"merged_{timestamp}")
+    
+    os.makedirs(output_dir, exist_ok=True)
+    
+    with open(os.path.join(output_dir, "evaluations.json"), 'w') as f:
+        json.dump(all_evaluations, f, indent=2, default=str)
+    
+    with open(os.path.join(output_dir, "raw_results.json"), 'w') as f:
+        json.dump(all_raw_results, f, indent=2, default=str)
+    
+    with open(os.path.join(output_dir, "metrics.json"), 'w') as f:
+        json.dump(metrics, f, indent=2, default=str)
+    
+    # Reporte de texto
+    with open(os.path.join(output_dir, "report.txt"), 'w') as f:
+        f.write(f"BENCHMARK COMBINADO — {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+        f.write(f"{'='*70}\n\n")
+        f.write(f"Batches combinados: {len(batch_dirs)}\n")
+        f.write(f"Casos totales: {len(all_evaluations)}\n")
+        f.write(f"Tiempo total: {total_time:.1f}s\n\n")
+        f.write(f"Tasa de éxito (pipeline): {metrics['success_rate']*100:.1f}%\n")
+        f.write(f"Raíces descubiertas:      {metrics['root_discovery_rate']*100:.1f}%\n")
+        f.write(f"Casos perfectos:          {metrics['perfect_cases']}/{metrics['total_cases']} ({metrics['perfect_rate']*100:.1f}%)\n")
+        f.write(f"Cobertura promedio:       {metrics['average_coverage']*100:.1f}%\n\n")
+        
+        f.write(f"{'='*70}\n")
+        f.write(f"DETALLE POR CASO\n")
+        f.write(f"{'='*70}\n\n")
+        
+        for e in all_evaluations:
+            status = "✓ PERFECTO" if e["root_match_rate"] == 1.0 else (
+                f"~ PARCIAL ({e['roots_matched']}/{e['roots_expected']})" if e["roots_matched"] > 0 else
+                "✗ FALLIDO"
+            )
+            f.write(f"{e['name']} [{e['category']}/{e['difficulty']}]: {status} ({e['time_seconds']:.1f}s)\n")
+            for md in e.get("match_details", []):
+                icon = "✓" if md["matched"] else "✗"
+                f.write(f"  {icon} esperada: {md['expected']}\n")
+                if md["matched"]:
+                    f.write(f"    descubierta: {md['discovered']}\n")
+                else:
+                    closest = md.get("closest_discovered")
+                    if closest:
+                        frac = md.get("closest_fraction", 0)
+                        err = md.get("closest_error", float('inf'))
+                        f.write(f"    descubierta: (no matcheó)\n")
+                        f.write(f"    más cercana: {closest}  [coincidencia={frac*100:.1f}%, error={err:.4f}]\n")
+                    else:
+                        f.write(f"    descubierta: (rama no encontrada por el pipeline)\n")
+            unmatched = e.get("unmatched_discovered", [])
+            if unmatched:
+                f.write(f"  ⚠ Raíces descubiertas sin match con esperadas:\n")
+                for ur in unmatched:
+                    f.write(f"    → {ur}\n")
+            f.write("\n")
+    
+    print(f"\n  Resultados combinados guardados en: {output_dir}")
+    return all_evaluations, metrics
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Benchmark del pipeline de descubrimiento de raíces"
@@ -208,14 +339,35 @@ def main():
                         help="Ejecutar solo casos cuyo nombre contenga este texto")
     parser.add_argument("--max", "-m", type=int,
                         help="Máximo número de casos a ejecutar")
+    parser.add_argument("--from-index", type=int, default=None,
+                        help="Índice inicial de casos (0-based, inclusive)")
+    parser.add_argument("--to-index", type=int, default=None,
+                        help="Índice final de casos (0-based, exclusive)")
     parser.add_argument("--dry-run", action="store_true",
                         help="Solo listar casos, no ejecutar")
     parser.add_argument("--niterations", type=int, default=None,
                         help="Override NITERATIONS de PySR")
     parser.add_argument("--output", "-o",
                         help="Directorio de salida")
+    parser.add_argument("--merge", nargs='+', metavar='DIR',
+                        help="Combinar resultados de múltiples batches")
     
     args = parser.parse_args()
+    
+    # Modo merge: combinar resultados existentes
+    if args.merge:
+        # Expandir globs
+        dirs = []
+        for pattern in args.merge:
+            expanded = glob.glob(pattern)
+            dirs.extend(expanded)
+        dirs = [d for d in dirs if os.path.isdir(d)]
+        if not dirs:
+            print("  ✗ No se encontraron directorios válidos")
+            return
+        print(f"\n  Combinando {len(dirs)} batches...")
+        merge_batch_results(dirs, output_dir=args.output)
+        return
     
     sr_config = {}
     if args.niterations is not None:
@@ -229,6 +381,8 @@ def main():
         sr_config=sr_config if sr_config else None,
         output_dir=args.output,
         dry_run=args.dry_run,
+        from_index=args.from_index,
+        to_index=args.to_index,
     )
 
 

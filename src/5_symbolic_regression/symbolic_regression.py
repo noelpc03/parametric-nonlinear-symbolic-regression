@@ -26,6 +26,9 @@ from config import (
     PARSIMONY, POPULATION_SIZE, NCYCLES_PER_ITERATION,
     MAXSIZE, TURBO, PROCS, NUM_ATTEMPTS,
     MIN_MATCH_FRACTION, USE_SIGMOID_LOSS,
+    TOURNAMENT_SELECTION_P, TOURNAMENT_SELECTION_N,
+    PROBABILITY_NEGATE_CONSTANT, FRACTION_REPLACED,
+    CROSSOVER_PROBABILITY, WEIGHT_MUTATE_OPERATOR,
 )
 
 from loss_functions import get_julia_loss_function
@@ -51,11 +54,18 @@ def train_symbolic_model(X, y, param_names, k=K, epsilon=EPSILON, niterations=NI
         model_selection="accuracy",
         batching=True,
         batch_size=200,
-        unary_operators=["safe_sqrt(x) = sqrt(abs(x))", "neg"],
-        binary_operators=BINARY_OPERATORS,
-        extra_sympy_mappings={"safe_sqrt": lambda x: sympy.sqrt(sympy.Abs(x))},
-        nested_constraints={"safe_sqrt": {"safe_sqrt": 0}},
-        complexity_of_operators={"+": 1, "-": 1, "*": 1, "/": 2, "safe_sqrt": 2, "neg": 1},
+        unary_operators=["neg"],
+        binary_operators=BINARY_OPERATORS + ["safe_pow(x, y) = sign(x) * abs(x)^y"],
+        extra_sympy_mappings={"safe_pow": lambda x, y: sympy.sign(x) * sympy.Pow(sympy.Abs(x), y)},
+        nested_constraints={"safe_pow": {"safe_pow": 0}},
+        constraints={"safe_pow": (-1, 1)},
+        complexity_of_operators={"+": 1, "-": 1, "*": 1, "/": 2, "safe_pow": 2, "neg": 1},
+        tournament_selection_p=TOURNAMENT_SELECTION_P,
+        tournament_selection_n=TOURNAMENT_SELECTION_N,
+        probability_negate_constant=PROBABILITY_NEGATE_CONSTANT,
+        fraction_replaced=FRACTION_REPLACED,
+        crossover_probability=CROSSOVER_PROBABILITY,
+        weight_mutate_operator=WEIGHT_MUTATE_OPERATOR,
         temp_equation_file=True,
         delete_tempfiles=True,
     )

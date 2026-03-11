@@ -1,0 +1,152 @@
+\documentclass[12pt, a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish]{babel}
+\usepackage{geometry}
+\usepackage{enumitem}
+\usepackage{amsmath, amssymb}
+\usepackage{booktabs}
+\usepackage{parskip}
+\geometry{margin=2.5cm}
+
+\title{\textbf{Regresión simbólica para la expresión analítica de soluciones de ecuaciones no lineales}}
+\author{Noel Pérez Calvo}
+\date{Febrero 2026}
+
+\begin{document}
+\maketitle
+
+\section*{OBJETIVO}
+
+Desarrollar y validar una metodología basada en regresión simbólica para determinar las expresiones analíticas de soluciones de ecuaciones no lineales.
+
+\section*{QUÉ SE HA HECHO HASTA HOY}
+
+\begin{itemize}[leftmargin=1.5em]
+
+  \item Revisión del estado del arte
+  \begin{itemize}
+    \item Se revisaron 30 artículos sobre regresión simbólica, búsqueda de raíces y álgebra computacional
+    \item Se estudiaron las bibliotecas de regresión simbólica existentes (PySR, gplearn, entre otras)
+    \item Se seleccionó PySR como herramienta base por su rendimiento en benchmarks y su backend en Julia
+  \end{itemize}
+
+  \item Diseño del sistema: pipeline de 6 etapas
+  \begin{itemize}
+    \item La idea general es: dada una ecuación $F(x; \alpha_1, \ldots, \alpha_n) = 0$, resolver numéricamente para muchas combinaciones de parámetros y luego usar regresión simbólica para descubrir la fórmula $x = g(\alpha_1, \ldots, \alpha_n)$
+    \item Se empezó por ecuaciones de una variable como caso de validación
+  \end{itemize}
+
+  \item Etapa 1 --- Definición de la ecuación
+  \begin{itemize}
+    \item Parser simbólico con SymPy que acepta cualquier ecuación como texto
+    \item Detecta automáticamente cuáles símbolos son variables y cuáles son parámetros
+  \end{itemize}
+
+  \item Etapa 2 --- Generación del grid de parámetros
+  \begin{itemize}
+    \item Genera todas las combinaciones de valores de los parámetros mediante producto cartesiano
+    \item Los rangos y la cantidad de puntos por parámetro son configurables
+  \end{itemize}
+
+  \item Etapa 3 --- Resolución numérica de los ceros
+  \begin{itemize}
+    \item Para cada combinación de parámetros, resuelve la ecuación con SymPy (\texttt{solve} y \texttt{nsolve})
+    \item Filtra raíces complejas y maneja timeouts
+  \end{itemize}
+
+  \item Etapa 4 --- Agrupación de raíces por rama
+  \begin{itemize}
+    \item Ordena las raíces reales y las agrupa en ramas (primera raíz, segunda raíz, etc.)
+    \item Genera un dataset de regresión independiente por cada rama
+  \end{itemize}
+
+  \item Etapa 5 --- Regresión simbólica (módulo central)
+  \begin{itemize}
+    \item Se usa PySR, que implementa programación genética multi-población sobre Julia
+    \item Se diseñó una arquitectura de tres niveles encima de PySR:
+    \begin{itemize}
+      \item Proceso iterativo: encuentra una expresión, quita los puntos que cubre, repite con los restantes
+      \item Múltiples intentos por iteración: ejecuta PySR 3 veces y se queda con el mejor resultado para compensar la aleatoriedad
+      \item Evaluación del Hall of Fame completo: revisa todas las ecuaciones candidatas, no solo la que PySR considera ``mejor''
+    \end{itemize}
+    \item Decisiones de diseño importantes:
+    \begin{itemize}
+      \item Se creó un operador \texttt{safe\_sqrt}$(x) = \sqrt{|x|}$ para evitar NaN durante la evolución genética
+        \begin{itemize}
+          \item Sin esto, PySR no puede descubrir fórmulas con raíces cuadradas
+          \item Se probó el mecanismo \texttt{bumper} de PySR y no funcionó porque mataba las expresiones con sqrt antes de que pudieran componerse
+        \end{itemize}
+      \item Se implementó y descartó una función de pérdida sigmoide
+        \begin{itemize}
+          \item Fragmentaba la búsqueda: PySR encontraba fórmulas locales en vez de la global
+          \item Se usa MSE estándar, que funciona bien porque los datos no tienen ruido
+        \end{itemize}
+      \item Se usa batching (mini-batches de 200 puntos) para controlar el consumo de RAM
+      \item Se configuró alta exploración: $\sim$275,000 ciclos evolutivos, 30 poblaciones, sin penalización por complejidad
+    \end{itemize}
+  \end{itemize}
+
+  \item Etapa 6 --- Construcción de la expresión final
+  \begin{itemize}
+    \item Si el proceso iterativo encuentra varias funciones para una rama, las ensambla como expresión Piecewise
+  \end{itemize}
+
+  \item Sistema de benchmark: 43 casos de prueba
+  \begin{itemize}
+    \item 10 lineales, 14 cuadráticas, 6 cúbicas, 4 cuárticas, 1 quíntica, 8 especiales
+    \item Cada caso tiene la ecuación, las raíces esperadas y métricas automáticas
+  \end{itemize}
+
+  \item Resultados del benchmark
+  \begin{itemize}
+    \item 43/43 casos ejecutados sin errores (100\% éxito operativo)
+    \item 77.6\% de raíces descubiertas, 28/43 casos perfectos
+    \item Todos los lineales perfectos
+    \item Patrón de fallo: descubre $\sqrt{a}$ pero no $-\sqrt{a}$ (y similares con el signo negativo)
+    \item Causa identificada: convergencia prematura de la búsqueda evolutiva por excesiva presión selectiva en el tournament selection de PySR
+  \end{itemize}
+
+\end{itemize}
+
+\section*{RECOMENDACIONES Y TRABAJO FUTURO}
+
+\begin{itemize}[leftmargin=1.5em]
+
+  \item Resolver el problema de las raíces negativas no descubiertas
+
+  \begin{table}[h]
+  \centering
+  \small
+  \caption{Literatura relevante para la configuración evolutiva de PySR}
+  \label{tab:refs}
+  \begin{tabular}{@{}p{4cm}p{10cm}@{}}
+  \toprule
+  \textbf{Referencia} & \textbf{Aporte relevante} \\
+  \midrule
+  Goldberg \& Deb (1991) & Demostraron matemáticamente que la presión selectiva controla la velocidad de convergencia. Mayor presión implica convergencia más rápida y pérdida de diversidad más rápida. Formalizaron la teoría del tournament selection. \\
+  \addlinespace
+  Blickle \& Thiele (1996) & Formalizaron que la intensidad de selección crece con el tamaño del torneo~$n$. Con $n=15$ la selección es mucho más agresiva que con $n=8$. \\
+  \addlinespace
+  Koza (1992) & Libro fundacional de la Programación Genética. Analizó cómo la probabilidad de crossover afecta el rendimiento: valores moderados ($\sim$5--10\,\%) dan buen balance entre exploración y preservación. \\
+  \bottomrule
+  \end{tabular}
+  \end{table}
+
+  \item Iterar sobre la configuración de PySR hasta que el benchmark dé resultados satisfactorios
+
+  \item Implementar un módulo de verificación algebraica con bases de Gröbner
+  \begin{itemize}
+    \item Para comprobar formalmente que las expresiones descubiertas son soluciones de la ecuación
+    \item Solo aplicable a ecuaciones polinómicas
+  \end{itemize}
+
+  \item Extender el sistema a sistemas de ecuaciones no lineales con múltiples incógnitas
+
+  \item Agregar casos de prueba con ecuaciones trascendentes (trigonométricas, exponenciales)
+
+  \item Pensar cómo verificar ecuaciones no polinómicas (donde Gröbner no aplica)
+
+\end{itemize}
+
+\end{document}

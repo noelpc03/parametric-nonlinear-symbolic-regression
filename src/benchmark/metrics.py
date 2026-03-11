@@ -13,10 +13,15 @@ from collections import Counter, defaultdict
 
 
 def _parse_expr(expr_str, param_names):
-    """Parsea una expresión string a SymPy, manejando safe_sqrt."""
+    """Parsea una expresión string a SymPy, manejando safe_pow, safe_sqrt y neg."""
+    # Retrocompatibilidad: safe_sqrt(x) → safe_pow(x, 0.5)
     clean = expr_str.replace("safe_sqrt", "sqrt")
     param_syms = {p: symbols(p) for p in param_names}
-    local_dict = {**param_syms, 'sqrt': sp.sqrt}
+    # neg(x) es el operador de negación de PySR → -x en SymPy
+    _neg = lambda x: -x
+    # safe_pow(x, y) = sign(x) * abs(x)^y
+    _safe_pow = lambda x, y: sp.sign(x) * sp.Pow(sp.Abs(x), y)
+    local_dict = {**param_syms, 'sqrt': sp.sqrt, 'neg': _neg, 'safe_pow': _safe_pow}
     try:
         expr = sympify(clean, locals=local_dict)
         return expr
@@ -70,10 +75,13 @@ def _expressions_equivalent(discovered_str, expected_str, param_names,
     def safe_sqrt_np(x):
         return np.sqrt(np.abs(x))
     
+    def safe_pow_np(x, y):
+        return np.sign(x) * np.power(np.abs(x), y)
+    
     try:
         f_discovered = sp.lambdify(
             param_syms, discovered,
-            modules=[{'sqrt': safe_sqrt_np, 'Abs': np.abs}, 'numpy']
+            modules=[{'sqrt': safe_sqrt_np, 'Abs': np.abs, 'safe_pow': safe_pow_np}, 'numpy']
         )
         f_expected = sp.lambdify(
             param_syms, expected,

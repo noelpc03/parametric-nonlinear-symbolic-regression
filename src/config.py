@@ -93,8 +93,11 @@ K = 100  # No se usa con MSE loss, solo para matcheo
 # ── Parámetros del modelo PySR ──
 NITERATIONS = 500  # Más iteraciones: con batching la RAM no crece
 POPULATIONS = 30  # Más poblaciones con batching (solo evalúa 200 pts/batch, no todos)
-UNARY_OPERATORS = ["sqrt", "neg"]
+UNARY_OPERATORS = ["neg"]
 BINARY_OPERATORS = ["+", "-", "*", "/"]
+# safe_pow(x, y) = sign(x) * abs(x)^y se agrega como operador inline en symbolic_regression.py
+# Preserva el signo (crucial para raíces impares: (-8)^(1/3) = -2)
+# y protege contra NaN (abs() evita bases negativas en potencias fraccionarias).
 USE_SIGMOID_LOSS = False  # False = usar MSE estándar
 
 # ── Parámetros del algoritmo iterativo ──
@@ -121,3 +124,16 @@ NCYCLES_PER_ITERATION = 550  # Ciclos evolutivos por iteración
 MAXSIZE = 25  # La cuadrática tiene ~15 nodos, 25 da margen
 TURBO = True  # Optimizaciones agresivas
 PROCS = 0  # Sin multiproceso: usa UN solo proceso Julia (ahorra mucha RAM)
+
+# ── Parámetros de diversidad evolutiva ──
+# Reducir presión selectiva para evitar convergencia prematura.
+# Defaults de PySR: tournament_selection_p=0.982, tournament_selection_n=15
+# Con p=0.982 el mejor individuo se elige 98.2% de las veces → la población
+# converge a clones en pocas generaciones (Goldberg & Deb, 1991).
+# Con p=0.75, n=8: P(2°)=18.8%, P(3°)=4.7% → diversidad real.
+TOURNAMENT_SELECTION_P = 0.75   # Prob. de elegir al mejor en torneo (default: 0.982)
+TOURNAMENT_SELECTION_N = 8      # Tamaño del torneo (default: 15)
+PROBABILITY_NEGATE_CONSTANT = 0.05  # Prob. de negar constante en mutación (default: 0.00743)
+FRACTION_REPLACED = 0.05       # Migración entre islas: 50*0.05=2.5 ind/gen (default: 0.00036≈0)
+CROSSOVER_PROBABILITY = 0.066  # Prob. de cruce vs mutación (default: 0.0259)
+WEIGHT_MUTATE_OPERATOR = 0.5   # Peso relativo de mutar operador (default: 0.293)
