@@ -35,3 +35,10 @@ entrega_semanal2.fdb_latexmk
 entrega_semanal2.fls 
 entrega_semanal2.log
 entrega_semanal2.synctex.gz
+
+# entrega semanal 3
+entrega_semanal3.aux
+entrega_semanal3.fdb_latexmk
+entrega_semanal3.fls
+entrega_semanal3.log
+entrega_semanal3.synctex.gz
