@@ -125,15 +125,15 @@ MAXSIZE = 25  # La cuadrática tiene ~15 nodos, 25 da margen
 TURBO = True  # Optimizaciones agresivas
 PROCS = 0  # Sin multiproceso: usa UN solo proceso Julia (ahorra mucha RAM)
 
-# ── Parámetros de diversidad evolutiva ──
-# Reducir presión selectiva para evitar convergencia prematura.
-# Defaults de PySR: tournament_selection_p=0.982, tournament_selection_n=15
-# Con p=0.982 el mejor individuo se elige 98.2% de las veces → la población
-# converge a clones en pocas generaciones (Goldberg & Deb, 1991).
-# Con p=0.75, n=8: P(2°)=18.8%, P(3°)=4.7% → diversidad real.
-TOURNAMENT_SELECTION_P = 0.75   # Prob. de elegir al mejor en torneo (default: 0.982)
-TOURNAMENT_SELECTION_N = 8      # Tamaño del torneo (default: 15)
-PROBABILITY_NEGATE_CONSTANT = 0.05  # Prob. de negar constante en mutación (default: 0.00743)
-FRACTION_REPLACED = 0.05       # Migración entre islas: 50*0.05=2.5 ind/gen (default: 0.00036≈0)
-CROSSOVER_PROBABILITY = 0.066  # Prob. de cruce vs mutación (default: 0.0259)
-WEIGHT_MUTATE_OPERATOR = 0.5   # Peso relativo de mutar operador (default: 0.293)
+# # ── Parámetros de diversidad evolutiva ──
+# # Reducir presión selectiva para evitar convergencia prematura.
+# # Defaults de PySR: tournament_selection_p=0.982, tournament_selection_n=15
+# # Con p=0.982 el mejor individuo se elige 98.2% de las veces → la población
+# # converge a clones en pocas generaciones (Goldberg & Deb, 1991).
+# # Con p=0.75, n=8: P(2°)=18.8%, P(3°)=4.7% → diversidad real.
+# TOURNAMENT_SELECTION_P = 0.75   # Prob. de elegir al mejor en torneo (default: 0.982)
+# TOURNAMENT_SELECTION_N = 8      # Tamaño del torneo (default: 15)
+# PROBABILITY_NEGATE_CONSTANT = 0.05  # Prob. de negar constante en mutación (default: 0.00743)
+# FRACTION_REPLACED = 0.05       # Migración entre islas: 50*0.05=2.5 ind/gen (default: 0.00036≈0)
+# CROSSOVER_PROBABILITY = 0.066  # Prob. de cruce vs mutación (default: 0.0259)
+# WEIGHT_MUTATE_OPERATOR = 0.5   # Peso relativo de mutar operador (default: 0.293)
