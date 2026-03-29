@@ -42,6 +42,42 @@ def train_symbolic_model(X, y, param_names, k=K, epsilon=EPSILON, niterations=NI
     """
     Entrena un modelo de regresión simbólica.
     """
+    # Operadores de raíces n-ésimas para Julia
+    # Usamos oftype() y one()/typeof() para preservar el tipo de entrada (Float32/Float64)
+    # - Raíces pares: resultado positivo
+    # - Raíces impares: preservan signo
+    root_operators = [
+        "safe_sqrt(x) = sqrt(abs(x))",                                    # raíz 2
+        "safe_cbrt(x) = cbrt(x)",                                         # raíz 3 (nativo, preserva signo)
+        "safe_root4(x) = sqrt(sqrt(abs(x)))",                             # raíz 4 = sqrt(sqrt(x))
+        "safe_root5(x) = copysign(abs(x)^(one(x)/typeof(x)(5)), x)",      # raíz 5, preserva tipo y signo
+        "safe_root6(x) = cbrt(sqrt(abs(x)))",                             # raíz 6 = cbrt(sqrt(x))
+        "safe_root7(x) = copysign(abs(x)^(one(x)/typeof(x)(7)), x)",      # raíz 7, preserva tipo y signo
+        "safe_root8(x) = sqrt(sqrt(sqrt(abs(x))))",                       # raíz 8 = sqrt^3(x)
+        "safe_root9(x) = cbrt(cbrt(x))",                                  # raíz 9 = cbrt(cbrt(x))
+        "safe_root10(x) = sqrt(sqrt(abs(x))) * sqrt(abs(x))^(one(x)/typeof(x)(5))",  # raíz 10
+    ]
+
+    # Mappings de sympy para las raíces
+    root_sympy_mappings = {
+        "safe_sqrt": lambda x: sympy.sqrt(sympy.Abs(x)),
+        "safe_cbrt": lambda x: sympy.sign(x) * sympy.Pow(sympy.Abs(x), sympy.Rational(1, 3)),
+        "safe_root4": lambda x: sympy.Pow(sympy.Abs(x), sympy.Rational(1, 4)),
+        "safe_root5": lambda x: sympy.sign(x) * sympy.Pow(sympy.Abs(x), sympy.Rational(1, 5)),
+        "safe_root6": lambda x: sympy.Pow(sympy.Abs(x), sympy.Rational(1, 6)),
+        "safe_root7": lambda x: sympy.sign(x) * sympy.Pow(sympy.Abs(x), sympy.Rational(1, 7)),
+        "safe_root8": lambda x: sympy.Pow(sympy.Abs(x), sympy.Rational(1, 8)),
+        "safe_root9": lambda x: sympy.sign(x) * sympy.Pow(sympy.Abs(x), sympy.Rational(1, 9)),
+        "safe_root10": lambda x: sympy.Pow(sympy.Abs(x), sympy.Rational(1, 10)),
+        "safe_pow": lambda x, y: sympy.sign(x) * sympy.Pow(sympy.Abs(x), y),
+    }
+
+    # Constraints para evitar anidamiento de raíces entre sí
+    root_names = ["safe_sqrt", "safe_cbrt", "safe_root4", "safe_root5", "safe_root6",
+                  "safe_root7", "safe_root8", "safe_root9", "safe_root10"]
+    root_nested_constraints = {name: {n: 0 for n in root_names} for name in root_names}
+    root_nested_constraints["safe_pow"] = {"safe_pow": 0}
+
     model_kwargs = dict(
         niterations=niterations,
         populations=POPULATIONS,
@@ -51,15 +87,19 @@ def train_symbolic_model(X, y, param_names, k=K, epsilon=EPSILON, niterations=NI
         parsimony=PARSIMONY,
         turbo=TURBO,
         procs=PROCS,
-        model_selection="accuracy",
-        batching=True,
-        batch_size=200,
-        unary_operators=["neg"],
-        binary_operators=BINARY_OPERATORS + ["safe_pow(x, y) = sign(x) * abs(x)^y"],
-        extra_sympy_mappings={"safe_pow": lambda x, y: sympy.sign(x) * sympy.Pow(sympy.Abs(x), y)},
-        nested_constraints={"safe_pow": {"safe_pow": 0}},
-        constraints={"safe_pow": (-1, 1)},
-        complexity_of_operators={"+": 1, "-": 1, "*": 1, "/": 2, "safe_pow": 2, "neg": 1},
+        model_selection="best",
+        unary_operators=["neg"] + root_operators,
+        binary_operators=BINARY_OPERATORS + ["safe_pow(x, y) = copysign(abs(x)^y, x)"],
+        extra_sympy_mappings=root_sympy_mappings,
+        nested_constraints=root_nested_constraints,
+        constraints={"safe_pow": (9, 1)},  # safe_pow: base compleja, exponente simple
+        complexity_of_operators={
+            "+": 1, "-": 1, "*": 1, "/": 2, "neg": 1,
+            "safe_sqrt": 2, "safe_cbrt": 2,
+            "safe_root4": 2, "safe_root5": 2, "safe_root6": 2,
+            "safe_root7": 2, "safe_root8": 2, "safe_root9": 2, "safe_root10": 2,
+            "safe_pow": 4,  # Penalizar safe_pow para preferir raíces específicas
+        },
         # tournament_selection_p=TOURNAMENT_SELECTION_P,
         # tournament_selection_n=TOURNAMENT_SELECTION_N,
         # probability_negate_constant=PROBABILITY_NEGATE_CONSTANT,

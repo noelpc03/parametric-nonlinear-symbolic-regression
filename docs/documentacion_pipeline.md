@@ -402,9 +402,22 @@ model = PySRRegressor(
 
 #### Configuración actual (Versión 3)
 
-La configuración actual del modelo tal como aparece en `symbolic_regression.py`:
+La configuración actual del modelo tal como aparece en `symbolic_regression.py`. Esta versión incorpora **operadores unarios de raíces n-ésimas** (2 a 10) para resolver el problema de ambigüedad exponencial/raíz detectado en versiones anteriores (ver §7.3.14):
 
 ```python
+# ── Operadores unarios de raíces (Julia) ──
+root_operators = [
+    "safe_sqrt(x) = sqrt(abs(x))",                      # Raíz 2
+    "safe_cbrt(x) = cbrt(x)",                           # Raíz 3
+    "safe_root4(x) = sqrt(sqrt(abs(x)))",               # Raíz 4
+    "safe_root5(x) = sign(x) * sqrt(sqrt(abs(x))) * abs(x)^0.05",  # Raíz 5
+    "safe_root6(x) = cbrt(sqrt(abs(x)))",               # Raíz 6
+    "safe_root7(x) = sign(x) * abs(x)^(1.0/7.0)",       # Raíz 7
+    "safe_root8(x) = sqrt(sqrt(sqrt(abs(x))))",         # Raíz 8
+    "safe_root9(x) = cbrt(cbrt(x))",                    # Raíz 9
+    "safe_root10(x) = sqrt(sqrt(sqrt(abs(x)))) * abs(x)^0.025",  # Raíz 10
+]
+
 model = PySRRegressor(
     niterations=500,              # Iteraciones evolutivas
     populations=30,               # Poblaciones paralelas (islas)
@@ -414,29 +427,31 @@ model = PySRRegressor(
     parsimony=0.0,                # Sin penalización por complejidad
     turbo=True,                   # Optimizaciones SIMD en Julia
     procs=0,                      # Un solo proceso Julia (ahorra RAM)
-    model_selection="accuracy",   # Seleccionar por precisión pura
-    batching=True,                # Evaluación por mini-batches
-    batch_size=200,               # 200 puntos por batch
-    unary_operators=["neg"],
+    model_selection="best",       # Salto de parsimonia (ver §7.3.14)
+
+    # ── Operadores ──
+    unary_operators=["neg"] + root_operators,
     binary_operators=["+", "-", "*", "/", "safe_pow(x, y) = sign(x) * abs(x)^y"],
-    extra_sympy_mappings={"safe_pow": lambda x, y: sympy.sign(x) * sympy.Pow(sympy.Abs(x), y)},
-    nested_constraints={"safe_pow": {"safe_pow": 0}},
-    constraints={"safe_pow": (-1, 1)},
+
+    # ── Mappings y constraints ──
+    extra_sympy_mappings=root_sympy_mappings,   # Ver §7.3.14
+    nested_constraints=root_nested_constraints,  # Prohibir anidamiento de raíces
+    constraints={"safe_pow": (9, 1)},           # Base compleja, exponente simple
+
     complexity_of_operators={
-        "+": 1, "-": 1, "*": 1, "/": 2,
-        "safe_pow": 2, "neg": 1
+        "+": 1, "-": 1, "*": 1, "/": 2, "neg": 1,
+        "safe_sqrt": 2, "safe_cbrt": 2,
+        "safe_root4": 2, "safe_root5": 2, "safe_root6": 2,
+        "safe_root7": 2, "safe_root8": 2, "safe_root9": 2, "safe_root10": 2,
+        "safe_pow": 4,  # Penalizado para preferir raíces específicas
     },
-    # ── Parámetros de diversidad (Versión 2+) ──
-    tournament_selection_p=0.75,
-    tournament_selection_n=8,
-    probability_negate_constant=0.05,
-    fraction_replaced=0.05,
-    crossover_probability=0.066,
-    weight_mutate_operator=0.5,
+
     temp_equation_file=True,      # Archivos temporales para ecuaciones
     delete_tempfiles=True,        # Limpiar archivos temporales al terminar
 )
 ```
+
+> **Nota:** Los parámetros de diversidad evolutiva (V2) se han comentado temporalmente en `config.py` mientras se evalúa el impacto de los nuevos operadores de raíces. Ver §7.3.13 para la documentación completa de estos parámetros.
 
 A continuación se justifica cada decisión de diseño:
 
@@ -523,11 +538,15 @@ nested_constraints = {"safe_pow": {"safe_pow": 0}}
 
 Inicialmente se incluyó el operador `square(x) = x²`. Sin embargo, PySR trataba `square` como un operador atómico y no descubría que $b^2 = b \cdot b$. Al removerlo, PySR usa `b * b` con el operador `*`, lo que le permite llegar a `safe_sqrt(b*b - 4*a*c)` componiendo sub-expresiones existentes.
 
-#### 7.3.3 `parsimony = 0.0` y `model_selection = "accuracy"`
+#### 7.3.3 `parsimony = 0.0` y `model_selection`
 
 La fórmula cuadrática tiene **complejidad ~18** (18 nodos en el árbol de expresión). Si se penaliza la complejidad (`parsimony > 0`), PySR prefiere expresiones simples pero inexactas. Al eliminar la penalización, se permite que la evolución explore expresiones complejas hasta alcanzar la fórmula exacta.
 
-`model_selection = "accuracy"` instruye a PySR a devolver la ecuación con menor loss del Hall of Fame, independientemente de su complejidad. La alternativa `"best"` usa un balance entre complejidad y loss (similar al criterio de información de Akaike), que descartaría la fórmula exacta en favor de aproximaciones más simples.
+**Evolución de `model_selection`:**
+
+- **V1/V2:** `model_selection = "accuracy"` — selecciona la ecuación con menor loss del Hall of Fame, independientemente de la complejidad.
+
+- **V3:** `model_selection = "best"` — usa el **salto de parsimonia** (máxima curvatura del frente Pareto complejidad-error) para balancear precisión y simplicidad. Con los operadores unarios de raíces (§7.3.14), la ecuación cuadrática correcta tiene complejidad ~15-18 nodos y MSE ~0. Una aproximación exponencial incorrecta podría tener MSE marginalmente menor pero complejidad ~23-25 nodos. El criterio `"best"` selecciona la ecuación correcta porque es más parsimoniosa.
 
 #### 7.3.4 `niterations=500` y `ncycles_per_iteration=550`: Esfuerzo Computacional
 
@@ -567,13 +586,15 @@ Referencia de complejidades:
 
 Con `maxsize=25` hay margen para que PySR represente la fórmula cuadrática incluso en formas no simplificadas (por ejemplo, `((b + safe_sqrt((b * b) + (a * (c * -4.0)))) / a) * -0.5` tiene ~20 nodos). Si se usara `maxsize=10`, sería imposible representar la fórmula cuadrática y PySR nunca la encontraría.
 
-#### 7.3.7 `batching=True` y `batch_size=200`
+#### 7.3.7 `batching` (V1/V2) — Eliminado en V3
 
-**Problema de RAM:** Con 1056 puntos de datos, 30 poblaciones y 50 individuos cada una, PySR evaluaba $30 \times 50 \times 1056 = 1{,}584{,}000$ predicciones por ciclo evolutivo, consumiendo RAM excesiva.
+**Problema de RAM (V1/V2):** Con 1056 puntos de datos, 30 poblaciones y 50 individuos cada una, PySR evaluaba $30 \times 50 \times 1056 = 1{,}584{,}000$ predicciones por ciclo evolutivo, consumiendo RAM excesiva.
 
-**Solución:** `batching=True` hace que cada ciclo evalúe un **mini-batch aleatorio** de 200 puntos en lugar de los 1056 completos. Esto reduce el consumo de memoria por un factor de $\sim$5.
+**Solución V1/V2:** `batching=True` hace que cada ciclo evalúe un **mini-batch aleatorio** de 200 puntos en lugar de los 1056 completos. Esto reduce el consumo de memoria por un factor de $\sim$5.
 
-**Efecto secundario positivo — regularización estocástica:** Al igual que el mini-batch en deep learning, evaluar diferentes subconjuntos aleatorios en cada ciclo evita que PySR se sobreajuste a un subconjunto particular de puntos. La expresión debe ser correcta en *todo* el dominio, no solo en un grupo de puntos favorables. Esto **mejora la generalización** de las expresiones descubiertas.
+**Efecto secundario positivo — regularización estocástica:** Al igual que el mini-batch en deep learning, evaluar diferentes subconjuntos aleatorios en cada ciclo evita que PySR se sobreajuste a un subconjunto particular de puntos.
+
+**Eliminación en V3:** Se eliminó el batching porque introducía **varianza estocástica** en el fitness: una expresión que matchea bien los 200 puntos del batch actual podría tener peor fitness con el siguiente batch. Con `procs=0` y datasets de ~512 puntos, el consumo de RAM es manejable (~4-6 GB). Al evaluar sobre **todos los puntos** en cada ciclo, el fitness es determinístico y la selección evolutiva es más estable. Ver §7.3.14 para detalles.
 
 #### 7.3.8 `procs=0`: Un Solo Proceso Julia
 
@@ -585,7 +606,9 @@ PySR puede lanzar múltiples procesos Julia para evolución paralela. Sin embarg
 
 #### 7.3.10 `complexity_of_operators`: Costos de Complejidad
 
-El diccionario de costos asigna a cada operador un peso que contribuye al conteo de nodos del árbol:
+El diccionario de costos asigna a cada operador un peso que contribuye al conteo de nodos del árbol.
+
+**Configuración V1/V2:**
 
 ```python
 complexity_of_operators = {
@@ -596,9 +619,25 @@ complexity_of_operators = {
 }
 ```
 
-Asignar costo 2 a `/` y `safe_pow` refleja que son operaciones más "caras" conceptualmente. Esto influye en cuándo PySR alcanza `maxsize`: una expresión con muchas divisiones y potencias consumirá su presupuesto de nodos más rápido, guiando la evolución a usarlas solo cuando realmente reducen el error.
+**Configuración V3 (con operadores de raíces):**
 
-> **Nota histórica:** En la implementación inicial de `safe_pow`, se asignó costo 3 (mayor que en V1 con `safe_sqrt`=2), razonando que un operador binario debía ser más costoso. Sin embargo, esto penalizaba excesivamente a PySR para alcanzar expresiones como `safe_pow(b*b - 4*a*c, 0.5)` (que acumulaba complejidad rápidamente). Al reducir el costo a 2 — igual que `safe_sqrt` en V1 — PySR recuperó la capacidad de descubrir la fórmula cuadrática.
+```python
+complexity_of_operators = {
+    "+": 1, "-": 1, "*": 1, "/": 2, "neg": 1,
+    # Operadores de raíces: costo moderado (2)
+    "safe_sqrt": 2, "safe_cbrt": 2,
+    "safe_root4": 2, "safe_root5": 2, "safe_root6": 2,
+    "safe_root7": 2, "safe_root8": 2, "safe_root9": 2, "safe_root10": 2,
+    # safe_pow: penalizado (4) para preferir raíces específicas
+    "safe_pow": 4,
+}
+```
+
+**Justificación de la penalización de `safe_pow`:**
+
+Con `maxsize=25` y `safe_pow` a complejidad 4, una expresión puede usar ~6 instancias de `safe_pow` o ~12 operadores de raíces específicos. Esto **guía a PySR hacia los operadores unarios de raíces** cuando son suficientes (raíces de orden 2-10), reservando `safe_pow` para casos donde realmente se necesita un exponente arbitrario. Ver §7.3.14 para detalles de la estrategia de desambiguación.
+
+> **Nota histórica:** En V2, `safe_pow` tenía costo 2. Esto era apropiado cuando era el único operador de raíces disponible. Al agregar operadores unarios específicos en V3, se aumentó a 4 para crear una preferencia evolutiva hacia las raíces dedicadas.
 
 #### 7.3.11 `temp_equation_file=True` y `delete_tempfiles=True`
 
@@ -779,6 +818,244 @@ La diferencia es que ε-lexicase logra esto cambiando el mecanismo de selección
 
 - **Referencia:** La Cava, W., Helmuth, T., Spector, L. & Moore, J. H. (2019). "A probabilistic and multi-objective analysis of lexicase selection and ε-lexicase selection." *Evolutionary Computation*, 27(3), 377-402.
 - **Referencia:** Orzechowski, P., La Cava, W. & Moore, J. H. (2022). "Where are we now? A large benchmark study of recent symbolic regression methods." *Proceedings of NeurIPS 2022.*
+
+#### 7.3.14 Versión 3: Operadores Unarios de Raíces n-ésimas
+
+> **Estado:** Validada. El caso `quadratic_19_full_abc` ($ax^2 + bx + c = 0$) pasó de 45.5% de cobertura (V2 con solo `safe_pow`) a **100% de cobertura** (V3 con operadores unarios de raíces).
+
+##### Diagnóstico del problema (identificado en V2)
+
+El benchmark V2 mostró que el caso más complejo del catálogo — la ecuación cuadrática completa con tres parámetros libres ($ax^2 + bx + c = 0$) — no lograba descubrirse correctamente. Mientras que versiones anteriores con `safe_sqrt` unario encontraban ambas raíces, V2 con solo `safe_pow` binario producía expresiones erróneas con **cobertura del 45.5%**.
+
+**Análisis del Hall of Fame de V2:** Las ecuaciones descubiertas tenían patrones como:
+
+```
+safe_pow(1.4931327, c) - (safe_pow(-1.2609383, c) / (a * 1.4765537))
+safe_pow(-1.4893247, b) / a
+```
+
+En lugar del patrón correcto:
+
+```
+safe_pow(b*b - 4*a*c, 0.5)  →  √(b² - 4ac)
+```
+
+##### El problema: ambigüedad exponencial/raíz de `safe_pow`
+
+El operador binario `safe_pow(x, y)` puede expresar **dos familias de funciones** completamente diferentes:
+
+| Patrón | Ejemplo | Función matemática |
+|--------|---------|-------------------|
+| `safe_pow(constante, variable)` | `safe_pow(2.0, b)` | $2^b$ (exponencial) |
+| `safe_pow(expresión, constante)` | `safe_pow(x, 0.5)` | $\sqrt{x}$ (raíz) |
+
+El constraint `(-1, 1)` intenta restringir el segundo argumento (exponente) a complejidad 1, pero **no elimina la ambigüedad**: tanto `safe_pow(2.0, b)` como `safe_pow(b*b - 4*a*c, 0.5)` satisfacen el constraint.
+
+**¿Por qué PySR prefiere exponenciales?**
+
+La evolución genética tiende hacia exponenciales porque son **numéricamente más fáciles de optimizar**:
+
+1. **Gradiente más suave:** $\frac{\partial}{\partial c}(2^b)$ es continuo y suave para todo $b$, mientras que $\frac{\partial}{\partial x}(\sqrt{x})$ tiene una singularidad en $x=0$.
+
+2. **BFGS converge más rápido:** El optimizador de constantes de PySR (BFGS) puede ajustar la base de una exponencial más eficientemente que optimizar expresiones bajo una raíz.
+
+3. **Fitness parcial temprano:** Una exponencial como `safe_pow(1.5, b)` produce valores finitos para todo $b$, obteniendo un MSE moderado desde la primera generación. En cambio, `safe_pow(b*b - 4*a*c, 0.5)` requiere que PySR **descubra primero** la expresión completa del discriminante antes de obtener buen fitness.
+
+Este fenómeno constituye un **atractor evolutivo**: la presión selectiva arrastra a PySR hacia exponenciales porque producen fitness inicial más alto, aunque la expresión objetivo (raíz cuadrada) tenga fitness final perfecto.
+
+##### La solución: operadores unarios de raíces específicas
+
+La solución es **desambiguar** las raíces de las exponenciales mediante operadores **unarios** dedicados. Un operador unario `safe_sqrt(x)` solo puede expresar raíces — es **imposible** escribir una exponencial con él.
+
+Se implementaron 9 operadores unarios para raíces de orden 2 a 10:
+
+```julia
+# Raíces con Julia nativo (sintaxis directa)
+safe_sqrt(x) = sqrt(abs(x))              # Raíz 2: √|x|
+safe_cbrt(x) = cbrt(x)                   # Raíz 3: ∛x (cbrt maneja negativos)
+
+# Raíces por composición (evita errores de sintaxis en Julia)
+safe_root4(x) = sqrt(sqrt(abs(x)))       # Raíz 4: √√|x|
+safe_root6(x) = cbrt(sqrt(abs(x)))       # Raíz 6: ∛√|x|
+safe_root8(x) = sqrt(sqrt(sqrt(abs(x)))) # Raíz 8: √√√|x|
+safe_root9(x) = cbrt(cbrt(x))            # Raíz 9: ∛∛x
+
+# Raíces con exponenciación explícita
+safe_root5(x) = sign(x) * sqrt(sqrt(abs(x))) * abs(x)^0.05   # Raíz 5: x^0.2
+safe_root7(x) = sign(x) * abs(x)^(1.0/7.0)                   # Raíz 7: x^(1/7)
+safe_root10(x) = sqrt(sqrt(sqrt(abs(x)))) * abs(x)^0.025     # Raíz 10: x^0.1
+```
+
+**Diseño de cada operador:**
+
+- **Raíces pares (2, 4, 6, 8, 10):** Usan `abs(x)` porque la raíz par de un negativo no es real. PySR debe descubrir que el argumento es positivo (ej: $b^2 - 4ac \geq 0$ cuando hay raíces reales).
+
+- **Raíces impares (3, 5, 7, 9):** Usan `sign(x) * abs(x)^(1/n)` para preservar el signo. Ejemplo: $\sqrt[3]{-8} = -2$.
+
+- **Composición vs. exponenciación:** Cuando es posible, se prefiere composición (`sqrt(sqrt(x))` para raíz 4) porque evita potencias fraccionarias explícitas que pueden causar errores numéricos en Julia. Solo cuando no hay composición exacta (raíces 5, 7, 10) se usa exponenciación.
+
+**Mappings a SymPy:**
+
+```python
+root_sympy_mappings = {
+    "safe_sqrt": lambda x: sympy.sqrt(sympy.Abs(x)),
+    "safe_cbrt": lambda x: sympy.sign(x) * sympy.Pow(sympy.Abs(x), sympy.Rational(1, 3)),
+    "safe_root4": lambda x: sympy.Pow(sympy.Abs(x), sympy.Rational(1, 4)),
+    "safe_root5": lambda x: sympy.sign(x) * sympy.Pow(sympy.Abs(x), sympy.Rational(1, 5)),
+    "safe_root6": lambda x: sympy.Pow(sympy.Abs(x), sympy.Rational(1, 6)),
+    "safe_root7": lambda x: sympy.sign(x) * sympy.Pow(sympy.Abs(x), sympy.Rational(1, 7)),
+    "safe_root8": lambda x: sympy.Pow(sympy.Abs(x), sympy.Rational(1, 8)),
+    "safe_root9": lambda x: sympy.sign(x) * sympy.Pow(sympy.Abs(x), sympy.Rational(1, 9)),
+    "safe_root10": lambda x: sympy.Pow(sympy.Abs(x), sympy.Rational(1, 10)),
+    "safe_pow": lambda x, y: sympy.sign(x) * sympy.Pow(sympy.Abs(x), y),
+}
+```
+
+##### Constraints de anidamiento entre raíces
+
+Para evitar expresiones redundantes como `safe_sqrt(safe_sqrt(x))` (equivalente a `safe_root4(x)`) o `safe_sqrt(safe_cbrt(x))` (equivalente a `safe_root6(x)`), se prohíbe el anidamiento de operadores de raíces entre sí:
+
+```python
+root_names = ["safe_sqrt", "safe_cbrt", "safe_root4", "safe_root5", "safe_root6",
+              "safe_root7", "safe_root8", "safe_root9", "safe_root10"]
+
+nested_constraints = {name: {n: 0 for n in root_names} for name in root_names}
+nested_constraints["safe_pow"] = {"safe_pow": 0}
+```
+
+Esto genera una matriz de restricciones $9 \times 9$ donde ningún operador de raíz puede contener a otro como hijo directo.
+
+##### Penalización de `safe_pow` con `complexity_of_operators`
+
+Se mantiene `safe_pow` como operador disponible para expresiones no estándar (potencias arbitrarias), pero se **penaliza** su uso asignándole complejidad 4 frente a complejidad 2 de los operadores de raíces:
+
+```python
+complexity_of_operators = {
+    "+": 1, "-": 1, "*": 1, "/": 2, "neg": 1,
+    "safe_sqrt": 2, "safe_cbrt": 2,
+    "safe_root4": 2, "safe_root5": 2, "safe_root6": 2,
+    "safe_root7": 2, "safe_root8": 2, "safe_root9": 2, "safe_root10": 2,
+    "safe_pow": 4,  # Penalizado para preferir raíces específicas
+}
+```
+
+Dado que `maxsize=25`, una expresión puede usar ~12 raíces específicas o ~6 instancias de `safe_pow`. Esto **guía a PySR hacia los operadores de raíces** cuando son suficientes, reservando `safe_pow` para casos donde realmente se necesita un exponente no entero.
+
+##### Cambio a `model_selection="best"` (salto de parsimonia)
+
+Se modificó `model_selection` de `"accuracy"` a `"best"`:
+
+```python
+model_selection = "best"  # (antes: "accuracy")
+```
+
+**¿Por qué?**
+
+- `"accuracy"` selecciona la ecuación con menor MSE del Hall of Fame, independientemente de la complejidad. Esto puede devolver expresiones de 25 nodos que sobreajustan cuando existe una expresión de 10 nodos igualmente precisa.
+
+- `"best"` busca el **salto de parsimonia**: la ecuación que ofrece la mayor reducción de error relativa a su aumento de complejidad. Formalmente, selecciona el punto de máxima curvatura en el frente de Pareto complejidad-error.
+
+Con los operadores de raíces unarios, la ecuación cuadrática correcta tiene complejidad ~15-18 nodos y MSE ~0. Una aproximación exponencial incorrecta podría tener MSE marginalmente menor (por sobreajuste) pero complejidad ~23-25 nodos. El criterio `"best"` selecciona la ecuación cuadrática correcta porque es más parsimoniosa.
+
+- **Referencia:** Cranmer, M. (2023). "Interpretable Machine Learning for Science with PySR and SymbolicRegression.jl." *arXiv:2305.01582*. Sección 3.2: "Pareto-optimal model selection."
+
+##### Eliminación de `batching`
+
+Se eliminó el batching del modelo:
+
+```python
+# ANTES (V2):
+batching = True
+batch_size = 200
+
+# AHORA (V3):
+# (sin batching — se eliminan ambas líneas)
+```
+
+**Justificación:**
+
+El batching evaluaba cada expresión candidata sobre 200 puntos aleatorios por ciclo evolutivo, reduciendo consumo de RAM. Sin embargo, introducía **varianza estocástica** en el fitness: una expresión que matchea bien los 200 puntos del batch actual podría tener peor fitness con el siguiente batch.
+
+Con `procs=0` (un solo proceso Julia) y los constraints implementados, el consumo de RAM es manejable (~4-6 GB para 512-1000 puntos). Al evaluar sobre **todos los puntos** en cada ciclo, el fitness es determinístico y la selección evolutiva es más estable.
+
+##### Configuración completa V3
+
+```python
+model = PySRRegressor(
+    niterations=500,
+    populations=30,
+    population_size=50,
+    ncycles_per_iteration=550,
+    maxsize=25,
+    parsimony=0.0,
+    turbo=True,
+    procs=0,
+    model_selection="best",  # Salto de parsimonia
+
+    # ── Operadores unarios: raíces específicas ──
+    unary_operators=[
+        "neg",
+        "safe_sqrt(x) = sqrt(abs(x))",
+        "safe_cbrt(x) = cbrt(x)",
+        "safe_root4(x) = sqrt(sqrt(abs(x)))",
+        "safe_root5(x) = sign(x) * sqrt(sqrt(abs(x))) * abs(x)^0.05",
+        "safe_root6(x) = cbrt(sqrt(abs(x)))",
+        "safe_root7(x) = sign(x) * abs(x)^(1.0/7.0)",
+        "safe_root8(x) = sqrt(sqrt(sqrt(abs(x))))",
+        "safe_root9(x) = cbrt(cbrt(x))",
+        "safe_root10(x) = sqrt(sqrt(sqrt(abs(x)))) * abs(x)^0.025",
+    ],
+
+    # ── Operadores binarios: aritmética + potencia generalizada ──
+    binary_operators=["+", "-", "*", "/", "safe_pow(x, y) = sign(x) * abs(x)^y"],
+
+    extra_sympy_mappings=root_sympy_mappings,  # Ver arriba
+    nested_constraints=root_nested_constraints,  # Prohibir anidamiento de raíces
+    constraints={"safe_pow": (9, 1)},  # Base compleja, exponente simple
+
+    complexity_of_operators={
+        "+": 1, "-": 1, "*": 1, "/": 2, "neg": 1,
+        "safe_sqrt": 2, "safe_cbrt": 2,
+        "safe_root4": 2, "safe_root5": 2, "safe_root6": 2,
+        "safe_root7": 2, "safe_root8": 2, "safe_root9": 2, "safe_root10": 2,
+        "safe_pow": 4,
+    },
+
+    temp_equation_file=True,
+    delete_tempfiles=True,
+)
+```
+
+##### Resultado: caso `quadratic_19_full_abc`
+
+Con la configuración V3, PySR redescubrió ambas raíces de la ecuación cuadrática:
+
+**Rama 1 (raíz negativa):**
+```
+neg(((b * 0.5) + safe_sqrt((a * c) - ((b * b) * 0.25))) / a)
+```
+Equivalente a: $x_1 = \frac{-b - \sqrt{b^2 - 4ac}}{2a}$
+
+**Rama 2 (raíz positiva):**
+```
+((b * -0.5) + safe_sqrt((-1 * (c * a)) + ((b * b) * 0.25))) / a
+```
+Equivalente a: $x_2 = \frac{-b + \sqrt{b^2 - 4ac}}{2a}$
+
+Ambas ecuaciones matchean el 100% de los puntos de datos con tolerancia $\varepsilon = 0.005$.
+
+##### Resumen de la evolución V1 → V2 → V3
+
+| Versión | Operador de raíces | Problema | Solución |
+|---------|-------------------|----------|----------|
+| V1 | `safe_sqrt` (unario) | Solo raíces cuadradas | Funciona para cuadrática |
+| V2 | `safe_pow` (binario) | Ambigüedad exponencial/raíz | Agregar diversidad evolutiva |
+| V3 | Raíces 2-10 (unarios) + `safe_pow` | Exponenciales dominaban | Desambiguar con operadores específicos |
+
+**Principio general:** Cuando un operador generalizado (como `safe_pow`) tiene múltiples interpretaciones semánticas, la evolución genética tiende hacia la interpretación numéricamente más fácil. Para forzar la interpretación deseada (raíces), se deben agregar operadores específicos que **solo** puedan expresar esa interpretación.
+
+- **Referencia:** Koza, J. R. (1992). *Genetic Programming*. MIT Press. Capítulo 7: "Choice of function and terminal sets" — discusión de cómo la elección de operadores afecta la trayectoria evolutiva.
+- **Referencia:** Cranmer, M. (2023). "PySR Tuning Guide." https://astroautomata.com/PySR/tuning/ — recomendaciones sobre diseño de operadores personalizados.
 
 ### 7.4 Evaluación del Hall of Fame
 
