@@ -1,109 +1,171 @@
 # Tesis
 
-Desarrollar y validar una metodología basada en regresión simbólica para determinar las expresiones analíticas de ecuaciones no lineales.
+Metodologia para descubrir expresiones analiticas de ceros de ecuaciones no lineales usando regresion simbolica con PySR.
 
-## Instalación
+## 1. Requisitos
 
-### Requisitos previos
-- Python 3.12+
-- Julia (requerido por PySR)
+- Python 3.12 o superior
+- Julia (recomendado 1.10 o superior)
+- Git (opcional, para clonar el repo)
 
-### Instalación de dependencias
+## 2. Instalacion portable (cualquier computadora)
+
+### 2.1 Clonar y entrar al proyecto
 
 ```bash
-# Crear entorno virtual
-python -m venv .venv
+git clone <URL_DEL_REPO>
+cd Tesis
+```
 
-# Activar entorno (Linux/Mac)
+### 2.2 Crear y activar entorno virtual
+
+Linux/macOS:
+
+```bash
+python3 -m venv .venv
 source .venv/bin/activate
-
-# Activar entorno (Windows)
-.venv\Scripts\activate
-
-# Instalar dependencias
+python -m pip install --upgrade pip
 pip install -r src/requirements.txt
 ```
 
-## Ejecución del Pipeline Principal
+Windows PowerShell:
 
-El pipeline descubre expresiones analíticas de ceros de ecuaciones mediante regresión simbólica.
+```powershell
+py -3.12 -m venv .venv
+.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+pip install -r src/requirements.txt
+```
 
-### Configuración
+Windows CMD:
 
-Antes de ejecutar, edita `src/config.py` para definir:
+```bat
+py -3.12 -m venv .venv
+.venv\Scripts\activate.bat
+python -m pip install --upgrade pip
+pip install -r src/requirements.txt
+```
+
+### 2.3 Instalar Julia (necesario para PySR)
+
+1. Instalar Julia desde su instalador oficial.
+2. Verificar que el comando julia quede en PATH.
+
+```bash
+julia --version
+```
+
+3. Verificar integracion Python + PySR:
+
+```bash
+python -c "import pysr; print('PySR OK')"
+```
+
+Notas:
+- En la primera corrida PySR puede demorar bastante porque Julia compila y descarga dependencias.
+- Si julia no se reconoce, cerrar y abrir la terminal luego de instalar Julia.
+
+## 3. Configuracion del pipeline principal
+
+Editar src/config.py y ajustar, como minimo:
 
 ```python
-# Ecuación a resolver
-EQUATION_STRING = "x + a - 2"  # f(x; params) = 0
+EQUATION_STRING = "(x - a) * (x + a)"
 VARIABLES = ["x"]
 PARAMETERS = ["a"]
 
-# Rangos de parámetros
 PARAMETER_RANGES = {
-    "a": (-5, 5, 50),  # (min, max, num_puntos)
+        "a": (0.1, 5, 50),
 }
 ```
 
-### Ejecutar el pipeline
+Opciones clave de ejecucion:
+
+- SR_INPUT_MODE:
+    - "combined": usa todos los pares (params, root) juntos y descubre ecuaciones iterativamente.
+    - "branches": separa por ramas antes de la regresion simbolica.
+- Modo de perdida:
+    - MSE: USE_SIGMOID_LOSS=False y USE_MATCH_COUNT_LOSS=False
+    - Match count: USE_MATCH_COUNT_LOSS=True
+    - Sigmoid: USE_SIGMOID_LOSS=True
+
+Regla importante:
+- USE_SIGMOID_LOSS y USE_MATCH_COUNT_LOSS no pueden ser True al mismo tiempo.
+
+## 4. Ejecutar un caso normal con main
+
+Desde la raiz del proyecto:
 
 ```bash
 python src/main.py
 ```
 
-Los resultados se guardan en `src/outputs_analytical/`.
+Comportamiento actual:
+- src/main.py respeta SR_INPUT_MODE definido en src/config.py.
+- Imprime el modo activo al inicio: Modo de entrada SR: combined o branches.
 
-## Benchmarks
+Salida:
+- Se guarda en OUTPUT_DIR/<EXPERIMENT_NAME>_<timestamp>
+- Por default: outputs_analytical/<experimento_timestamp>
 
-El sistema incluye un conjunto de 43 casos de prueba organizados por categorías.
+Archivos generados tipicos:
+- config.json
+- results_summary.json
+- final_expressions.txt
 
-### Categorías disponibles
+### 4.1 Ejecutar el mismo caso en los 3 modos de perdida
 
-| Categoría | Casos | Descripción |
-|-----------|-------|-------------|
-| `linear` | 1-10 | Ecuaciones lineales |
-| `quadratic` | 11-24 | Ecuaciones cuadráticas |
-| `cubic` | 25-30 | Ecuaciones cúbicas |
-| `quartic` | 31-34 | Ecuaciones cuárticas |
-| `quintic` | 34 | Ecuaciones quínticas |
-| `special` | 36-43 | Formas especiales |
+Para cada corrida, cambia estas banderas en src/config.py y vuelve a ejecutar:
 
-### Dificultades
+```bash
+python src/main.py
+```
 
-- `easy`: Casos simples
-- `medium`: Complejidad intermedia
-- `hard`: Casos complejos
+MSE:
+- USE_SIGMOID_LOSS=False
+- USE_MATCH_COUNT_LOSS=False
 
-### Comandos de Benchmark
+Match count:
+- USE_SIGMOID_LOSS=False
+- USE_MATCH_COUNT_LOSS=True
 
-#### Ejecutar todos los tests
+Sigmoid:
+- USE_SIGMOID_LOSS=True
+- USE_MATCH_COUNT_LOSS=False
+
+## 5. Benchmarks (todas las formas de ejecucion)
+
+Script principal:
 
 ```bash
 python src/benchmark/run_benchmark.py
 ```
 
-#### Ejecutar por categoría (grupo)
+Nota:
+- El benchmark usa SR_INPUT_MODE desde src/config.py (igual que main).
+
+### 5.1 Ejecutar todo el benchmark
 
 ```bash
-# Lineales
+python src/benchmark/run_benchmark.py
+```
+
+### 5.2 Filtrar por categoria
+
+Categorias validas: linear, quadratic, cubic, quartic, quintic, special
+
+```bash
 python src/benchmark/run_benchmark.py --category linear
-
-# Cuadráticas
 python src/benchmark/run_benchmark.py --category quadratic
-
-# Cúbicas
 python src/benchmark/run_benchmark.py --category cubic
-
-# Cuárticas
 python src/benchmark/run_benchmark.py --category quartic
-
-# Quínticas
 python src/benchmark/run_benchmark.py --category quintic
-
-# Especiales
 python src/benchmark/run_benchmark.py --category special
 ```
 
-#### Ejecutar por dificultad
+### 5.3 Filtrar por dificultad
+
+Dificultades validas: easy, medium, hard
 
 ```bash
 python src/benchmark/run_benchmark.py --difficulty easy
@@ -111,128 +173,141 @@ python src/benchmark/run_benchmark.py --difficulty medium
 python src/benchmark/run_benchmark.py --difficulty hard
 ```
 
-#### Combinar filtros
+### 5.4 Combinar filtros
 
 ```bash
-# Cuadráticas difíciles
 python src/benchmark/run_benchmark.py --category quadratic --difficulty hard
-
-# Lineales fáciles
 python src/benchmark/run_benchmark.py --category linear --difficulty easy
 ```
 
-#### Ejecutar caso específico
+### 5.5 Ejecutar por nombre de caso
+
+Busqueda parcial por nombre:
 
 ```bash
-# Por nombre (búsqueda parcial)
 python src/benchmark/run_benchmark.py --case linear_01
 python src/benchmark/run_benchmark.py --case quadratic
 ```
 
-#### Limitar número de casos
+### 5.6 Limitar cantidad de casos
 
 ```bash
-# Solo los primeros 5 casos
 python src/benchmark/run_benchmark.py --max 5
-
-# Primeros 3 casos cuadráticos
 python src/benchmark/run_benchmark.py --category quadratic --max 3
 ```
 
-#### Modo dry-run (ver sin ejecutar)
+### 5.7 Dry run (solo listar)
 
 ```bash
-# Ver qué casos se ejecutarían
+python src/benchmark/run_benchmark.py --dry-run
 python src/benchmark/run_benchmark.py --category cubic --dry-run
 ```
 
-#### Ejecutar por rango de índices (batches)
+### 5.8 Ejecutar por rango de indices
+
+Los indices son 0-based e incluyen from-index, excluyen to-index.
 
 ```bash
-# Casos 1-10 (índices 0-9)
 python src/benchmark/run_benchmark.py --from-index 0 --to-index 10
-
-# Casos 11-20 (índices 10-19)
 python src/benchmark/run_benchmark.py --from-index 10 --to-index 20
 ```
 
-#### Especificar directorio de salida
+### 5.9 Cambiar directorio de salida
 
 ```bash
-python src/benchmark/run_benchmark.py --category linear --output ./mis_resultados
+python src/benchmark/run_benchmark.py --output ./mis_resultados
+python src/benchmark/run_benchmark.py --category linear --output ./mis_resultados/linear
 ```
 
-#### Ajustar iteraciones de PySR
+### 5.10 Override de iteraciones PySR
 
 ```bash
 python src/benchmark/run_benchmark.py --niterations 1000
 ```
 
-### Ejecución por Batches (recomendado para RAM limitada)
+### 5.11 Ejecutar por batches (recomendado para RAM limitada)
 
-Ejecuta el benchmark completo en procesos separados para liberar RAM entre batches:
+Linux/macOS (bash):
 
 ```bash
 cd src/benchmark
 bash run_batches.sh
 ```
 
-Este script:
-1. Ejecuta cada categoría en un proceso independiente
-2. Libera la RAM de Julia/PySR entre batches
-3. Combina todos los resultados al final
+Esto ejecuta batches en procesos separados para liberar RAM entre tandas y al final combina resultados.
 
-### Combinar resultados de múltiples ejecuciones
+### 5.12 Combinar resultados de ejecuciones previas
 
 ```bash
-python src/benchmark/run_benchmark.py --merge benchmark_results/batch_*
+python src/benchmark/run_benchmark.py --merge src/benchmark_results/batches_*/batch_* --output ./benchmark_merge
 ```
 
-### Ver catálogo de casos
+### 5.13 Ver catalogo de casos
 
 ```bash
 python src/benchmark/test_cases.py
 ```
 
-## Estructura del Proyecto
+## 6. Resultados del benchmark
 
-```
+Por default se guardan en src/benchmark_results/benchmark_<timestamp>/
+
+Archivos principales:
+- raw_results.json
+- evaluations.json
+- metrics.json
+- report.txt
+
+## 7. Estructura del proyecto
+
+```text
 src/
-├── 1_equation_definition/   # Parsing de ecuaciones
-├── 2_parameter_grid/        # Generación de grid de parámetros
-├── 3_zero_finding/          # Resolución numérica/simbólica
-├── 4_data_preparation/      # Agrupación de raíces por rama
-├── 5_symbolic_regression/   # Regresión simbólica con PySR
-├── 6_expression_builder/    # Construcción de expresiones finales
-├── benchmark/               # Sistema de benchmarking
-│   ├── run_benchmark.py     # Orquestador principal
-│   ├── test_cases.py        # Catálogo de 43 casos de prueba
-│   ├── runner.py            # Ejecutor de casos individuales
-│   ├── metrics.py           # Cálculo de métricas
-│   └── run_batches.sh       # Script para ejecución por batches
-├── benchmark_results/       # Resultados de benchmarks
-├── config.py                # Configuración del pipeline
-├── main.py                  # Entrada principal
-└── requirements.txt         # Dependencias
+|- 1_equation_definition/
+|- 2_parameter_grid/
+|- 3_zero_finding/
+|- 4_data_preparation/
+|- 5_symbolic_regression/
+|- 6_expression_builder/
+|- benchmark/
+|  |- run_benchmark.py
+|  |- runner.py
+|  |- metrics.py
+|  |- test_cases.py
+|  |- run_batches.sh
+|- config.py
+|- main.py
+|- requirements.txt
 ```
 
-## Resultados
+## 8. Problemas comunes y soluciones
 
-Los resultados de los benchmarks se guardan en `src/benchmark_results/` con:
+### 8.1 Se queda en Compiling Julia backend...
 
-- `raw_results.json` - Resultados crudos
-- `evaluations.json` - Evaluaciones por caso
-- `metrics.json` - Métricas globales
-- `report.txt` - Reporte legible
+Es normal en la primera ejecucion. Esperar a que termine la compilacion inicial.
 
-## Opciones de Configuración
+### 8.2 Error: julia command not found
 
-Las principales opciones en `src/config.py`:
+- Verificar instalacion de Julia.
+- Confirmar julia --version en la misma terminal donde correras Python.
+- Reabrir terminal para refrescar PATH.
 
-| Opción | Descripción | Default |
-|--------|-------------|---------|
-| `NITERATIONS` | Iteraciones de PySR | 500 |
-| `EPSILON` | Tolerancia de matcheo | 0.005 |
-| `MIN_POINTS` | Mínimo puntos por rama | 5 |
-| `SOLVER_METHOD` | Método de resolución | `'solve'` |
-| `FILTER_COMPLEX` | Filtrar raíces complejas | `True` |
+### 8.3 Error: No module named pysr
+
+- Verificar que el entorno virtual este activado.
+- Reinstalar dependencias con pip install -r src/requirements.txt.
+
+### 8.4 Codigo de salida 130
+
+Significa que la ejecucion fue interrumpida manualmente (Ctrl+C o Stop del IDE).
+
+### 8.5 Alto uso de RAM
+
+- Ejecutar benchmark por batches con src/benchmark/run_batches.sh.
+- Reducir NITERATIONS, POPULATIONS o MAXSIZE en src/config.py.
+
+## 9. Recomendaciones para reproducibilidad
+
+- Ejecutar siempre desde la raiz del repo.
+- Usar un entorno virtual limpio por maquina.
+- Mantener Python y Julia en versiones compatibles entre equipos.
+- Guardar junto a resultados el commit de git y los parametros usados en src/config.py.

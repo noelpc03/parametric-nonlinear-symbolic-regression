@@ -5,8 +5,8 @@ Ejecuta el pipeline completo para un caso de prueba:
   1. Parsear ecuación
   2. Generar grid
   3. Resolver
-  4. Agrupar raíces
-  5. Regresión simbólica
+    4. Preparar datos para SR (modo combinado o por ramas)
+    5. Regresión simbólica iterativa
   6. Comparar con respuesta esperada
 
 Diseñado para ser llamado desde el orquestador de benchmark.
@@ -35,8 +35,8 @@ for subdir in ['1_equation_definition', '2_parameter_grid', '3_zero_finding',
 from equation_parser import parse_equation
 from grid_generator import generate_grid
 from solver import solve_for_all_parameter_tuples
-from root_grouping import group_by_root_branch
-from regression_adapter import run_for_all_branches
+from root_grouping import group_by_root_branch, combine_all_roots
+from regression_adapter import run_for_all_branches, run_combined_symbolic_regression
 
 
 def run_single_case(test_case, sr_config=None):
@@ -84,6 +84,7 @@ def run_single_case(test_case, sr_config=None):
         MAX_ITERATIONS, MAX_CONSECUTIVE_NO_MATCH,
         NUM_ATTEMPTS, PARSIMONY, POPULATION_SIZE,
         NCYCLES_PER_ITERATION, MAXSIZE, TURBO, PROCS,
+        SR_INPUT_MODE,
     )
     
     # Override con config personalizada si se provee
@@ -94,6 +95,12 @@ def run_single_case(test_case, sr_config=None):
     k = sr_config.get("k", K)
     niterations = sr_config.get("niterations", NITERATIONS)
     min_points = sr_config.get("min_points", MIN_POINTS)
+    input_mode = str(sr_config.get("sr_input_mode", SR_INPUT_MODE)).strip().lower()
+
+    if input_mode not in ("combined", "branches"):
+        raise ValueError(
+            f"sr_input_mode inválido: {input_mode}. Usa 'combined' o 'branches'."
+        )
     
     total_start = time.time()
     
@@ -134,46 +141,98 @@ def run_single_case(test_case, sr_config=None):
             result["total_time_seconds"] = time.time() - total_start
             return result
         
-        # ── Etapa 4: Agrupar raíces ──
+        # ── Etapa 4: Preparar datos para SR ──
         t0 = time.time()
-        branches = group_by_root_branch(solver_results, param_names)
+
+        branches = None
+        combined_data = None
+
+        if input_mode == "combined":
+            combined_data = combine_all_roots(solver_results, param_names)
+            result["num_combined_tuples"] = len(combined_data["y"])
+            # Se define más adelante como el número de ecuaciones descubiertas.
+            result["num_branches_found"] = 0
+        else:
+            branches = group_by_root_branch(solver_results, param_names)
+            result["num_branches_found"] = len(branches)
+
         result["stages_timing"]["grouping"] = time.time() - t0
-        result["num_branches_found"] = len(branches)
         
         # ── Etapa 5: Regresión simbólica ──
         t0 = time.time()
-        all_sr_results = run_for_all_branches(
-            branches, param_names,
-            epsilon=epsilon, k=k,
-            niterations=niterations, min_points=min_points
-        )
+
+        if input_mode == "combined":
+            combined_sr_results = run_combined_symbolic_regression(
+                combined_data,
+                param_names,
+                epsilon=epsilon,
+                k=k,
+                niterations=niterations,
+                min_points=min_points,
+                max_iterations=MAX_ITERATIONS,
+            )
+            all_sr_results = None
+        else:
+            all_sr_results = run_for_all_branches(
+                branches, param_names,
+                epsilon=epsilon, k=k,
+                niterations=niterations, min_points=min_points
+            )
+            combined_sr_results = None
+
         result["stages_timing"]["symbolic_regression"] = time.time() - t0
-        
-        # ── Procesar resultados por rama ──
-        for branch_idx, branch_results in enumerate(all_sr_results):
-            branch_info = {
-                "branch_index": branch_idx,
-                "num_data_points": len(branches[branch_idx]['y']),
-                "functions_found": [],
-                "total_points_matched": 0,
-            }
-            
-            for func in branch_results:
-                func_info = {
-                    "equation": str(func['equation']),
-                    "num_matched": int(func['num_matched']),
+
+        # ── Procesar resultados ──
+        if input_mode == "combined":
+            total_points = len(combined_data["y"]) if combined_data is not None else 0
+            total_matched = 0
+            functions_found = []
+
+            for func in combined_sr_results:
+                eq = str(func["equation"])
+                num_matched = int(func["num_matched"])
+
+                functions_found.append({
+                    "equation": eq,
+                    "num_matched": num_matched,
+                })
+                total_matched += num_matched
+                result["discovered_roots"].append(eq)
+
+            coverage = (total_matched / total_points) if total_points > 0 else 0.0
+            result["branch_results"].append({
+                "branch_index": 0,
+                "num_data_points": total_points,
+                "functions_found": functions_found,
+                "total_points_matched": total_matched,
+                "coverage": coverage,
+            })
+            result["num_branches_found"] = len(result["discovered_roots"])
+        else:
+            for branch_idx, branch_results in enumerate(all_sr_results):
+                branch_info = {
+                    "branch_index": branch_idx,
+                    "num_data_points": len(branches[branch_idx]['y']),
+                    "functions_found": [],
+                    "total_points_matched": 0,
                 }
-                branch_info["functions_found"].append(func_info)
-                branch_info["total_points_matched"] += func['num_matched']
-                result["discovered_roots"].append(str(func['equation']))
-            
-            # Cobertura de esta rama
-            if branch_info["num_data_points"] > 0:
-                branch_info["coverage"] = branch_info["total_points_matched"] / branch_info["num_data_points"]
-            else:
-                branch_info["coverage"] = 0.0
-            
-            result["branch_results"].append(branch_info)
+
+                for func in branch_results:
+                    func_info = {
+                        "equation": str(func['equation']),
+                        "num_matched": int(func['num_matched']),
+                    }
+                    branch_info["functions_found"].append(func_info)
+                    branch_info["total_points_matched"] += func['num_matched']
+                    result["discovered_roots"].append(str(func['equation']))
+
+                # Cobertura de esta rama
+                if branch_info["num_data_points"] > 0:
+                    branch_info["coverage"] = branch_info["total_points_matched"] / branch_info["num_data_points"]
+                else:
+                    branch_info["coverage"] = 0.0
+
+                result["branch_results"].append(branch_info)
         
         if len(result["discovered_roots"]) == 0:
             result["status"] = "no_sr_results"

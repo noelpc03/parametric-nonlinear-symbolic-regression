@@ -5,30 +5,77 @@ import numpy as np
 from typing import List, Dict, Any
 
 
-def expand_tuples(results: List[Dict[str, Any]], 
+def expand_tuples(results: List[Dict[str, Any]],
                   param_names: List[str]) -> np.ndarray:
     """
     Expande los resultados de resolución en tuplas (params, root).
-    
+
     Args:
         results: Lista de diccionarios con 'parameters' y 'roots'
         param_names: Lista de nombres de parámetros
-    
+
     Returns:
         expanded: Array (M, num_params + 1) donde cada fila es (a1, a2, ..., x_i)
     """
     expanded_tuples = []
-    
+
     for result in results:
         params = [result['parameters'][p] for p in param_names]
         roots = result['roots']
-        
+
         # Crear una fila por cada raíz
         for root in roots:
             row = params + [root]
             expanded_tuples.append(row)
-    
+
     return np.array(expanded_tuples)
+
+
+def combine_all_roots(results: List[Dict[str, Any]],
+                      param_names: List[str]) -> Dict[str, np.ndarray]:
+    """
+    Combina TODAS las raíces en un único dataset sin separar por ramas.
+
+    Para cada tupla de parámetros con múltiples raíces, crea múltiples filas
+    (una por cada raíz). El algoritmo de regresión simbólica iterativo será
+    el encargado de descubrir las diferentes ecuaciones (ramas) a partir
+    de este conjunto combinado.
+
+    Args:
+        results: Lista de diccionarios con 'parameters' y 'roots'
+        param_names: Lista de nombres de parámetros
+
+    Returns:
+        Dict con:
+            'X': Array (M, num_params) con los parámetros
+            'y': Array (M,) con las raíces correspondientes
+    """
+    all_params = []
+    all_roots = []
+
+    for result in results:
+        params = [result['parameters'][p] for p in param_names]
+        roots = result['roots']
+
+        # Crear una entrada por cada raíz (sin agrupar por índice de rama)
+        for root in roots:
+            all_params.append(params)
+            all_roots.append(root)
+
+    X = np.array(all_params)
+    y = np.array(all_roots)
+
+    # Conteo de información
+    num_roots_dist = {}
+    for result in results:
+        n = result['num_roots']
+        num_roots_dist[n] = num_roots_dist.get(n, 0) + 1
+
+    print(f"Datos combinados: {len(y)} tuplas (params → root)")
+    print(f"  Tuplas de parámetros originales: {len(results)}")
+    print(f"  Distribución de raíces por tupla: {num_roots_dist}")
+
+    return {'X': X, 'y': y}
 
 
 def group_by_root_branch(results: List[Dict[str, Any]], 

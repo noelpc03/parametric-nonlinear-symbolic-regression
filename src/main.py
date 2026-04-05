@@ -29,6 +29,7 @@ from config import (
     PARAMETER_RANGES,
     SOLVER_METHOD, FILTER_COMPLEX, COMPLEX_TOLERANCE, SORT_ROOTS,
     EPSILON, K, NITERATIONS, MIN_POINTS,
+    MAX_ITERATIONS, SR_INPUT_MODE,
 )
 
 # ── Añadir subdirectorios al path para importar módulos ──
@@ -42,8 +43,8 @@ for subdir in ['1_equation_definition', '2_parameter_grid', '3_zero_finding',
 from equation_parser import parse_equation
 from grid_generator import generate_grid
 from solver import solve_for_all_parameter_tuples
-from root_grouping import group_by_root_branch
-from regression_adapter import run_for_all_branches
+from root_grouping import group_by_root_branch, combine_all_roots
+from regression_adapter import run_for_all_branches, run_combined_symbolic_regression
 from piecewise_builder import (
     build_piecewise_expression,
     find_region_boundaries,
@@ -143,6 +144,14 @@ def main():
     print(" DESCUBRIMIENTO DE EXPRESIONES ANALÍTICAS")
     print(" Pipeline de Regresión Simbólica para Ceros de Ecuaciones")
     print("="*70)
+
+    input_mode = str(SR_INPUT_MODE).strip().lower()
+    if input_mode not in ("combined", "branches"):
+        raise ValueError(
+            f"SR_INPUT_MODE inválido: {SR_INPUT_MODE}. Usa 'combined' o 'branches'."
+        )
+
+    print(f"Modo de entrada SR: {input_mode}")
     
     # ============================================================
     # PASO 1: Definir ecuación
@@ -190,26 +199,43 @@ def main():
         print(f"Distribución de número de raíces: {num_roots_dist}")
     
     # ============================================================
-    # PASO 4: Agrupar raíces por rama
+    # PASO 4: Preparar datos para regresión simbólica
     # ============================================================
-    print_section("PASO 4: Agrupación de raíces")
-    
-    branches = group_by_root_branch(results, param_names)
-    
-    print(f"Ramas identificadas: {len(branches)}")
-    for i, branch in enumerate(branches):
-        print(f"  Rama {i+1}: {len(branch['y'])} puntos")
+    print_section("PASO 4: Preparación de datos para SR")
+
+    if input_mode == "combined":
+        combined_data = combine_all_roots(results, param_names)
+        branches = [{"X": combined_data["X"], "y": combined_data["y"]}]
+        print(f"Tuplas combinadas para SR: {len(combined_data['y'])}")
+    else:
+        combined_data = None
+        branches = group_by_root_branch(results, param_names)
+        print(f"Ramas identificadas: {len(branches)}")
+        for i, branch in enumerate(branches):
+            print(f"  Rama {i+1}: {len(branch['y'])} puntos")
     
     # ============================================================
     # PASO 5: Regresión simbólica por rama
     # ============================================================
     print_section("PASO 5: Regresión simbólica")
-    
-    all_results = run_for_all_branches(
-        branches, param_names,
-        epsilon=EPSILON, k=K, 
-        niterations=NITERATIONS, min_points=MIN_POINTS
-    )
+
+    if input_mode == "combined":
+        combined_results = run_combined_symbolic_regression(
+            combined_data,
+            param_names,
+            epsilon=EPSILON,
+            k=K,
+            niterations=NITERATIONS,
+            min_points=MIN_POINTS,
+            max_iterations=MAX_ITERATIONS,
+        )
+        all_results = [combined_results]
+    else:
+        all_results = run_for_all_branches(
+            branches, param_names,
+            epsilon=EPSILON, k=K,
+            niterations=NITERATIONS, min_points=MIN_POINTS
+        )
     
     # ============================================================
     # PASO 6: Construir expresiones finales

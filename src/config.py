@@ -30,8 +30,9 @@ EXPERIMENT_NAME = "linear_test"
 # ============================================================
 
 # Ecuación a resolver: f(x; params) = 0
-# Ejemplo: x + a - 2 = 0  →  x = 2 - a
-EQUATION_STRING = "x + a - 2"
+# Caso benchmark manual: quadratic_13_factored
+# (x - a) * (x + a) = 0  -> raíces esperadas: -a y a
+EQUATION_STRING = "(x - a) * (x + a)"
 VARIABLES = ["x"]
 PARAMETERS = ["a"]
 
@@ -47,7 +48,7 @@ PARAMETERS = ["a"]
 # Rangos para cada parámetro
 # Formato: {nombre_parametro: (min, max, num_puntos)}
 PARAMETER_RANGES = {
-    "a": (-5, 5, 50),
+  "a": (0.1, 5, 50),
 }
 
 # Método: producto cartesiano (grid regular)
@@ -95,15 +96,44 @@ NITERATIONS = 500  # Más iteraciones: con batching la RAM no crece
 POPULATIONS = 30  # Más poblaciones con batching (solo evalúa 200 pts/batch, no todos)
 UNARY_OPERATORS = ["neg"]
 BINARY_OPERATORS = ["+", "-", "*", "/"]
-# safe_pow(x, y) = sign(x) * abs(x)^y se agrega como operador inline en symbolic_regression.py
-# Preserva el signo (crucial para raíces impares: (-8)^(1/3) = -2)
-# y protege contra NaN (abs() evita bases negativas en potencias fraccionarias).
+
+# Operadores custom para PySR (fuente única de verdad).
+# Se expresan en sintaxis Julia porque PySR los evalúa del lado de Julia.
+CUSTOM_UNARY_OPERATOR_DEFINITIONS = [
+  "safe_sqrt(x) = sqrt(abs(x))",                                    # raíz 2
+  "safe_cbrt(x) = cbrt(x)",                                         # raíz 3 (preserva signo)
+  "safe_root4(x) = sqrt(sqrt(abs(x)))",                             # raíz 4
+  "safe_root5(x) = copysign(abs(x)^(one(x)/typeof(x)(5)), x)",      # raíz 5
+  "safe_root6(x) = cbrt(sqrt(abs(x)))",                             # raíz 6
+  "safe_root7(x) = copysign(abs(x)^(one(x)/typeof(x)(7)), x)",      # raíz 7
+  "safe_root8(x) = sqrt(sqrt(sqrt(abs(x))))",                       # raíz 8
+  "safe_root9(x) = cbrt(cbrt(x))",                                  # raíz 9
+  "safe_root10(x) = sqrt(sqrt(abs(x))) * sqrt(abs(x))^(one(x)/typeof(x)(5))",  # raíz 10
+]
+
+CUSTOM_BINARY_OPERATOR_DEFINITIONS = [
+  # Preserva el signo (crucial para raíces impares) y evita NaN en bases negativas.
+  "safe_pow(x, y) = copysign(abs(x)^y, x)",
+]
+
 USE_SIGMOID_LOSS = False  # False = usar MSE estándar
+
+# Nueva pérdida por conteo duro de matches:
+# Un punto matchea si |y - y_pred| < MATCH_COUNT_EPSILON.
+# La optimización minimiza la fracción de no-matches (equivale a maximizar matches).
+USE_MATCH_COUNT_LOSS = False
+MATCH_COUNT_EPSILON = 1e-4
 
 # ── Parámetros del algoritmo iterativo ──
 MIN_POINTS = 5  # Mínimo de puntos para continuar
-MAX_ITERATIONS = 5  # Máximo de iteraciones del proceso iterativo
-MAX_CONSECUTIVE_NO_MATCH = 2
+MAX_ITERATIONS = None  # Sin límite de iteraciones
+MAX_CONSECUTIVE_NO_MATCH = 3  # Corte global: parar tras N iteraciones consecutivas sin matches
+
+# Modo de entrada para la regresión simbólica:
+#   - 'combined': usa todas las tuplas (params -> root) juntas
+#                 y el algoritmo iterativo descubre ecuaciones secuencialmente.
+#   - 'branches': separa por rama antes de SR (modo legacy).
+SR_INPUT_MODE = 'combined'
 
 # ── Estrategia multi-intento por iteración ──
 # En cada iteración del proceso iterativo, PySR se ejecuta NUM_ATTEMPTS veces.
