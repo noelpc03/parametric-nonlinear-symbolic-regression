@@ -42,3 +42,12 @@ entrega_semanal3.fdb_latexmk
 entrega_semanal3.fls
 entrega_semanal3.log
 entrega_semanal3.synctex.gz
+
+# fernando
+progreso.aux
+progreso.fdb_latexmk
+progreso.fls
+progreso.log
+progreso.out
+progreso.synctex.gz
+progreso.toc

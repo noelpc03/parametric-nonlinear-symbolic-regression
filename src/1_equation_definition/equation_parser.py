@@ -44,6 +44,10 @@ def parse_equation(equation_str: str, variables: List[str], parameters: List[str
 def get_equation_info(equation: sp.Expr, symbols_dict: dict) -> dict:
     """
     Obtiene información sobre la ecuación.
+
+    Args:
+        equation: Expresión SymPy parseada
+        symbols_dict: Diccionario con símbolos {nombre: símbolo}
     
     Returns:
         info: Diccionario con información de la ecuación
@@ -57,7 +61,6 @@ def get_equation_info(equation: sp.Expr, symbols_dict: dict) -> dict:
 
 
 if __name__ == "__main__":
-    # Ejemplo de uso
     import sys
     sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
     from config import EQUATION_STRING, VARIABLES, PARAMETERS

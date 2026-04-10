@@ -268,6 +268,7 @@ src/
 |- 4_data_preparation/
 |- 5_symbolic_regression/
 |- 6_expression_builder/
+|  |- functions_report.py
 |- benchmark/
 |  |- run_benchmark.py
 |  |- runner.py

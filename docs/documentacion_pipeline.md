@@ -99,7 +99,7 @@ src/
 │   ├── loss_functions.py
 │   └── utils.py
 ├── 6_expression_builder/            # Paso 6
-│   └── piecewise_builder.py
+│   └── functions_report.py
 ├── grobner_verification/            # Comprobación
 │   └── verify.py
 └── benchmark/                       # Sistema de benchmarking

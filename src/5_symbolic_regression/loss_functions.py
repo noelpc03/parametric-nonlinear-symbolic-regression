@@ -62,13 +62,19 @@ def get_julia_loss_function(epsilon, k):
 
 
 def get_julia_match_count_loss_function(epsilon=1e-4):
-        """
-        Genera la pérdida de conteo duro en sintaxis Julia para PySR.
+    """
+    Genera la pérdida de conteo duro en sintaxis Julia para PySR.
 
-        Para cada punto:
-            - 0.0 si matchea (|target - prediction| < epsilon)
-            - 1.0 si no matchea
+    Para cada punto:
+        - 0.0 si matchea (|target - prediction| < epsilon)
+        - 1.0 si no matchea
 
-        El promedio sobre el dataset equivale a la fracción de puntos no matcheados.
-        """
-        return f"match_count_loss(prediction, target) = ifelse(abs(target - prediction) < {epsilon}, 0.0, 1.0)"
+    El promedio sobre el dataset equivale a la fracción de puntos no matcheados.
+
+    Args:
+        epsilon: Umbral absoluto de match
+
+    Returns:
+        str: Función de pérdida en Julia
+    """
+    return f"match_count_loss(prediction, target) = ifelse(abs(target - prediction) < {epsilon}, 0.0, 1.0)"

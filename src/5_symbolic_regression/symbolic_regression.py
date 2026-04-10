@@ -45,13 +45,35 @@ from utils import (
 
 
 def _operator_name(op_definition: str) -> str:
-    """Extrae el nombre de un operador a partir de su definición Julia."""
+    """
+    Extrae el nombre de un operador a partir de su definición Julia.
+
+    Args:
+        op_definition: Definición del operador en sintaxis Julia
+
+    Returns:
+        operator_name: Nombre del operador sin argumentos
+    """
     return op_definition.split("(", 1)[0].strip()
 
 
 def train_symbolic_model(X, y, param_names, k=K, epsilon=EPSILON, niterations=NITERATIONS):
     """
     Entrena un modelo de regresión simbólica.
+
+    Args:
+        X: Matriz de entrada con parámetros
+        y: Vector objetivo con raíces
+        param_names: Lista de nombres de parámetros (nombres de variables para PySR)
+        k: Pendiente para la loss sigmoidal (si está activa)
+        epsilon: Tolerancia usada por las funciones de pérdida personalizadas
+        niterations: Iteraciones internas de PySR por entrenamiento
+
+    Returns:
+        model: Instancia entrenada de PySRRegressor
+
+    Raises:
+        ValueError: Si se habilitan simultáneamente dos losses incompatibles
     """
     if USE_SIGMOID_LOSS and USE_MATCH_COUNT_LOSS:
         raise ValueError("Configuración inválida: USE_SIGMOID_LOSS y USE_MATCH_COUNT_LOSS no pueden ser True a la vez.")
@@ -143,6 +165,15 @@ def _evaluate_hall_of_fame(model, X, y, epsilon):
       - 'model': referencia al modelo
     
     Retorna None si no matchea ningún punto.
+
+    Args:
+        model: Modelo PySR ya entrenado
+        X: Matriz de entrada evaluada por cada ecuación candidata
+        y: Vector objetivo real
+        epsilon: Tolerancia de matcheo en modo relativo
+
+    Returns:
+        best: Diccionario con la mejor ecuación encontrada o None
     """
     best = None
     match_mode = "absolute" if USE_MATCH_COUNT_LOSS else "relative"
@@ -207,6 +238,17 @@ def _run_single_search(X, y, param_names, epsilon, k, niterations):
     todo su Hall of Fame.
 
     Retorna la mejor ecuación de la corrida o None si no hubo matches.
+
+    Args:
+        X: Matriz de entrada con parámetros
+        y: Vector objetivo con raíces
+        param_names: Lista de nombres de parámetros para PySR
+        epsilon: Tolerancia de matcheo
+        k: Pendiente para la loss sigmoidal (si está activa)
+        niterations: Iteraciones internas de PySR por corrida
+
+    Returns:
+        candidate: Mejor candidata de la corrida o None si no hay matches
     """
     model = train_symbolic_model(X, y, param_names, k=k, epsilon=epsilon, niterations=niterations)
     candidate = _evaluate_hall_of_fame(model, X, y, epsilon)
@@ -227,22 +269,30 @@ def iterative_symbolic_regression(
     max_iterations=MAX_ITERATIONS
 ):
     """
-        Algoritmo iterativo de regresión simbólica (una corrida por iteración):
+    Algoritmo iterativo de regresión simbólica (una corrida por iteración).
 
     Para cada iteración:
-            1. Ejecuta una corrida de PySR sobre los puntos restantes
-            2. Evalúa su Hall of Fame y selecciona la ecuación con más matches
-            3. Si supera MIN_MATCH_FRACTION, acepta la ecuación y quita los puntos
-            4. Repite con los puntos restantes
+        1. Ejecuta una corrida de PySR sobre los puntos restantes
+        2. Evalúa su Hall of Fame y selecciona la ecuación con más matches
+        3. Si supera MIN_MATCH_FRACTION, acepta la ecuación y quita los puntos
+        4. Repite con los puntos restantes
 
     Esto permite:
-      - Ecuaciones simples: se encuentran en 1 iteración (100% en un solo paso)
-      - Ecuaciones complejas/Piecewise: se descubren en varias iteraciones
+        - Ecuaciones simples: se encuentran en 1 iteración
+        - Ecuaciones complejas: se descubren en varias iteraciones
+
+    Args:
+        X: Matriz de entrada con parámetros
+        y: Vector objetivo con raíces
+        param_names: Lista de nombres de parámetros
+        epsilon: Tolerancia de matcheo
+        k: Pendiente para la loss sigmoidal (si está activa)
+        niterations: Iteraciones internas de PySR por corrida
+        min_points: Mínimo de puntos para seguir iterando
+        max_iterations: Máximo de iteraciones externas permitidas
 
     Returns:
-        List[Dict]: Lista de funciones encontradas, cada una con:
-            - 'iteration', 'model', 'equation', 'equation_series',
-            - 'matched_indices', 'X_matched', 'y_matched', 'num_matched'
+        results: Lista de funciones encontradas con su cobertura y metadatos
     """
     results = []
     X_remaining = X.copy()

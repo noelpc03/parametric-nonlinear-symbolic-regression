@@ -8,7 +8,7 @@ Pipeline:
 3. Resolver f = 0 para cada tupla de parámetros
 4. Agrupar raíces por rama
 5. Aplicar regresión simbólica a cada rama
-6. Construir expresiones finales (Piecewise si es necesario)
+6. Reportar funciones encontradas por rama
 """
 
 import os
@@ -34,7 +34,7 @@ from config import (
 
 # ── Añadir subdirectorios al path para importar módulos ──
 for subdir in ['1_equation_definition', '2_parameter_grid', '3_zero_finding',
-               '4_data_preparation', '5_symbolic_regression', '6_expression_builder']:
+               '4_data_preparation', '5_symbolic_regression']:
     _p = os.path.join(base_dir, subdir)
     if _p not in sys.path:
         sys.path.insert(0, _p)
@@ -45,11 +45,6 @@ from grid_generator import generate_grid
 from solver import solve_for_all_parameter_tuples
 from root_grouping import group_by_root_branch, combine_all_roots
 from regression_adapter import run_for_all_branches, run_combined_symbolic_regression
-from piecewise_builder import (
-    build_piecewise_expression,
-    find_region_boundaries,
-    simplify_to_single_expression
-)
 
 
 def print_section(title):
@@ -128,11 +123,6 @@ def save_results(output_dir, equation_info, branches, all_results, param_names):
                     f.write(f"\n  Función {func_idx + 1}:\n")
                     f.write(f"    {VARIABLES[0]} = {func['equation']}\n")
                     f.write(f"    Puntos cubiertos: {func['num_matched']}\n")
-                
-                # Intentar simplificar
-                simplified = simplify_to_single_expression(branch_results)
-                f.write(f"\n  Expresión simplificada (más puntos):\n")
-                f.write(f"    {VARIABLES[0]} = {simplified}\n")
     
     print(f"\nResultados guardados en: {output_dir}")
 
@@ -238,9 +228,9 @@ def main():
         )
     
     # ============================================================
-    # PASO 6: Construir expresiones finales
+    # PASO 6: Reportar funciones encontradas
     # ============================================================
-    print_section("PASO 6: Expresiones finales")
+    print_section("PASO 6: Funciones encontradas")
     
     for branch_idx, branch_results in enumerate(all_results):
         print(f"\nRama {branch_idx + 1}:")
@@ -254,13 +244,6 @@ def main():
             print(f"  Múltiples funciones ({len(branch_results)}):")
             for i, func in enumerate(branch_results):
                 print(f"    {i+1}. {func['equation']} ({func['num_matched']} puntos)")
-            
-            # Analizar regiones
-            boundaries = find_region_boundaries(
-                [f['X_matched'] for f in branch_results],
-                param_names
-            )
-            print(f"  Regiones detectadas: {len(boundaries)}")
     
     # ============================================================
     # Guardar resultados

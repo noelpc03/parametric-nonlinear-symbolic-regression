@@ -1,0 +1,478 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish]{babel}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{longtable}
+\usepackage{enumitem}
+\usepackage{amsmath}
+\geometry{margin=2.5cm}
+
+\title{Progreso}
+
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+\newpage
+
+\section{Módulos del sistema}
+El pipeline queda organizado en siete bloques de trabajo:
+\begin{enumerate}[leftmargin=1.5em]
+    \item \textbf{Módulo de orquestación:} \texttt{src/main.py}.
+    \item \textbf{Módulo 1 (definición simbólica):} \texttt{src/1\_equation\_definition}.
+    \item \textbf{Módulo 2 (muestreo de parámetros):} \texttt{src/2\_parameter\_grid}.
+    \item \textbf{Módulo 3 (resolución de ceros):} \texttt{src/3\_zero\_finding}.
+    \item \textbf{Módulo 4 (preparación de datos):} \texttt{src/4\_data\_preparation}.
+    \item \textbf{Módulo 5 (regresión simbólica):} \texttt{src/5\_symbolic\_regression}.
+    \item \textbf{Módulo 6 (reporte de funciones encontradas):} \texttt{src/6\_expression\_builder}.
+\end{enumerate}
+
+\section{Desarrollo módulo por módulo}
+
+\subsection{Módulo de orquestación: \texttt{src/main.py}}
+\subsubsection*{Perspectiva teórica}
+Desde el punto de vista teórico, este módulo define la composición del pipeline como una transformación secuencial:
+\[
+\mathcal{E} \xrightarrow{\text{parseo}} \mathcal{S} \xrightarrow{\text{muestreo}} \Theta
+\xrightarrow{\text{solver}} \mathcal{D}
+\xrightarrow{\text{preparacion}} \mathcal{D}_{SR}
+\xrightarrow{\text{SR}} \mathcal{G}
+\xrightarrow{\text{postproceso}} \mathcal{G}^{*}
+\]
+donde:
+\begin{itemize}[leftmargin=1.5em]
+    \item $\mathcal{E}$ es la ecuación de entrada,
+    \item $\Theta$ es el conjunto de tuplas de parámetros,
+    \item $\mathcal{D}$ son los pares observacionales \((params, roots)\),
+    \item $\mathcal{G}$ son expresiones candidatas descubiertas,
+    \item $\mathcal{G}^{*}$ es la salida final reportada.
+\end{itemize}
+
+Además, este módulo fija reproducibilidad experimental porque concentra la lectura de configuración, el orden de etapas y la persistencia de artefactos.
+
+\subsubsection*{Archivos}
+\begin{itemize}[leftmargin=1.5em]
+    \item \texttt{src/main.py}:
+    \begin{itemize}[leftmargin=1.5em]
+        \item valida modo \texttt{SR\_INPUT\_MODE},
+        \item ejecuta pasos 1 a 6 en orden,
+        \item soporta flujo \texttt{combined} y \texttt{branches},
+        \item guarda \texttt{config.json}, \texttt{results\_summary.json} y \texttt{final\_expressions.txt}.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Módulo 1: \texttt{src/1\_equation\_definition}}
+\subsubsection*{Perspectiva teórica}
+Este módulo formaliza la ecuación paramétrica de entrada
+\[
+F(x;\,\alpha_1,\ldots,\alpha_n)=0
+\]
+en una representación simbólica manipulable. La idea teórica clave es desacoplar la sintaxis textual del problema matemático: se transforma un string en un objeto algebraico para derivar, sustituir y resolver de manera sistemática.
+
+\subsubsection*{Archivos}
+\begin{itemize}[leftmargin=1.5em]
+    \item \texttt{src/1\_equation\_definition/equation\_parser.py}:
+    \begin{itemize}[leftmargin=1.5em]
+        \item \texttt{parse\_equation(...)} crea símbolos SymPy para variables y parámetros, y parsea la ecuación con \texttt{sympify}.
+        \item \texttt{get\_equation\_info(...)} genera metadatos (formato latex, complejidad aproximada, símbolos).
+    \end{itemize}
+\end{itemize}
+
+\subsection{Módulo 2: \texttt{src/2\_parameter\_grid}}
+\subsubsection*{Perspectiva teórica}
+Este módulo construye el dominio discreto de evaluación de parámetros. Sea cada parámetro
+\(
+\alpha_i \in [m_i, M_i]
+\)
+con $k_i$ puntos, entonces el conjunto total es el producto cartesiano:
+\[
+\Theta = \prod_{i=1}^{n} \{\alpha_i^{(1)},\ldots,\alpha_i^{(k_i)}\}
+\]
+y su cardinalidad es $|\Theta| = \prod_i k_i$. Este paso controla la cobertura del espacio paramétrico y el costo computacional total del pipeline.
+
+\subsubsection*{Archivos}
+\begin{itemize}[leftmargin=1.5em]
+    \item \texttt{src/2\_parameter\_grid/grid\_generator.py}:
+    \begin{itemize}[leftmargin=1.5em]
+        \item \texttt{generate\_grid(...)} discretiza rangos con \texttt{numpy.linspace}.
+        \item calcula el producto cartesiano con \texttt{itertools.product}.
+        \item retorna \texttt{grid} en forma matricial y el orden de parámetros.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Módulo 3: \texttt{src/3\_zero\_finding}}
+\subsubsection*{Perspectiva teórica}
+Este módulo resuelve, para cada $\theta \in \Theta$, la ecuación escalar:
+\[
+F(x;\theta)=0
+\]
+y obtiene un conjunto de raíces reales. Teóricamente, transforma el problema simbólico en un dataset supervisado multivaluado:
+\[
+\mathcal{D}=\{(\theta_k, r_{k,1}), (\theta_k, r_{k,2}), \ldots\}
+\]
+con filtrado de soluciones no reales y normalización de orden.
+
+Como línea de trabajo futura, esta etapa se evaluará también con herramientas de \texttt{SciPy} para comparar robustez numérica y costo computacional frente al enfoque actual basado en SymPy.
+
+\subsubsection*{Archivos}
+\begin{itemize}[leftmargin=1.5em]
+    \item \texttt{src/3\_zero\_finding/solver.py}:
+    \begin{itemize}[leftmargin=1.5em]
+        \item \texttt{solve\_equation\_for\_parameters(...)} resuelve una tupla vía \texttt{solve} o \texttt{nsolve}.
+        \item \texttt{\_nsolve\_multiple(...)} prueba varios guesses para aproximar múltiples raíces con \texttt{nsolve}.
+        \item \texttt{solve\_for\_all\_parameter\_tuples(...)} recorre todo el grid y acumula resultados válidos.
+        \item filtra complejos con tolerancia y opcionalmente ordena las raíces.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Módulo 4: \texttt{src/4\_data\_preparation}}
+\subsubsection*{Perspectiva teórica}
+Este módulo decide cómo representar la relación multivaluada parámetro-raíz antes de la regresión simbólica:
+\begin{itemize}[leftmargin=1.5em]
+    \item \textbf{en ramas:} descompone en subproblemas univaluados por índice ordinal de raíz,
+    \item \textbf{combinado:} conserva todas las raíces en un único conjunto y delega la separación al algoritmo iterativo de SR.
+\end{itemize}
+
+La elección afecta el tipo de hipótesis que aprende el modelo: funciones por rama explícitas o cobertura secuencial de un conjunto mixto.
+
+\subsubsection*{Archivos}
+\begin{itemize}[leftmargin=1.5em]
+    \item \texttt{src/4\_data\_preparation/root\_grouping.py}:
+    \begin{itemize}[leftmargin=1.5em]
+        \item \texttt{expand\_tuples(...)} expande cada tupla en filas \((params, root)\).
+        \item \texttt{group\_by\_root\_branch(...)} agrupa por rama ordinal.
+        \item \texttt{combine\_all\_roots(...)} crea dataset unico para modo combinado.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Módulo 5: \texttt{src/5\_symbolic\_regression}}
+\subsubsection*{Perspectiva teórica}
+Este es el núcleo del sistema. El objetivo es encontrar expresiones simbólicas $g(\theta)$ que minimicen la discrepancia con los datos observados. El enfoque implementado es de cobertura iterativa:
+\begin{enumerate}[leftmargin=1.5em]
+    \item entrenar una corrida de SR sobre puntos restantes,
+    \item evaluar candidatas del Hall of Fame,
+    \item seleccionar la expresión con mayor cobertura,
+    \item remover puntos cubiertos,
+    \item repetir hasta condicion de parada.
+\end{enumerate}
+
+Conceptualmente, es un esquema voraz sobre conjuntos de puntos cubiertos por expresiones candidatas. La calidad depende de la función de pérdida, los operadores permitidos, las restricciones estructurales y el criterio de match.
+
+\subsubsection*{Parámetros activos actuales del modelo (PySR)}
+En esta subsección se explicita, para cada parámetro de entrenamiento, el valor por defecto de PySR y el valor adoptado en el proyecto.
+
+Los valores por defecto se verificaron desde la instancia base de \texttt{PySRRegressor()} en el entorno actual.
+
+\begin{longtable}{|p{0.22\textwidth}|p{0.17\textwidth}|p{0.17\textwidth}|p{0.34\textwidth}|}
+\hline
+\textbf{Parametro} & \textbf{Default PySR} & \textbf{Valor proyecto} & \textbf{Motivo de uso} \\
+\hline
+\texttt{niterations} & \texttt{100} & \texttt{500} & Aumentar la profundidad de búsqueda para mejorar la recuperación de formas analíticas complejas. \\
+\hline
+\texttt{populations} & \texttt{31} & \texttt{30} & Mantener estrategia multiisla con alta diversidad estructural y costo controlado. \\
+\hline
+\texttt{population\_size} & \texttt{27} & \texttt{50} & Incrementar cobertura de candidatos por isla para reducir convergencia prematura. \\
+\hline
+\texttt{ncycles\_per\_iteration} & \texttt{380} & \texttt{550} & Favorecer un refinamiento local más largo antes de la siguiente migración. \\
+\hline
+\texttt{maxsize} & \texttt{30} & \texttt{25} & Acotar complejidad para evitar expresiones excesivas sin perder capacidad expresiva necesaria. \\
+\hline
+\texttt{parsimony} & \texttt{0.0} & \texttt{0.0} & Se mantiene default; el control de complejidad se hace con costos por operador y restricciones. \\
+\hline
+\texttt{model\_selection} & \texttt{best} & \texttt{best} & Se mantiene default por equilibrio entre error y complejidad en Hall of Fame. \\
+\hline
+\texttt{turbo} & \texttt{False} & \texttt{True} & Activar la ruta acelerada de evaluación para reducir el tiempo de corrida. \\
+\hline
+\texttt{procs} & \texttt{None} & \texttt{0} & Forzar una configuración conservadora de paralelismo para la estabilidad de RAM en el entorno local. \\
+\hline
+\texttt{progress} & \texttt{True} & \texttt{bool(VERBOSE)} & Acoplar salida de progreso al nivel de verbosidad global del proyecto. \\
+\hline
+\texttt{verbosity} & \texttt{1} & \texttt{1 u 0} & Ajustar detalle de logs segun ejecucion detallada o silenciosa. \\
+\hline
+\texttt{temp\_equation\_file} & \texttt{False} & \texttt{True} & Mantener trazabilidad de ecuaciones temporales durante la corrida. \\
+\hline
+\texttt{delete\_tempfiles} & \texttt{True} & \texttt{True} & Se mantiene default para limpiar temporales al finalizar. \\
+\hline
+\end{longtable}
+
+\subsubsection*{Qué significa cada parámetro de la tabla}
+\begin{itemize}[leftmargin=1.5em]
+    \item \texttt{niterations}: número de iteraciones internas de evolución que ejecuta PySR en una corrida.
+    \item \texttt{populations}: cantidad de poblaciones independientes (islas evolutivas) que se mantienen en paralelo.
+    \item \texttt{population\_size}: cantidad de individuos (ecuaciones candidatas) dentro de cada población.
+    \item \texttt{ncycles\_per\_iteration}: cantidad de ciclos evolutivos locales que se ejecutan antes de sincronización/migración.
+    \item \texttt{maxsize}: tamaño máximo permitido del árbol simbólico (complejidad estructural de una ecuación).
+    \item \texttt{parsimony}: peso de penalización por complejidad en la función objetivo de búsqueda.
+    \item \texttt{model\_selection}: regla para elegir la ecuación final desde el Hall of Fame.
+    \item \texttt{turbo}: bandera de optimización de evaluación numérica acelerada en backend Julia.
+    \item \texttt{procs}: número de procesos de Julia usados para paralelismo de evaluación.
+    \item \texttt{progress}: controla si se muestra barra de progreso durante entrenamiento.
+    \item \texttt{verbosity}: nivel de detalle de logs en consola.
+    \item \texttt{temp\_equation\_file}: indica si se escribe archivo temporal con ecuaciones intermedias.
+    \item \texttt{delete\_tempfiles}: indica si esos archivos temporales se eliminan automáticamente al terminar.
+\end{itemize}
+
+\subsubsection*{Operadores y restricciones activas}
+La gramática simbólica actual incorpora operadores base y operadores custom con sesgo de dominio:
+
+\begin{itemize}[leftmargin=1.5em]
+    \item Operadores unarios:
+    base \texttt{UNARY\_OPERATORS} con \texttt{neg} +
+    \texttt{safe\_sqrt}, \texttt{safe\_cbrt}, \texttt{safe\_root4}, \ldots, \texttt{safe\_root10}.
+    \item Operadores binarios:
+    base \texttt{BINARY\_OPERATORS} con \texttt{+}, \texttt{-}, \texttt{*}, \texttt{/} + \texttt{safe\_pow}.
+\end{itemize}
+
+La motivación técnica es estabilidad numérica e interpretabilidad:
+\begin{itemize}[leftmargin=1.5em]
+    \item \texttt{safe\_pow} preserva el signo para bases negativas y evita comportamientos no reales en potencias fraccionarias.
+    \item Se penaliza \texttt{safe\_pow} con complejidad 4 para favorecer formas más explicables cuando existe una alternativa en términos de raíces explícitas.
+    \item En la práctica, con la configuración de búsqueda actual (iteraciones/poblaciones/ciclos), cuando se intentaba expresar raíces solo a través de \texttt{safe\_pow} la convergencia no era estable.
+    \item Por esa razón se decidió explicitar operadores de raíz \texttt{safe\_sqrt}, \texttt{safe\_cbrt}, \texttt{safe\_root4}, \ldots, \texttt{safe\_root10}; con esta gramática la convergencia observada fue consistente en los casos de trabajo.
+    \item Se aplican restricciones de anidamiento para evitar explosiones combinatorias (por ejemplo, no permitir anidamiento arbitrario entre operadores de raíz).
+    \item Se agrega \texttt{constraints[safe\_pow] = (9, 1)} para controlar complejidad de argumentos en potencia segura.
+\end{itemize}
+
+\subsubsection*{Funciones de pérdida y criterio de match}
+Las funciones de pérdida definen \textbf{qué significa "mejor"} durante el entrenamiento evolutivo. En este proyecto hay tres modos, implementados en \texttt{src/5\_symbolic\_regression/loss\_functions.py} e inyectados al modelo desde \texttt{symbolic\_regression.py}.
+
+\paragraph{1) MSE (error cuadrático medio, modo base)}
+Es la pérdida por defecto del backend de SymbolicRegression.jl cuando no se activa ninguna pérdida custom:
+\[
+L_{MSE}=\frac{1}{N}\sum_{i=1}^{N}(\hat y_i-y_i)^2
+\]
+\textbf{Interpretación:}
+\begin{itemize}[leftmargin=1.5em]
+    \item penaliza fuertemente errores grandes (cuadrático),
+    \item favorece un buen ajuste promedio global,
+    \item sirve como baseline estándar para comparar contra las otras pérdidas.
+\end{itemize}
+
+\paragraph{2) Perdida sigmoidal (umbral suave)}
+Se implementa por punto como:
+\[
+L_{sig}(y,\hat y)=\frac{1}{1+\exp\left(-k\left(|y-\hat y|-\varepsilon\right)\right)}
+\]
+y la pérdida de la expresión es el promedio de esos valores punto a punto.
+
+\textbf{Interpretación:}
+\begin{itemize}[leftmargin=1.5em]
+    \item si $|y-\hat y|<\varepsilon$, la pérdida tiende a 0,
+    \item si $|y-\hat y|>\varepsilon$, la pérdida tiende a 1,
+    \item $\varepsilon$ define la banda de tolerancia y $k$ define qué tan abrupta es la transición.
+\end{itemize}
+
+\paragraph{3) Pérdida de conteo duro de matches}
+Se implementa por punto como una función indicadora:
+\[
+L_{hard}(y,\hat y)=\mathbf{1}\left(|y-\hat y|\geq\varepsilon_{mc}\right)
+\]
+y al promediar en el dataset se obtiene la fracción de no-matches.
+
+\textbf{Interpretación:}
+\begin{itemize}[leftmargin=1.5em]
+    \item optimiza directamente la cobertura (maximizar matches),
+    \item no diferencia cuánto se falla, solo si matchea o no,
+    \item alinea el entrenamiento con el objetivo final de cubrir la mayor cantidad de puntos.
+\end{itemize}
+
+\paragraph{Activación práctica de cada modo}
+\begin{itemize}[leftmargin=1.5em]
+    \item \textbf{MSE (actual por defecto):}
+    \texttt{USE\_SIGMOID\_LOSS = False} y
+    \texttt{USE\_MATCH\_COUNT\_LOSS = False}.
+    \item \textbf{Sigmoidal:}
+    \texttt{USE\_SIGMOID\_LOSS = True}.
+    \item \textbf{Conteo duro:}
+    \texttt{USE\_MATCH\_COUNT\_LOSS = True} y
+    \texttt{MATCH\_COUNT\_EPSILON = 1e-4}.
+\end{itemize}
+
+Regla de consistencia: no se permite activar simultáneamente \texttt{USE\_SIGMOID\_LOSS} y \texttt{USE\_MATCH\_COUNT\_LOSS}.
+
+\paragraph{Relación entre pérdida de entrenamiento y criterio de match}
+Además de la pérdida de entrenamiento, el proyecto aplica un criterio de match para medir cobertura al evaluar ecuaciones candidatas:
+\begin{itemize}[leftmargin=1.5em]
+    \item para MSE y sigmoidal se usa match \textbf{relativo}:
+    $|y-\hat y| < \varepsilon(1+|y|)$ con \texttt{EPSILON = 0.005},
+    \item para conteo duro se usa match \textbf{absoluto}:
+    $|y-\hat y| < \varepsilon_{mc}$.
+\end{itemize}
+
+Esta separación entre "pérdida para entrenar" y "regla de match para cobertura" es clave para interpretar los resultados del algoritmo iterativo.
+
+\subsubsection*{Características del algoritmo iterativo}
+El algoritmo del wrapper externo (función \texttt{iterative\_symbolic\_regression}) trabaja sobre puntos remanentes y produce una secuencia de ecuaciones.
+
+\paragraph{Qué significa una iteración en este proyecto}
+Una iteración externa corresponde a:
+\begin{enumerate}[leftmargin=1.5em]
+    \item correr \textbf{una} vez PySR sobre los puntos restantes,
+    \item evaluar todo el Hall of Fame,
+    \item elegir la ecuación con mayor cantidad de matches,
+    \item si pasa el umbral mínimo, remover sus puntos y continuar.
+\end{enumerate}
+
+Por eso hay dos escalas de iteración:
+\begin{itemize}[leftmargin=1.5em]
+    \item \textbf{iteración interna de PySR:} \texttt{niterations = 500},
+    \item \textbf{iteración externa del wrapper:} contador \texttt{iteration} del algoritmo iterativo.
+\end{itemize}
+
+\paragraph{Costo computacional}
+En primera aproximacion,
+\[
+\text{costo total} \propto I_{ext} \times C_{PySR}(niterations, populations, population\_size, ncycles\_per\_iteration)
+\]
+donde $I_{ext}$ es el número de iteraciones externas aceptadas/reintentadas.
+
+\subsubsection*{Condiciones de parada actualmente vigentes}
+El loop externo se detiene por cualquiera de estas condiciones:
+
+\begin{enumerate}[leftmargin=1.5em]
+    \item \textbf{Pocos puntos restantes:} si \texttt{len(X\_remaining) < MIN\_POINTS}.
+    Hoy: \texttt{MIN\_POINTS = 5}.
+    \item \textbf{Máximo de iteraciones externas:} si \texttt{MAX\_ITERATIONS} no es \texttt{None} y se supera.
+    Hoy: \texttt{MAX\_ITERATIONS = None} (sin tope fijo).
+    \item \textbf{Estancamiento por cero match:} si hay \texttt{MAX\_CONSECUTIVE\_NO\_MATCH} iteraciones seguidas sin matches.
+    Hoy: \texttt{MAX\_CONSECUTIVE\_NO\_MATCH = 3}.
+    \item \textbf{Estancamiento por baja cobertura:} si la mejor ecuación de la iteración queda por debajo de
+    \texttt{MIN\_MATCH\_FRACTION} y eso se repite consecutivamente hasta el mismo limite.
+    Hoy: \texttt{MIN\_MATCH\_FRACTION = 0.05}.
+\end{enumerate}
+\subsubsection*{Archivos}
+\begin{itemize}[leftmargin=1.5em]
+    \item \texttt{src/5\_symbolic\_regression/symbolic\_regression.py}:
+    \begin{itemize}[leftmargin=1.5em]
+        \item construye y entrena \texttt{PySRRegressor} con operadores base y custom seguros,
+        \item define mappings a SymPy y restricciones de anidamiento,
+        \item evalúa Hall of Fame para maximizar puntos matcheados,
+        \item implementa el algoritmo iterativo y sus condiciones de parada.
+    \end{itemize}
+    \item \texttt{src/5\_symbolic\_regression/loss\_functions.py}:
+    \begin{itemize}[leftmargin=1.5em]
+        \item define \texttt{sigmoid\_loss} y \texttt{match\_count\_loss} en Python,
+        \item expone versiones equivalentes en sintaxis Julia para PySR.
+    \end{itemize}
+    \item \texttt{src/5\_symbolic\_regression/utils.py}:
+    \begin{itemize}[leftmargin=1.5em]
+        \item define criterio de match relativo/absoluto,
+        \item provee funciones de trazabilidad por iteración.
+    \end{itemize}
+    \item \texttt{src/5\_symbolic\_regression/regression\_adapter.py}:
+    \begin{itemize}[leftmargin=1.5em]
+        \item interfaz de ejecución para modo por ramas y modo combinado,
+        \item desacopla el consumo de datos del motor iterativo.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Módulo 6: \texttt{src/6\_expression\_builder}}
+\subsubsection*{Perspectiva teórica}
+Este módulo estandariza la salida de la etapa de regresión simbólica para reportar, de forma explícita, las funciones descubiertas por rama.
+
+También aporta utilidades de resumen orientadas a reporte, preservando la trazabilidad entre ecuación encontrada y cobertura de puntos.
+
+\subsubsection*{Archivos}
+\begin{itemize}[leftmargin=1.5em]
+    \item \texttt{src/6\_expression\_builder/functions\_report.py}:
+    \begin{itemize}[leftmargin=1.5em]
+        \item \texttt{return\_discovered\_functions(...)} devuelve sin postproceso las funciones encontradas.
+        \item \texttt{summarize\_discovered\_functions(...)} genera un resumen liviano con índice, ecuación y puntos matcheados.
+    \end{itemize}
+\end{itemize}
+
+\section{Benchmark del pipeline}
+\subsection{Catálogo de casos y respuesta esperada}
+El benchmark actual del proyecto usa 43 casos. Cada uno fija una ecuación, rangos de parámetros y una lista ordenada de raíces esperadas (una por rama real).
+
+\subsubsection*{Listado completo por categoría}
+
+\newcommand{\casobench}[3]{%
+    \item \textbf{\texttt{#1}}\\
+    \textbf{Ecuación:}\\
+    \begin{minipage}[t]{0.92\linewidth}\ttfamily #2 = 0\end{minipage}\\
+    \textbf{Ramas esperadas:}\\
+    \begin{minipage}[t]{0.92\linewidth}\ttfamily #3\end{minipage}
+    \vspace{0.35em}
+}
+
+\paragraph{Lineales (casos 1--10)}
+\begin{itemize}[leftmargin=1.5em]
+    \casobench{linear\_01\_basic}{$x + a - 2$}{$[2 - a]$}
+    \casobench{linear\_02\_scaled}{$2x - a$}{$[\frac{a}{2}]$}
+    \casobench{linear\_03\_offset}{$x - 3a + 5$}{$[3a - 5]$}
+    \casobench{linear\_04\_fraction}{$3x + a - 6$}{$[\frac{6 - a}{3}]$}
+    \casobench{linear\_05\_negative}{$-x + a + 1$}{$[a + 1]$}
+    \casobench{linear\_06\_two\_params}{$x - a - b$}{$[a + b]$}
+    \casobench{linear\_07\_scaled\_params}{$x - 2a + 3b$}{$[2a - 3b]$}
+    \casobench{linear\_08\_product\_param}{$x - ab$}{$[ab]$}
+    \casobench{linear\_09\_division}{$ax - b$}{$[\frac{b}{a}]$}
+    \casobench{linear\_10\_three\_params}{$x - a - b - c$}{$[a + b + c]$}
+\end{itemize}
+
+\paragraph{Cuadráticas (casos 11--24)}
+\begin{itemize}[leftmargin=1.5em]
+    \casobench{quadratic\_11\_simple}{$x^2 - a$}{$[-\sqrt{a}, \sqrt{a}]$}
+    \casobench{quadratic\_12\_shifted}{$x^2 - 2ax + a^2$}{$[a]$}
+    \casobench{quadratic\_13\_factored}{$(x - a)(x + a)$}{$[-a, a]$}
+    \casobench{quadratic\_14\_linear\_coeff}{$x^2 + ax$}{$[-a, 0]$}
+    \casobench{quadratic\_15\_full}{$x^2 - 3ax + 2a^2$}{$[a, 2a]$}
+    \casobench{quadratic\_16\_irrational}{$x^2 - 2x - a$}{$[1 - \sqrt{1 + a}, 1 + \sqrt{1 + a}]$}
+    \casobench{quadratic\_17\_param\_coeff}{$ax^2 - 1$}{$[-\frac{1}{\sqrt{a}}, \frac{1}{\sqrt{a}}]$}
+    \casobench{quadratic\_18\_two\_params}{$x^2 - ax - b$}{$[\frac{a - \sqrt{a^2 + 4b}}{2}, \frac{a + \sqrt{a^2 + 4b}}{2}]$}
+    \casobench{quadratic\_19\_full\_abc}{$ax^2 + bx + c$}{$[\frac{-b - \sqrt{b^2 - 4ac}}{2a}, \frac{-b + \sqrt{b^2 - 4ac}}{2a}]$}
+    \casobench{quadratic\_20\_factored\_two}{$(x - a)(x - b)$}{$[b, a]$}
+    \casobench{quadratic\_21\_sum\_product}{$x^2 - (a + b)x + ab$}{$[b, a]$}
+    \casobench{quadratic\_22\_symmetric}{$x^2 - a^2 - b^2$}{$[-\sqrt{a^2 + b^2}, \sqrt{a^2 + b^2}]$}
+    \casobench{quadratic\_23\_nested}{$x^2 - 4ab$}{$[-2\sqrt{ab}, 2\sqrt{ab}]$}
+    \casobench{quadratic\_24\_depressed}{$x^2 + ax + \frac{a^2}{4}$}{$[-\frac{a}{2}]$}
+\end{itemize}
+
+\paragraph{Cúbicas (casos 25--30)}
+\begin{itemize}[leftmargin=1.5em]
+    \casobench{cubic\_25\_one\_root}{$x^3 - a$}{$[a^{1/3}]$}
+    \casobench{cubic\_26\_factored}{$x(x - a)(x + a)$}{$[-a, 0, a]$}
+    \casobench{cubic\_27\_quadratic\_factor}{$(x - a)(x^2 + 1)$}{$[a]$}
+    \casobench{cubic\_28\_depressed}{$x^3 - 3ax + 2a^{3/2}$}{$[-2\sqrt{a}, \sqrt{a}]$}
+    \casobench{cubic\_29\_two\_params}{$x^3 - abx$}{$[-\sqrt{ab}, 0, \sqrt{ab}]$}
+    \casobench{cubic\_30\_triple}{$(x - a)^3$}{$[a]$}
+\end{itemize}
+
+\paragraph{Cuárticas y quíntica (casos 31--35)}
+\begin{itemize}[leftmargin=1.5em]
+    \casobench{quartic\_31\_biquadratic}{$x^4 - a^2$}{$[-\sqrt{a}, \sqrt{a}]$}
+    \casobench{quartic\_32\_factored}{$(x - a)(x + a)(x - 2a)(x + 2a)$}{$[-2a, -a, a, 2a]$}
+    \casobench{quartic\_33\_double\_quadratic}{$(x^2 - a)(x^2 - b)$}{$[-\sqrt{b}, -\sqrt{a}, \sqrt{a}, \sqrt{b}]$}
+    \casobench{quintic\_34\_factored}{$x(x - a)(x + a)(x - 2a)(x + 2a)$}{$[-2a, -a, 0, a, 2a]$}
+    \casobench{quartic\_35\_repeated}{$(x - a)^2(x + a)^2$}{$[-a, a]$}
+\end{itemize}
+
+\paragraph{Especiales (casos 36--43)}
+\begin{itemize}[leftmargin=1.5em]
+    \casobench{special\_36\_reciprocal}{$ax - 1$}{$[\frac{1}{a}]$}
+    \casobench{special\_37\_ratio}{$ax - b$}{$[\frac{b}{a}]$}
+    \casobench{special\_38\_quadratic\_ratio}{$x^2 - \frac{a}{b}$}{$[-\sqrt{\frac{a}{b}}, \sqrt{\frac{a}{b}}]$}
+    \casobench{special\_39\_difference\_of\_squares}{$x^2 - (a - b)^2$}{$[-(a - b), a - b]$}
+    \casobench{special\_40\_linear\_three\_params}{$ax + bx - c$}{$[\frac{c}{a + b}]$}
+    \casobench{special\_41\_square\_root\_form}{$x^2 - (a + b)^2$}{$[-(a + b), a + b]$}
+    \casobench{special\_42\_cubic\_simple}{$x^3 - a^3$}{$[a]$}
+    \casobench{special\_43\_mixed}{$x^2 - ax - bx + ab$}{$[b, a]$}
+\end{itemize}
+
+\subsection{Propiedad de no cruce de ramas}
+En estos casos de prueba, las ramas no se cruzan. El catálogo se construyó con rangos de parámetros que conservan el orden de las raíces esperadas en cada caso multirrama (de menor a mayor), evitando intercambios de etiqueta entre rama 1, rama 2, etc.
+
+\subsection{Resultado observado con parámetros actuales}
+Con los parámetros actuales de SR del proyecto, usando pérdida MSE y modo \texttt{branches}, la batería completa de \texttt{43} casos registró éxito de pipeline en todos los casos.
+
+\subsection{Pendiente experimental}
+Queda pendiente ejecutar estos mismos \texttt{43} casos en modo \texttt{combined} para cada una de las tres expresiones de pérdida:
+\begin{enumerate}[leftmargin=1.5em]
+    \item MSE,
+    \item sigmoidal,
+    \item match count (conteo duro).
+\end{enumerate}
+\end{document}

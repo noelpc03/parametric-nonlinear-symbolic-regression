@@ -23,14 +23,14 @@ VERBOSE = True
 SAVE_INTERMEDIATE = True
 
 # Nombre del experimento (para organizar outputs)
-EXPERIMENT_NAME = "linear_test"
+EXPERIMENT_NAME = "test_1"
 
 # ============================================================
 # 2. DEFINICIÓN DE LA ECUACIÓN
 # ============================================================
 
 # Ecuación a resolver: f(x; params) = 0
-# Caso benchmark manual: quadratic_13_factored
+# Caso quadratic_13_factored
 # (x - a) * (x + a) = 0  -> raíces esperadas: -a y a
 EQUATION_STRING = "(x - a) * (x + a)"
 VARIABLES = ["x"]
@@ -92,8 +92,8 @@ EPSILON = 0.005  # Tolerancia relativa para considerar un punto como "matcheado"
 K = 100  # No se usa con MSE loss, solo para matcheo
 
 # ── Parámetros del modelo PySR ──
-NITERATIONS = 500  # Más iteraciones: con batching la RAM no crece
-POPULATIONS = 30  # Más poblaciones con batching (solo evalúa 200 pts/batch, no todos)
+NITERATIONS = 500 
+POPULATIONS = 30  
 UNARY_OPERATORS = ["neg"]
 BINARY_OPERATORS = ["+", "-", "*", "/"]
 

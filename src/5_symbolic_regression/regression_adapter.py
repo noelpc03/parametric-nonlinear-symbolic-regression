@@ -28,6 +28,18 @@ def run_symbolic_regression_for_branch(branch_data: Dict[str, np.ndarray],
     """
     Ejecuta regresión simbólica para una rama de raíces.
     La lógica iterativa y criterios de parada están dentro de iterative_symbolic_regression.
+
+    Args:
+        branch_data: Diccionario con 'X' (parámetros) e 'y' (raíces) de una rama
+        param_names: Lista de nombres de parámetros
+        branch_index: Índice de la rama para trazabilidad en logs
+        epsilon: Tolerancia de matcheo
+        k: Pendiente para la loss sigmoidal (si está activa)
+        niterations: Iteraciones internas de PySR por corrida
+        min_points: Mínimo de puntos para continuar la búsqueda iterativa
+
+    Returns:
+        results: Lista de ecuaciones/iteraciones aceptadas para esa rama
     """
     X = branch_data['X']
     y = branch_data['y']
@@ -58,6 +70,17 @@ def run_for_all_branches(branches: List[Dict[str, np.ndarray]],
                         min_points: int = MIN_POINTS) -> List[List[Dict[str, Any]]]:
     """
     Ejecuta regresión simbólica para todas las ramas.
+
+    Args:
+        branches: Lista de datasets por rama, cada uno con 'X' e 'y'
+        param_names: Lista de nombres de parámetros
+        epsilon: Tolerancia de matcheo
+        k: Pendiente para la loss sigmoidal (si está activa)
+        niterations: Iteraciones internas de PySR por corrida
+        min_points: Mínimo de puntos para continuar la búsqueda iterativa
+
+    Returns:
+        all_results: Lista con resultados por rama
     """
     all_results = []
 

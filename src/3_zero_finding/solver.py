@@ -136,11 +136,14 @@ def solve_for_all_parameter_tuples(equation: sp.Expr,
     
     Args:
         equation: Ecuación a resolver
-        variables: Lista de variables a resolver
-        param_names: Lista de nombres de parámetros
-        param_symbols: Diccionario de símbolos de parámetros
+        variables: Lista de variables incógnita a resolver
+        param_names: Lista de nombres de parámetros en el orden del grid
+        param_symbols: Diccionario {nombre: símbolo} de parámetros
         parameter_grid: Array (N, num_params) con tuplas de parámetros
-        ... (otros parámetros igual que solve_equation_for_parameters)
+        method: Método de resolución ('solve' o 'nsolve')
+        filter_complex: Si True, filtra raíces complejas
+        complex_tol: Tolerancia para considerar una raíz como real
+        sort_roots: Si True, ordena las raíces numéricamente
     
     Returns:
         results: Lista de diccionarios con resultados por tupla
