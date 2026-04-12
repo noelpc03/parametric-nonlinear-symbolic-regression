@@ -1,0 +1,19 @@
+EXPRESIONES ANALÍTICAS DESCUBIERTAS
+======================================================================
+
+Ecuación original: a*x**2 + b*x + c = 0
+Variables: ['x']
+Parámetros: ['a', 'b', 'c']
+
+
+RAMA 1 (raíz #1):
+----------------------------------------------------------------------
+Expresión única:
+  x = (b + safe_sqrt((b * b) + ((c * -4.0000005) * a))) / (a * -2.0000007)
+  Puntos cubiertos: 1056
+
+RAMA 2 (raíz #2):
+----------------------------------------------------------------------
+Expresión única:
+  x = (safe_sqrt(((a * c) * 4.0) - (b * b)) - b) * (0.5 / a)
+  Puntos cubiertos: 1056

@@ -1,0 +1,60 @@
+BENCHMARK DEL PIPELINE — 2026-03-03 03:18:29
+======================================================================
+
+Casos ejecutados: 8
+Tiempo total: 2409.0s
+
+Tasa de éxito (pipeline): 100.0%
+Raíces descubiertas:      83.3%
+Casos perfectos:          7/8 (87.5%)
+Cobertura promedio:       100.0%
+
+======================================================================
+DETALLE POR CASO
+======================================================================
+
+special_36_reciprocal [special/easy]: ✓ PERFECTO (168.0s)
+  ✓ esperada: 1/a
+    descubierta: 1.0 / a
+
+special_37_ratio [special/easy]: ✓ PERFECTO (205.7s)
+  ✓ esperada: b/a
+    descubierta: b / a
+
+special_38_quadratic_ratio [special/medium]: ✓ PERFECTO (362.2s)
+  ✓ esperada: -sqrt(a/b)
+    descubierta: neg(safe_pow(b / a, -0.5))
+  ✓ esperada: sqrt(a/b)
+    descubierta: safe_pow(b / a, -0.5)
+
+special_39_difference_of_squares [special/medium]: ✗ FALLIDO (557.6s)
+  ✗ esperada: -(a - b)
+    descubierta: (no matcheó)
+    más cercana: safe_pow(a - b, 4.5159463e-9) * (b - a)  [coincidencia=52.0%, error=0.4007]
+  ✗ esperada: a - b
+    descubierta: (no matcheó)
+    más cercana: safe_pow(b - a, 9.032606e-9) * (b - a)  [coincidencia=52.0%, error=0.4007]
+  ⚠ Raíces descubiertas sin match con esperadas:
+    → safe_pow(a - b, 4.5159463e-9) * (b - a)
+    → safe_pow(b - a, 9.032606e-9) * (b - a)
+
+special_40_linear_three_params [special/medium]: ✓ PERFECTO (196.5s)
+  ✓ esperada: c / (a + b)
+    descubierta: c / (a + b)
+
+special_41_square_root_form [special/medium]: ✓ PERFECTO (344.4s)
+  ✓ esperada: -(a + b)
+    descubierta: neg(b + a)
+  ✓ esperada: a + b
+    descubierta: a + b
+
+special_42_cubic_simple [special/medium]: ✓ PERFECTO (163.3s)
+  ✓ esperada: a
+    descubierta: a
+
+special_43_mixed [special/medium]: ✓ PERFECTO (410.5s)
+  ✓ esperada: b
+    descubierta: b
+  ✓ esperada: a
+    descubierta: a
+

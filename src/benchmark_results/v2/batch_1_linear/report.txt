@@ -1,0 +1,55 @@
+BENCHMARK DEL PIPELINE — 2026-03-02 19:29:29
+======================================================================
+
+Casos ejecutados: 10
+Tiempo total: 2327.3s
+
+Tasa de éxito (pipeline): 100.0%
+Raíces descubiertas:      100.0%
+Casos perfectos:          10/10 (100.0%)
+Cobertura promedio:       100.0%
+
+======================================================================
+DETALLE POR CASO
+======================================================================
+
+linear_01_basic [linear/easy]: ✓ PERFECTO (166.7s)
+  ✓ esperada: 2 - a
+    descubierta: 2.0 - a
+
+linear_02_scaled [linear/easy]: ✓ PERFECTO (202.6s)
+  ✓ esperada: a / 2
+    descubierta: a * 0.5
+
+linear_03_offset [linear/easy]: ✓ PERFECTO (238.5s)
+  ✓ esperada: 3*a - 5
+    descubierta: (a * 3.0) + -5.0
+
+linear_04_fraction [linear/easy]: ✓ PERFECTO (228.8s)
+  ✓ esperada: (6 - a) / 3
+    descubierta: (a * -0.33333334) + 2.0
+
+linear_05_negative [linear/easy]: ✓ PERFECTO (217.2s)
+  ✓ esperada: a + 1
+    descubierta: a - -1.0
+
+linear_06_two_params [linear/easy]: ✓ PERFECTO (284.3s)
+  ✓ esperada: a + b
+    descubierta: b + a
+
+linear_07_scaled_params [linear/easy]: ✓ PERFECTO (259.1s)
+  ✓ esperada: 2*a - 3*b
+    descubierta: (b + (a * -0.6666667)) * -3.0
+
+linear_08_product_param [linear/medium]: ✓ PERFECTO (245.2s)
+  ✓ esperada: a*b
+    descubierta: b * a
+
+linear_09_division [linear/medium]: ✓ PERFECTO (241.4s)
+  ✓ esperada: b / a
+    descubierta: b / a
+
+linear_10_three_params [linear/easy]: ✓ PERFECTO (243.5s)
+  ✓ esperada: a + b + c
+    descubierta: b + (c + a)
+

@@ -1,0 +1,17 @@
+BENCHMARK DEL PIPELINE — 2026-03-29 15:50:27
+======================================================================
+
+Casos ejecutados: 1
+Tiempo total: 1.7s
+
+Tasa de éxito (pipeline): 0.0%
+Raíces descubiertas:      0.0%
+Casos perfectos:          0/1 (0.0%)
+Cobertura promedio:       0.0%
+
+======================================================================
+DETALLE POR CASO
+======================================================================
+
+quintic_34_factored [quintic/hard]: ✗ FALLIDO (1.7s)
+

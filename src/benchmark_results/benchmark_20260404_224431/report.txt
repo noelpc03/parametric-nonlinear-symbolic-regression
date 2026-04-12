@@ -1,0 +1,25 @@
+BENCHMARK DEL PIPELINE — 2026-04-04 22:44:31
+======================================================================
+
+Casos ejecutados: 1
+Tiempo total: 1006.2s
+
+Tasa de éxito (pipeline): 100.0%
+Raíces descubiertas:      100.0%
+Casos perfectos:          1/1 (100.0%)
+Cobertura promedio:       100.0%
+
+======================================================================
+DETALLE POR CASO
+======================================================================
+
+quartic_32_factored [quartic/hard]: ✓ PERFECTO (1006.1s)
+  ✓ esperada: -2*a
+    descubierta: neg(a + a)
+  ✓ esperada: -a
+    descubierta: neg(a)
+  ✓ esperada: a
+    descubierta: a
+  ✓ esperada: 2*a
+    descubierta: a + a
+

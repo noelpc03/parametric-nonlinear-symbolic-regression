@@ -1,0 +1,42 @@
+[
+  {
+    "name": "special_36_reciprocal",
+    "category": "special",
+    "difficulty": "easy",
+    "equation": "a*x - 1",
+    "expected_roots": [
+      "1/a"
+    ],
+    "num_branches_expected": 1,
+    "discovered_roots": [
+      "safe_pow(a, -1.0)"
+    ],
+    "num_branches_found": 1,
+    "branch_results": [
+      {
+        "branch_index": 0,
+        "num_data_points": 50,
+        "functions_found": [
+          {
+            "equation": "safe_pow(a, -1.0)",
+            "num_matched": 50
+          }
+        ],
+        "total_points_matched": 50,
+        "coverage": 1.0
+      }
+    ],
+    "total_time_seconds": 98.04510045051575,
+    "status": "success",
+    "error_message": null,
+    "stages_timing": {
+      "parse": 0.01570916175842285,
+      "grid": 8.296966552734375e-05,
+      "solve": 0.1653432846069336,
+      "grouping": 5.7697296142578125e-05,
+      "symbolic_regression": 97.86389660835266
+    },
+    "num_grid_points": 50,
+    "num_solved": 50
+  }
+]

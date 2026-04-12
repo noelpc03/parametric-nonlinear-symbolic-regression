@@ -1,0 +1,402 @@
+[
+  {
+    "name": "linear_01_basic",
+    "category": "linear",
+    "difficulty": "easy",
+    "equation": "x + a - 2",
+    "expected_roots": [
+      "2 - a"
+    ],
+    "num_branches_expected": 1,
+    "discovered_roots": [
+      "2.0 - a"
+    ],
+    "num_branches_found": 1,
+    "branch_results": [
+      {
+        "branch_index": 0,
+        "num_data_points": 50,
+        "functions_found": [
+          {
+            "equation": "2.0 - a",
+            "num_matched": 50
+          }
+        ],
+        "total_points_matched": 50,
+        "coverage": 1.0
+      }
+    ],
+    "total_time_seconds": 166.68919944763184,
+    "status": "success",
+    "error_message": null,
+    "stages_timing": {
+      "parse": 0.01747417449951172,
+      "grid": 0.00010085105895996094,
+      "solve": 0.09829187393188477,
+      "grouping": 5.245208740234375e-05,
+      "symbolic_regression": 166.57327008247375
+    },
+    "num_grid_points": 50,
+    "num_solved": 50
+  },
+  {
+    "name": "linear_02_scaled",
+    "category": "linear",
+    "difficulty": "easy",
+    "equation": "2*x - a",
+    "expected_roots": [
+      "a / 2"
+    ],
+    "num_branches_expected": 1,
+    "discovered_roots": [
+      "a * 0.5"
+    ],
+    "num_branches_found": 1,
+    "branch_results": [
+      {
+        "branch_index": 0,
+        "num_data_points": 50,
+        "functions_found": [
+          {
+            "equation": "a * 0.5",
+            "num_matched": 50
+          }
+        ],
+        "total_points_matched": 50,
+        "coverage": 1.0
+      }
+    ],
+    "total_time_seconds": 202.5854594707489,
+    "status": "success",
+    "error_message": null,
+    "stages_timing": {
+      "parse": 0.0004241466522216797,
+      "grid": 6.628036499023438e-05,
+      "solve": 0.14392542839050293,
+      "grouping": 6.198883056640625e-05,
+      "symbolic_regression": 202.44097256660461
+    },
+    "num_grid_points": 50,
+    "num_solved": 50
+  },
+  {
+    "name": "linear_03_offset",
+    "category": "linear",
+    "difficulty": "easy",
+    "equation": "x - 3*a + 5",
+    "expected_roots": [
+      "3*a - 5"
+    ],
+    "num_branches_expected": 1,
+    "discovered_roots": [
+      "(a * 3.0) + -5.0"
+    ],
+    "num_branches_found": 1,
+    "branch_results": [
+      {
+        "branch_index": 0,
+        "num_data_points": 50,
+        "functions_found": [
+          {
+            "equation": "(a * 3.0) + -5.0",
+            "num_matched": 50
+          }
+        ],
+        "total_points_matched": 50,
+        "coverage": 1.0
+      }
+    ],
+    "total_time_seconds": 238.48262095451355,
+    "status": "success",
+    "error_message": null,
+    "stages_timing": {
+      "parse": 0.0005822181701660156,
+      "grid": 6.794929504394531e-05,
+      "solve": 0.20555949211120605,
+      "grouping": 6.914138793945312e-05,
+      "symbolic_regression": 238.27633500099182
+    },
+    "num_grid_points": 50,
+    "num_solved": 50
+  },
+  {
+    "name": "linear_04_fraction",
+    "category": "linear",
+    "difficulty": "easy",
+    "equation": "3*x + a - 6",
+    "expected_roots": [
+      "(6 - a) / 3"
+    ],
+    "num_branches_expected": 1,
+    "discovered_roots": [
+      "(a * -0.33333334) + 2.0"
+    ],
+    "num_branches_found": 1,
+    "branch_results": [
+      {
+        "branch_index": 0,
+        "num_data_points": 50,
+        "functions_found": [
+          {
+            "equation": "(a * -0.33333334) + 2.0",
+            "num_matched": 50
+          }
+        ],
+        "total_points_matched": 50,
+        "coverage": 1.0
+      }
+    ],
+    "total_time_seconds": 228.82373428344727,
+    "status": "success",
+    "error_message": null,
+    "stages_timing": {
+      "parse": 0.00047326087951660156,
+      "grid": 7.486343383789062e-05,
+      "solve": 0.14012479782104492,
+      "grouping": 8.153915405273438e-05,
+      "symbolic_regression": 228.68296790122986
+    },
+    "num_grid_points": 50,
+    "num_solved": 50
+  },
+  {
+    "name": "linear_05_negative",
+    "category": "linear",
+    "difficulty": "easy",
+    "equation": "-x + a + 1",
+    "expected_roots": [
+      "a + 1"
+    ],
+    "num_branches_expected": 1,
+    "discovered_roots": [
+      "a - -1.0"
+    ],
+    "num_branches_found": 1,
+    "branch_results": [
+      {
+        "branch_index": 0,
+        "num_data_points": 50,
+        "functions_found": [
+          {
+            "equation": "a - -1.0",
+            "num_matched": 50
+          }
+        ],
+        "total_points_matched": 50,
+        "coverage": 1.0
+      }
+    ],
+    "total_time_seconds": 217.20071363449097,
+    "status": "success",
+    "error_message": null,
+    "stages_timing": {
+      "parse": 0.0005710124969482422,
+      "grid": 0.00010037422180175781,
+      "solve": 0.1614522933959961,
+      "grouping": 7.152557373046875e-05,
+      "symbolic_regression": 217.0385091304779
+    },
+    "num_grid_points": 50,
+    "num_solved": 50
+  },
+  {
+    "name": "linear_06_two_params",
+    "category": "linear",
+    "difficulty": "easy",
+    "equation": "x - a - b",
+    "expected_roots": [
+      "a + b"
+    ],
+    "num_branches_expected": 1,
+    "discovered_roots": [
+      "b + a"
+    ],
+    "num_branches_found": 1,
+    "branch_results": [
+      {
+        "branch_index": 0,
+        "num_data_points": 225,
+        "functions_found": [
+          {
+            "equation": "b + a",
+            "num_matched": 225
+          }
+        ],
+        "total_points_matched": 225,
+        "coverage": 1.0
+      }
+    ],
+    "total_time_seconds": 284.3024022579193,
+    "status": "success",
+    "error_message": null,
+    "stages_timing": {
+      "parse": 0.0005474090576171875,
+      "grid": 0.0001671314239501953,
+      "solve": 0.3605623245239258,
+      "grouping": 0.00023055076599121094,
+      "symbolic_regression": 283.94088673591614
+    },
+    "num_grid_points": 225,
+    "num_solved": 225
+  },
+  {
+    "name": "linear_07_scaled_params",
+    "category": "linear",
+    "difficulty": "easy",
+    "equation": "x - 2*a + 3*b",
+    "expected_roots": [
+      "2*a - 3*b"
+    ],
+    "num_branches_expected": 1,
+    "discovered_roots": [
+      "(b + (a * -0.6666667)) * -3.0"
+    ],
+    "num_branches_found": 1,
+    "branch_results": [
+      {
+        "branch_index": 0,
+        "num_data_points": 225,
+        "functions_found": [
+          {
+            "equation": "(b + (a * -0.6666667)) * -3.0",
+            "num_matched": 225
+          }
+        ],
+        "total_points_matched": 225,
+        "coverage": 1.0
+      }
+    ],
+    "total_time_seconds": 259.0740830898285,
+    "status": "success",
+    "error_message": null,
+    "stages_timing": {
+      "parse": 0.0006403923034667969,
+      "grid": 0.000141143798828125,
+      "solve": 0.46906447410583496,
+      "grouping": 0.00031638145446777344,
+      "symbolic_regression": 258.6039125919342
+    },
+    "num_grid_points": 225,
+    "num_solved": 225
+  },
+  {
+    "name": "linear_08_product_param",
+    "category": "linear",
+    "difficulty": "medium",
+    "equation": "x - a*b",
+    "expected_roots": [
+      "a*b"
+    ],
+    "num_branches_expected": 1,
+    "discovered_roots": [
+      "b * a"
+    ],
+    "num_branches_found": 1,
+    "branch_results": [
+      {
+        "branch_index": 0,
+        "num_data_points": 225,
+        "functions_found": [
+          {
+            "equation": "b * a",
+            "num_matched": 225
+          }
+        ],
+        "total_points_matched": 225,
+        "coverage": 1.0
+      }
+    ],
+    "total_time_seconds": 245.18045568466187,
+    "status": "success",
+    "error_message": null,
+    "stages_timing": {
+      "parse": 0.0004987716674804688,
+      "grid": 0.0001499652862548828,
+      "solve": 0.5867366790771484,
+      "grouping": 0.0002715587615966797,
+      "symbolic_regression": 244.59278869628906
+    },
+    "num_grid_points": 225,
+    "num_solved": 225
+  },
+  {
+    "name": "linear_09_division",
+    "category": "linear",
+    "difficulty": "medium",
+    "equation": "a*x - b",
+    "expected_roots": [
+      "b / a"
+    ],
+    "num_branches_expected": 1,
+    "discovered_roots": [
+      "b / a"
+    ],
+    "num_branches_found": 1,
+    "branch_results": [
+      {
+        "branch_index": 0,
+        "num_data_points": 225,
+        "functions_found": [
+          {
+            "equation": "b / a",
+            "num_matched": 225
+          }
+        ],
+        "total_points_matched": 225,
+        "coverage": 1.0
+      }
+    ],
+    "total_time_seconds": 241.44132590293884,
+    "status": "success",
+    "error_message": null,
+    "stages_timing": {
+      "parse": 0.0004949569702148438,
+      "grid": 0.0005352497100830078,
+      "solve": 0.5899934768676758,
+      "grouping": 0.0002830028533935547,
+      "symbolic_regression": 240.85001039505005
+    },
+    "num_grid_points": 225,
+    "num_solved": 225
+  },
+  {
+    "name": "linear_10_three_params",
+    "category": "linear",
+    "difficulty": "easy",
+    "equation": "x - a - b - c",
+    "expected_roots": [
+      "a + b + c"
+    ],
+    "num_branches_expected": 1,
+    "discovered_roots": [
+      "b + (c + a)"
+    ],
+    "num_branches_found": 1,
+    "branch_results": [
+      {
+        "branch_index": 0,
+        "num_data_points": 512,
+        "functions_found": [
+          {
+            "equation": "b + (c + a)",
+            "num_matched": 512
+          }
+        ],
+        "total_points_matched": 512,
+        "coverage": 1.0
+      }
+    ],
+    "total_time_seconds": 243.52170538902283,
+    "status": "success",
+    "error_message": null,
+    "stages_timing": {
+      "parse": 0.0006010532379150391,
+      "grid": 0.0002925395965576172,
+      "solve": 0.7528774738311768,
+      "grouping": 0.0006165504455566406,
+      "symbolic_regression": 242.76730918884277
+    },
+    "num_grid_points": 512,
+    "num_solved": 512
+  }
+]

@@ -1,0 +1,34 @@
+{
+  "total_cases": 1,
+  "status_distribution": {
+    "error": 1
+  },
+  "success_rate": 0.0,
+  "root_discovery_rate": 0.0,
+  "perfect_cases": 0,
+  "perfect_rate": 0.0,
+  "average_coverage": 0.0,
+  "branch_count_accuracy": 0.0,
+  "total_time_seconds": 0.4696378707885742,
+  "average_time_seconds": 0.4696378707885742,
+  "by_category": {
+    "special": {
+      "total": 1,
+      "success": 0,
+      "root_discovery_rate": 0.0,
+      "perfect_cases": 0,
+      "perfect_rate": 0.0,
+      "avg_time": 0.4696378707885742
+    }
+  },
+  "by_difficulty": {
+    "easy": {
+      "total": 1,
+      "success": 0,
+      "root_discovery_rate": 0.0,
+      "perfect_cases": 0,
+      "perfect_rate": 0.0,
+      "avg_time": 0.4696378707885742
+    }
+  }
+}

@@ -19,8 +19,8 @@ estadoDelArte.synctex.gz
 docs/.obsidian
 
 # results 
-src/outputs_analytical
-src/benchmark_results
+# src/outputs_analytical
+# src/benchmark_results
 
 # plan
 entrega_semanal.aux

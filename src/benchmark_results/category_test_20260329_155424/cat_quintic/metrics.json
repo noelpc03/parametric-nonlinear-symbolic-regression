@@ -1,0 +1,34 @@
+{
+  "total_cases": 1,
+  "status_distribution": {
+    "error": 1
+  },
+  "success_rate": 0.0,
+  "root_discovery_rate": 0.0,
+  "perfect_cases": 0,
+  "perfect_rate": 0.0,
+  "average_coverage": 0.0,
+  "branch_count_accuracy": 0.0,
+  "total_time_seconds": 1.6050138473510742,
+  "average_time_seconds": 1.6050138473510742,
+  "by_category": {
+    "quintic": {
+      "total": 1,
+      "success": 0,
+      "root_discovery_rate": 0.0,
+      "perfect_cases": 0,
+      "perfect_rate": 0.0,
+      "avg_time": 1.6050138473510742
+    }
+  },
+  "by_difficulty": {
+    "hard": {
+      "total": 1,
+      "success": 0,
+      "root_discovery_rate": 0.0,
+      "perfect_cases": 0,
+      "perfect_rate": 0.0,
+      "avg_time": 1.6050138473510742
+    }
+  }
+}

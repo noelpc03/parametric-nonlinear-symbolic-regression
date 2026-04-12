@@ -1,0 +1,325 @@
+[
+  {
+    "name": "cubic_25_one_root",
+    "category": "cubic",
+    "difficulty": "medium",
+    "equation": "x**3 - a",
+    "expected_roots": [
+      "a**(1/3)"
+    ],
+    "num_branches_expected": 1,
+    "discovered_roots": [
+      "safe_pow(a, 0.33333334)"
+    ],
+    "num_branches_found": 1,
+    "branch_results": [
+      {
+        "branch_index": 0,
+        "num_data_points": 50,
+        "functions_found": [
+          {
+            "equation": "safe_pow(a, 0.33333334)",
+            "num_matched": 50
+          }
+        ],
+        "total_points_matched": 50,
+        "coverage": 1.0
+      }
+    ],
+    "total_time_seconds": 164.80509042739868,
+    "status": "success",
+    "error_message": null,
+    "stages_timing": {
+      "parse": 0.021085023880004883,
+      "grid": 0.0001227855682373047,
+      "solve": 0.6345884799957275,
+      "grouping": 6.246566772460938e-05,
+      "symbolic_regression": 164.1492223739624
+    },
+    "num_grid_points": 50,
+    "num_solved": 50
+  },
+  {
+    "name": "cubic_26_factored",
+    "category": "cubic",
+    "difficulty": "easy",
+    "equation": "x * (x - a) * (x + a)",
+    "expected_roots": [
+      "-a",
+      "0",
+      "a"
+    ],
+    "num_branches_expected": 3,
+    "discovered_roots": [
+      "neg(a)",
+      "0.0",
+      "a"
+    ],
+    "num_branches_found": 3,
+    "branch_results": [
+      {
+        "branch_index": 0,
+        "num_data_points": 50,
+        "functions_found": [
+          {
+            "equation": "neg(a)",
+            "num_matched": 50
+          }
+        ],
+        "total_points_matched": 50,
+        "coverage": 1.0
+      },
+      {
+        "branch_index": 1,
+        "num_data_points": 50,
+        "functions_found": [
+          {
+            "equation": "0.0",
+            "num_matched": 50
+          }
+        ],
+        "total_points_matched": 50,
+        "coverage": 1.0
+      },
+      {
+        "branch_index": 2,
+        "num_data_points": 50,
+        "functions_found": [
+          {
+            "equation": "a",
+            "num_matched": 50
+          }
+        ],
+        "total_points_matched": 50,
+        "coverage": 1.0
+      }
+    ],
+    "total_time_seconds": 543.9917433261871,
+    "status": "success",
+    "error_message": null,
+    "stages_timing": {
+      "parse": 0.0005140304565429688,
+      "grid": 6.461143493652344e-05,
+      "solve": 0.1567544937133789,
+      "grouping": 9.441375732421875e-05,
+      "symbolic_regression": 543.834303855896
+    },
+    "num_grid_points": 50,
+    "num_solved": 50
+  },
+  {
+    "name": "cubic_27_quadratic_factor",
+    "category": "cubic",
+    "difficulty": "easy",
+    "equation": "(x - a) * (x**2 + 1)",
+    "expected_roots": [
+      "a"
+    ],
+    "num_branches_expected": 1,
+    "discovered_roots": [
+      "a"
+    ],
+    "num_branches_found": 1,
+    "branch_results": [
+      {
+        "branch_index": 0,
+        "num_data_points": 50,
+        "functions_found": [
+          {
+            "equation": "a",
+            "num_matched": 50
+          }
+        ],
+        "total_points_matched": 50,
+        "coverage": 1.0
+      }
+    ],
+    "total_time_seconds": 175.01180934906006,
+    "status": "success",
+    "error_message": null,
+    "stages_timing": {
+      "parse": 0.0005023479461669922,
+      "grid": 8.0108642578125e-05,
+      "solve": 0.2034440040588379,
+      "grouping": 6.890296936035156e-05,
+      "symbolic_regression": 174.80770707130432
+    },
+    "num_grid_points": 50,
+    "num_solved": 50
+  },
+  {
+    "name": "cubic_28_depressed",
+    "category": "cubic",
+    "difficulty": "hard",
+    "equation": "x**3 - 3*a*x + 2*a**(3/2)",
+    "expected_roots": [
+      "-2*sqrt(a)",
+      "sqrt(a)"
+    ],
+    "num_branches_expected": 2,
+    "discovered_roots": [
+      "safe_pow(a, 0.5) * -2.0",
+      "safe_pow(a, 0.5)",
+      "safe_pow(a, 0.5)"
+    ],
+    "num_branches_found": 3,
+    "branch_results": [
+      {
+        "branch_index": 0,
+        "num_data_points": 50,
+        "functions_found": [
+          {
+            "equation": "safe_pow(a, 0.5) * -2.0",
+            "num_matched": 50
+          }
+        ],
+        "total_points_matched": 50,
+        "coverage": 1.0
+      },
+      {
+        "branch_index": 1,
+        "num_data_points": 21,
+        "functions_found": [
+          {
+            "equation": "safe_pow(a, 0.5)",
+            "num_matched": 21
+          }
+        ],
+        "total_points_matched": 21,
+        "coverage": 1.0
+      },
+      {
+        "branch_index": 2,
+        "num_data_points": 19,
+        "functions_found": [
+          {
+            "equation": "safe_pow(a, 0.5)",
+            "num_matched": 19
+          }
+        ],
+        "total_points_matched": 19,
+        "coverage": 1.0
+      }
+    ],
+    "total_time_seconds": 440.92953300476074,
+    "status": "success",
+    "error_message": null,
+    "stages_timing": {
+      "parse": 0.0006172657012939453,
+      "grid": 6.580352783203125e-05,
+      "solve": 0.895263671875,
+      "grouping": 0.0001068115234375,
+      "symbolic_regression": 440.0334665775299
+    },
+    "num_grid_points": 50,
+    "num_solved": 50
+  },
+  {
+    "name": "cubic_29_two_params",
+    "category": "cubic",
+    "difficulty": "medium",
+    "equation": "x**3 - a*b*x",
+    "expected_roots": [
+      "-sqrt(a*b)",
+      "0",
+      "sqrt(a*b)"
+    ],
+    "num_branches_expected": 3,
+    "discovered_roots": [
+      "neg(safe_pow(a * b, 0.5))",
+      "-0.0",
+      "safe_pow(b * a, 0.5)"
+    ],
+    "num_branches_found": 3,
+    "branch_results": [
+      {
+        "branch_index": 0,
+        "num_data_points": 144,
+        "functions_found": [
+          {
+            "equation": "neg(safe_pow(a * b, 0.5))",
+            "num_matched": 144
+          }
+        ],
+        "total_points_matched": 144,
+        "coverage": 1.0
+      },
+      {
+        "branch_index": 1,
+        "num_data_points": 144,
+        "functions_found": [
+          {
+            "equation": "-0.0",
+            "num_matched": 144
+          }
+        ],
+        "total_points_matched": 144,
+        "coverage": 1.0
+      },
+      {
+        "branch_index": 2,
+        "num_data_points": 144,
+        "functions_found": [
+          {
+            "equation": "safe_pow(b * a, 0.5)",
+            "num_matched": 144
+          }
+        ],
+        "total_points_matched": 144,
+        "coverage": 1.0
+      }
+    ],
+    "total_time_seconds": 527.6152830123901,
+    "status": "success",
+    "error_message": null,
+    "stages_timing": {
+      "parse": 0.0004172325134277344,
+      "grid": 8.988380432128906e-05,
+      "solve": 1.5660605430603027,
+      "grouping": 0.0004112720489501953,
+      "symbolic_regression": 526.0482923984528
+    },
+    "num_grid_points": 144,
+    "num_solved": 144
+  },
+  {
+    "name": "cubic_30_triple",
+    "category": "cubic",
+    "difficulty": "easy",
+    "equation": "(x - a)**3",
+    "expected_roots": [
+      "a"
+    ],
+    "num_branches_expected": 1,
+    "discovered_roots": [
+      "a"
+    ],
+    "num_branches_found": 1,
+    "branch_results": [
+      {
+        "branch_index": 0,
+        "num_data_points": 50,
+        "functions_found": [
+          {
+            "equation": "a",
+            "num_matched": 50
+          }
+        ],
+        "total_points_matched": 50,
+        "coverage": 1.0
+      }
+    ],
+    "total_time_seconds": 163.00638580322266,
+    "status": "success",
+    "error_message": null,
+    "stages_timing": {
+      "parse": 0.0004057884216308594,
+      "grid": 6.008148193359375e-05,
+      "solve": 0.3313591480255127,
+      "grouping": 0.0001475811004638672,
+      "symbolic_regression": 162.67439436912537
+    },
+    "num_grid_points": 50,
+    "num_solved": 50
+  }
+]

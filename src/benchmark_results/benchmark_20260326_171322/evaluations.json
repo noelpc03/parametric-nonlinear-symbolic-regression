@@ -1,0 +1,31 @@
+[
+  {
+    "name": "quadratic_11_simple",
+    "category": "quadratic",
+    "difficulty": "easy",
+    "status": "success",
+    "time_seconds": 234.0031406879425,
+    "roots_expected": 2,
+    "roots_matched": 2,
+    "root_match_rate": 1.0,
+    "branch_count_correct": true,
+    "average_coverage": 1.0,
+    "match_details": [
+      {
+        "expected": "-sqrt(a)",
+        "discovered": "neg(safe_pow(a, 0.5))",
+        "match_fraction": 1.0,
+        "matched": true
+      },
+      {
+        "expected": "sqrt(a)",
+        "discovered": "safe_pow(a, 0.5)",
+        "match_fraction": 1.0,
+        "matched": true
+      }
+    ],
+    "any_error": null,
+    "num_branches_found": 2,
+    "unmatched_discovered": []
+  }
+]

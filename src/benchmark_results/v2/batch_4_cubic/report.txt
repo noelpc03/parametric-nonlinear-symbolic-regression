@@ -1,0 +1,51 @@
+BENCHMARK DEL PIPELINE — 2026-03-03 01:37:41
+======================================================================
+
+Casos ejecutados: 6
+Tiempo total: 2015.7s
+
+Tasa de éxito (pipeline): 100.0%
+Raíces descubiertas:      100.0%
+Casos perfectos:          6/6 (100.0%)
+Cobertura promedio:       100.0%
+
+======================================================================
+DETALLE POR CASO
+======================================================================
+
+cubic_25_one_root [cubic/medium]: ✓ PERFECTO (164.8s)
+  ✓ esperada: a**(1/3)
+    descubierta: safe_pow(a, 0.33333334)
+
+cubic_26_factored [cubic/easy]: ✓ PERFECTO (544.0s)
+  ✓ esperada: -a
+    descubierta: neg(a)
+  ✓ esperada: 0
+    descubierta: 0.0
+  ✓ esperada: a
+    descubierta: a
+
+cubic_27_quadratic_factor [cubic/easy]: ✓ PERFECTO (175.0s)
+  ✓ esperada: a
+    descubierta: a
+
+cubic_28_depressed [cubic/hard]: ✓ PERFECTO (440.9s)
+  ✓ esperada: -2*sqrt(a)
+    descubierta: safe_pow(a, 0.5) * -2.0
+  ✓ esperada: sqrt(a)
+    descubierta: safe_pow(a, 0.5)
+  ⚠ Raíces descubiertas sin match con esperadas:
+    → safe_pow(a, 0.5)
+
+cubic_29_two_params [cubic/medium]: ✓ PERFECTO (527.6s)
+  ✓ esperada: -sqrt(a*b)
+    descubierta: neg(safe_pow(a * b, 0.5))
+  ✓ esperada: 0
+    descubierta: -0.0
+  ✓ esperada: sqrt(a*b)
+    descubierta: safe_pow(b * a, 0.5)
+
+cubic_30_triple [cubic/easy]: ✓ PERFECTO (163.0s)
+  ✓ esperada: a
+    descubierta: a
+

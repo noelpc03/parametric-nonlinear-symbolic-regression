@@ -1,0 +1,19 @@
+BENCHMARK DEL PIPELINE — 2026-03-24 17:46:57
+======================================================================
+
+Casos ejecutados: 1
+Tiempo total: 98.2s
+
+Tasa de éxito (pipeline): 100.0%
+Raíces descubiertas:      100.0%
+Casos perfectos:          1/1 (100.0%)
+Cobertura promedio:       100.0%
+
+======================================================================
+DETALLE POR CASO
+======================================================================
+
+special_36_reciprocal [special/easy]: ✓ PERFECTO (98.0s)
+  ✓ esperada: 1/a
+    descubierta: safe_pow(a, -1.0)
+

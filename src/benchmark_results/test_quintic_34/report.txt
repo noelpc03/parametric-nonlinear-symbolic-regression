@@ -1,0 +1,27 @@
+BENCHMARK DEL PIPELINE — 2026-03-29 17:12:36
+======================================================================
+
+Casos ejecutados: 1
+Tiempo total: 921.2s
+
+Tasa de éxito (pipeline): 100.0%
+Raíces descubiertas:      100.0%
+Casos perfectos:          1/1 (100.0%)
+Cobertura promedio:       100.0%
+
+======================================================================
+DETALLE POR CASO
+======================================================================
+
+quintic_34_factored [quintic/hard]: ✓ PERFECTO (921.1s)
+  ✓ esperada: -2*a
+    descubierta: a * -2.0
+  ✓ esperada: -a
+    descubierta: neg(a)
+  ✓ esperada: 0
+    descubierta: 0.0
+  ✓ esperada: a
+    descubierta: a
+  ✓ esperada: 2*a
+    descubierta: a * 2.0
+

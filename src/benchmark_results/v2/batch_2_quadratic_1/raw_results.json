@@ -1,0 +1,373 @@
+[
+  {
+    "name": "quadratic_11_simple",
+    "category": "quadratic",
+    "difficulty": "easy",
+    "equation": "x**2 - a",
+    "expected_roots": [
+      "-sqrt(a)",
+      "sqrt(a)"
+    ],
+    "num_branches_expected": 2,
+    "discovered_roots": [
+      "neg(safe_pow(a, 0.5))",
+      "safe_pow(a, 0.5)"
+    ],
+    "num_branches_found": 2,
+    "branch_results": [
+      {
+        "branch_index": 0,
+        "num_data_points": 50,
+        "functions_found": [
+          {
+            "equation": "neg(safe_pow(a, 0.5))",
+            "num_matched": 50
+          }
+        ],
+        "total_points_matched": 50,
+        "coverage": 1.0
+      },
+      {
+        "branch_index": 1,
+        "num_data_points": 50,
+        "functions_found": [
+          {
+            "equation": "safe_pow(a, 0.5)",
+            "num_matched": 50
+          }
+        ],
+        "total_points_matched": 50,
+        "coverage": 1.0
+      }
+    ],
+    "total_time_seconds": 326.08881187438965,
+    "status": "success",
+    "error_message": null,
+    "stages_timing": {
+      "parse": 0.021607398986816406,
+      "grid": 0.00010037422180175781,
+      "solve": 0.8344888687133789,
+      "grouping": 8.392333984375e-05,
+      "symbolic_regression": 325.2325167655945
+    },
+    "num_grid_points": 50,
+    "num_solved": 50
+  },
+  {
+    "name": "quadratic_12_shifted",
+    "category": "quadratic",
+    "difficulty": "easy",
+    "equation": "x**2 - 2*a*x + a**2",
+    "expected_roots": [
+      "a"
+    ],
+    "num_branches_expected": 1,
+    "discovered_roots": [
+      "a"
+    ],
+    "num_branches_found": 2,
+    "branch_results": [
+      {
+        "branch_index": 0,
+        "num_data_points": 49,
+        "functions_found": [
+          {
+            "equation": "a",
+            "num_matched": 49
+          }
+        ],
+        "total_points_matched": 49,
+        "coverage": 1.0
+      },
+      {
+        "branch_index": 1,
+        "num_data_points": 3,
+        "functions_found": [],
+        "total_points_matched": 0,
+        "coverage": 0.0
+      }
+    ],
+    "total_time_seconds": 223.58776688575745,
+    "status": "success",
+    "error_message": null,
+    "stages_timing": {
+      "parse": 0.000621795654296875,
+      "grid": 8.368492126464844e-05,
+      "solve": 0.5100917816162109,
+      "grouping": 7.05718994140625e-05,
+      "symbolic_regression": 223.0768895149231
+    },
+    "num_grid_points": 50,
+    "num_solved": 49
+  },
+  {
+    "name": "quadratic_13_factored",
+    "category": "quadratic",
+    "difficulty": "easy",
+    "equation": "(x - a) * (x + a)",
+    "expected_roots": [
+      "-a",
+      "a"
+    ],
+    "num_branches_expected": 2,
+    "discovered_roots": [
+      "neg(a)",
+      "a"
+    ],
+    "num_branches_found": 2,
+    "branch_results": [
+      {
+        "branch_index": 0,
+        "num_data_points": 50,
+        "functions_found": [
+          {
+            "equation": "neg(a)",
+            "num_matched": 50
+          }
+        ],
+        "total_points_matched": 50,
+        "coverage": 1.0
+      },
+      {
+        "branch_index": 1,
+        "num_data_points": 50,
+        "functions_found": [
+          {
+            "equation": "a",
+            "num_matched": 50
+          }
+        ],
+        "total_points_matched": 50,
+        "coverage": 1.0
+      }
+    ],
+    "total_time_seconds": 443.4671835899353,
+    "status": "success",
+    "error_message": null,
+    "stages_timing": {
+      "parse": 0.0005114078521728516,
+      "grid": 6.508827209472656e-05,
+      "solve": 0.18743681907653809,
+      "grouping": 8.96453857421875e-05,
+      "symbolic_regression": 443.2790677547455
+    },
+    "num_grid_points": 50,
+    "num_solved": 50
+  },
+  {
+    "name": "quadratic_14_linear_coeff",
+    "category": "quadratic",
+    "difficulty": "easy",
+    "equation": "x**2 + a*x",
+    "expected_roots": [
+      "-a",
+      "0"
+    ],
+    "num_branches_expected": 2,
+    "discovered_roots": [
+      "(a + safe_pow(a * a, 0.5)) * -0.5",
+      "(safe_pow(a * a, 0.5) - a) * 0.5"
+    ],
+    "num_branches_found": 2,
+    "branch_results": [
+      {
+        "branch_index": 0,
+        "num_data_points": 50,
+        "functions_found": [
+          {
+            "equation": "(a + safe_pow(a * a, 0.5)) * -0.5",
+            "num_matched": 50
+          }
+        ],
+        "total_points_matched": 50,
+        "coverage": 1.0
+      },
+      {
+        "branch_index": 1,
+        "num_data_points": 50,
+        "functions_found": [
+          {
+            "equation": "(safe_pow(a * a, 0.5) - a) * 0.5",
+            "num_matched": 50
+          }
+        ],
+        "total_points_matched": 50,
+        "coverage": 1.0
+      }
+    ],
+    "total_time_seconds": 416.0220003128052,
+    "status": "success",
+    "error_message": null,
+    "stages_timing": {
+      "parse": 0.000484466552734375,
+      "grid": 7.724761962890625e-05,
+      "solve": 0.22654223442077637,
+      "grouping": 9.870529174804688e-05,
+      "symbolic_regression": 415.79478669166565
+    },
+    "num_grid_points": 50,
+    "num_solved": 50
+  },
+  {
+    "name": "quadratic_15_full",
+    "category": "quadratic",
+    "difficulty": "medium",
+    "equation": "x**2 - 3*a*x + 2*a**2",
+    "expected_roots": [
+      "a",
+      "2*a"
+    ],
+    "num_branches_expected": 2,
+    "discovered_roots": [
+      "a",
+      "a + a"
+    ],
+    "num_branches_found": 2,
+    "branch_results": [
+      {
+        "branch_index": 0,
+        "num_data_points": 50,
+        "functions_found": [
+          {
+            "equation": "a",
+            "num_matched": 50
+          }
+        ],
+        "total_points_matched": 50,
+        "coverage": 1.0
+      },
+      {
+        "branch_index": 1,
+        "num_data_points": 50,
+        "functions_found": [
+          {
+            "equation": "a + a",
+            "num_matched": 50
+          }
+        ],
+        "total_points_matched": 50,
+        "coverage": 1.0
+      }
+    ],
+    "total_time_seconds": 440.4650311470032,
+    "status": "success",
+    "error_message": null,
+    "stages_timing": {
+      "parse": 0.0007085800170898438,
+      "grid": 7.963180541992188e-05,
+      "solve": 0.4034249782562256,
+      "grouping": 9.775161743164062e-05,
+      "symbolic_regression": 440.06071066856384
+    },
+    "num_grid_points": 50,
+    "num_solved": 50
+  },
+  {
+    "name": "quadratic_16_irrational",
+    "category": "quadratic",
+    "difficulty": "medium",
+    "equation": "x**2 - 2*x - a",
+    "expected_roots": [
+      "1 - sqrt(1 + a)",
+      "1 + sqrt(1 + a)"
+    ],
+    "num_branches_expected": 2,
+    "discovered_roots": [
+      "0.9999998 - safe_pow(a + 0.99999964, 0.49999997)",
+      "safe_pow(a + 1.0, 0.5) - -1.0"
+    ],
+    "num_branches_found": 2,
+    "branch_results": [
+      {
+        "branch_index": 0,
+        "num_data_points": 50,
+        "functions_found": [
+          {
+            "equation": "0.9999998 - safe_pow(a + 0.99999964, 0.49999997)",
+            "num_matched": 50
+          }
+        ],
+        "total_points_matched": 50,
+        "coverage": 1.0
+      },
+      {
+        "branch_index": 1,
+        "num_data_points": 50,
+        "functions_found": [
+          {
+            "equation": "safe_pow(a + 1.0, 0.5) - -1.0",
+            "num_matched": 50
+          }
+        ],
+        "total_points_matched": 50,
+        "coverage": 1.0
+      }
+    ],
+    "total_time_seconds": 401.75576877593994,
+    "status": "success",
+    "error_message": null,
+    "stages_timing": {
+      "parse": 0.0005662441253662109,
+      "grid": 6.604194641113281e-05,
+      "solve": 0.7697670459747314,
+      "grouping": 8.702278137207031e-05,
+      "symbolic_regression": 400.9852726459503
+    },
+    "num_grid_points": 50,
+    "num_solved": 50
+  },
+  {
+    "name": "quadratic_17_param_coeff",
+    "category": "quadratic",
+    "difficulty": "medium",
+    "equation": "a*x**2 - 1",
+    "expected_roots": [
+      "-1/sqrt(a)",
+      "1/sqrt(a)"
+    ],
+    "num_branches_expected": 2,
+    "discovered_roots": [
+      "neg(safe_pow(a, -0.5))",
+      "safe_pow(a, -0.5)"
+    ],
+    "num_branches_found": 2,
+    "branch_results": [
+      {
+        "branch_index": 0,
+        "num_data_points": 50,
+        "functions_found": [
+          {
+            "equation": "neg(safe_pow(a, -0.5))",
+            "num_matched": 50
+          }
+        ],
+        "total_points_matched": 50,
+        "coverage": 1.0
+      },
+      {
+        "branch_index": 1,
+        "num_data_points": 50,
+        "functions_found": [
+          {
+            "equation": "safe_pow(a, -0.5)",
+            "num_matched": 50
+          }
+        ],
+        "total_points_matched": 50,
+        "coverage": 1.0
+      }
+    ],
+    "total_time_seconds": 379.252423286438,
+    "status": "success",
+    "error_message": null,
+    "stages_timing": {
+      "parse": 0.0005049705505371094,
+      "grid": 7.224082946777344e-05,
+      "solve": 0.4352376461029053,
+      "grouping": 0.00010824203491210938,
+      "symbolic_regression": 378.81649017333984
+    },
+    "num_grid_points": 50,
+    "num_solved": 50
+  }
+]

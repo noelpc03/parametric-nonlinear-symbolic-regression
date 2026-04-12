@@ -1,0 +1,210 @@
+[
+  {
+    "name": "quadratic_18_two_params",
+    "category": "quadratic",
+    "difficulty": "medium",
+    "status": "success",
+    "time_seconds": 505.8886287212372,
+    "roots_expected": 2,
+    "roots_matched": 2,
+    "root_match_rate": 1.0,
+    "branch_count_correct": true,
+    "average_coverage": 1.0,
+    "match_details": [
+      {
+        "expected": "(a - sqrt(a**2 + 4*b)) / 2",
+        "discovered": "safe_pow(((a * a) * -0.25) - b, 0.5) + (a * 0.5)",
+        "match_fraction": 1.0,
+        "matched": true
+      },
+      {
+        "expected": "(a + sqrt(a**2 + 4*b)) / 2",
+        "discovered": "(a * 0.5) + safe_pow(b + (a * (a * 0.25)), 0.5)",
+        "match_fraction": 1.0,
+        "matched": true
+      }
+    ],
+    "any_error": null,
+    "num_branches_found": 2,
+    "unmatched_discovered": []
+  },
+  {
+    "name": "quadratic_19_full_abc",
+    "category": "quadratic",
+    "difficulty": "hard",
+    "status": "success",
+    "time_seconds": 5274.7428867816925,
+    "roots_expected": 2,
+    "roots_matched": 1,
+    "root_match_rate": 0.5,
+    "branch_count_correct": true,
+    "average_coverage": 0.75390625,
+    "match_details": [
+      {
+        "expected": "(-b - sqrt(b**2 - 4*a*c)) / (2*a)",
+        "discovered": null,
+        "match_fraction": 0.0,
+        "matched": false,
+        "closest_discovered": "(safe_pow(-0.7975335 - (b * 0.3286723), 1.890788) / a) - (c * -0.30697596)",
+        "closest_fraction": 0.0,
+        "closest_error": 0.08134104351375172
+      },
+      {
+        "expected": "(-b + sqrt(b**2 - 4*a*c)) / (2*a)",
+        "discovered": "(safe_pow(neg(a * c) + (b * (0.25000393 * b)), 0.4999974) + (b * -0.50000095)) / a",
+        "match_fraction": 1.0,
+        "matched": true
+      }
+    ],
+    "any_error": null,
+    "num_branches_found": 2,
+    "unmatched_discovered": [
+      "((b * (safe_pow(-1.0936486, b) + 0.52504605)) - (safe_pow((a * c) - 0.36227518, 0.51083165) * -0.87625325)) / a",
+      "(safe_pow(-0.7975335 - (b * 0.3286723), 1.890788) / a) - (c * -0.30697596)",
+      "(-0.68558294 / (a * (safe_pow(0.33896172, b) - -0.2082646))) - (c * -0.3092508)",
+      "c * 0.5851142",
+      "((0.21017772 * c) + (safe_pow(-1.4601141, b) / (safe_pow(0.22038957, b - (c - -0.38217473)) + a))) + -0.06673897",
+      "((safe_pow(0.6990956, b) + -0.5679804) - safe_pow((0.2952239 * c) * a, 0.6930654)) * (1.2174814 / a)",
+      "((safe_pow(b - 2.3155687, 1.8415147) / a) + (c * 2.1979287)) * -0.13777994"
+    ]
+  },
+  {
+    "name": "quadratic_20_factored_two",
+    "category": "quadratic",
+    "difficulty": "easy",
+    "status": "success",
+    "time_seconds": 405.92564129829407,
+    "roots_expected": 2,
+    "roots_matched": 2,
+    "root_match_rate": 1.0,
+    "branch_count_correct": true,
+    "average_coverage": 1.0,
+    "match_details": [
+      {
+        "expected": "b",
+        "discovered": "b",
+        "match_fraction": 1.0,
+        "matched": true
+      },
+      {
+        "expected": "a",
+        "discovered": "a",
+        "match_fraction": 1.0,
+        "matched": true
+      }
+    ],
+    "any_error": null,
+    "num_branches_found": 2,
+    "unmatched_discovered": []
+  },
+  {
+    "name": "quadratic_21_sum_product",
+    "category": "quadratic",
+    "difficulty": "medium",
+    "status": "success",
+    "time_seconds": 394.5035960674286,
+    "roots_expected": 2,
+    "roots_matched": 2,
+    "root_match_rate": 1.0,
+    "branch_count_correct": true,
+    "average_coverage": 1.0,
+    "match_details": [
+      {
+        "expected": "b",
+        "discovered": "b",
+        "match_fraction": 1.0,
+        "matched": true
+      },
+      {
+        "expected": "a",
+        "discovered": "a",
+        "match_fraction": 1.0,
+        "matched": true
+      }
+    ],
+    "any_error": null,
+    "num_branches_found": 2,
+    "unmatched_discovered": []
+  },
+  {
+    "name": "quadratic_22_symmetric",
+    "category": "quadratic",
+    "difficulty": "medium",
+    "status": "success",
+    "time_seconds": 332.0491523742676,
+    "roots_expected": 2,
+    "roots_matched": 2,
+    "root_match_rate": 1.0,
+    "branch_count_correct": true,
+    "average_coverage": 1.0,
+    "match_details": [
+      {
+        "expected": "-sqrt(a**2 + b**2)",
+        "discovered": "neg(safe_pow((a * a) + (b * b), 0.5))",
+        "match_fraction": 1.0,
+        "matched": true
+      },
+      {
+        "expected": "sqrt(a**2 + b**2)",
+        "discovered": "safe_pow((a * a) + (b * b), 0.5)",
+        "match_fraction": 1.0,
+        "matched": true
+      }
+    ],
+    "any_error": null,
+    "num_branches_found": 2,
+    "unmatched_discovered": []
+  },
+  {
+    "name": "quadratic_23_nested",
+    "category": "quadratic",
+    "difficulty": "medium",
+    "status": "success",
+    "time_seconds": 321.22505378723145,
+    "roots_expected": 2,
+    "roots_matched": 2,
+    "root_match_rate": 1.0,
+    "branch_count_correct": true,
+    "average_coverage": 1.0,
+    "match_details": [
+      {
+        "expected": "-2*sqrt(a*b)",
+        "discovered": "-2.0 * safe_pow(b * a, 0.5)",
+        "match_fraction": 1.0,
+        "matched": true
+      },
+      {
+        "expected": "2*sqrt(a*b)",
+        "discovered": "safe_pow(a * (b * 4.000126), 0.49999315)",
+        "match_fraction": 1.0,
+        "matched": true
+      }
+    ],
+    "any_error": null,
+    "num_branches_found": 2,
+    "unmatched_discovered": []
+  },
+  {
+    "name": "quadratic_24_depressed",
+    "category": "quadratic",
+    "difficulty": "easy",
+    "status": "success",
+    "time_seconds": 152.8406720161438,
+    "roots_expected": 1,
+    "roots_matched": 1,
+    "root_match_rate": 1.0,
+    "branch_count_correct": false,
+    "average_coverage": 0.5,
+    "match_details": [
+      {
+        "expected": "-a/2",
+        "discovered": "a * -0.5",
+        "match_fraction": 1.0,
+        "matched": true
+      }
+    ],
+    "any_error": null,
+    "num_branches_found": 2,
+    "unmatched_discovered": []
+  }
+]

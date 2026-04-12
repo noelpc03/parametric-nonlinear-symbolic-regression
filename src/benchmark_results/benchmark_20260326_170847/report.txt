@@ -1,0 +1,19 @@
+BENCHMARK DEL PIPELINE — 2026-03-26 17:08:47
+======================================================================
+
+Casos ejecutados: 1
+Tiempo total: 128.4s
+
+Tasa de éxito (pipeline): 100.0%
+Raíces descubiertas:      100.0%
+Casos perfectos:          1/1 (100.0%)
+Cobertura promedio:       100.0%
+
+======================================================================
+DETALLE POR CASO
+======================================================================
+
+linear_01_basic [linear/easy]: ✓ PERFECTO (128.4s)
+  ✓ esperada: 2 - a
+    descubierta: 2.0 - a
+

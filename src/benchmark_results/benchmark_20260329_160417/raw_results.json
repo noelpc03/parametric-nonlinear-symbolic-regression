@@ -1,0 +1,42 @@
+[
+  {
+    "name": "linear_01_basic",
+    "category": "linear",
+    "difficulty": "easy",
+    "equation": "x + a - 2",
+    "expected_roots": [
+      "2 - a"
+    ],
+    "num_branches_expected": 1,
+    "discovered_roots": [
+      "2.0 - a"
+    ],
+    "num_branches_found": 1,
+    "branch_results": [
+      {
+        "branch_index": 0,
+        "num_data_points": 50,
+        "functions_found": [
+          {
+            "equation": "2.0 - a",
+            "num_matched": 50
+          }
+        ],
+        "total_points_matched": 50,
+        "coverage": 1.0
+      }
+    ],
+    "total_time_seconds": 187.27238392829895,
+    "status": "success",
+    "error_message": null,
+    "stages_timing": {
+      "parse": 0.036362409591674805,
+      "grid": 0.00010132789611816406,
+      "solve": 0.09686613082885742,
+      "grouping": 5.125999450683594e-05,
+      "symbolic_regression": 187.13899183273315
+    },
+    "num_grid_points": 50,
+    "num_solved": 50
+  }
+]

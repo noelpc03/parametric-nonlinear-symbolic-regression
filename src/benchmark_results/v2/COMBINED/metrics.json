@@ -1,0 +1,90 @@
+{
+  "total_cases": 43,
+  "status_distribution": {
+    "success": 43
+  },
+  "success_rate": 1.0,
+  "root_discovery_rate": 0.9605263157894737,
+  "perfect_cases": 41,
+  "perfect_rate": 0.9534883720930233,
+  "average_coverage": 0.9710210755813954,
+  "branch_count_accuracy": 0.9302325581395349,
+  "total_time_seconds": 19703.248042583466,
+  "average_time_seconds": 458.21507075775503,
+  "by_category": {
+    "cubic": {
+      "total": 6,
+      "success": 6,
+      "root_discovery_rate": 1.0,
+      "perfect_cases": 6,
+      "perfect_rate": 1.0,
+      "avg_time": 335.8933074871699
+    },
+    "linear": {
+      "total": 10,
+      "success": 10,
+      "root_discovery_rate": 1.0,
+      "perfect_cases": 10,
+      "perfect_rate": 1.0,
+      "avg_time": 232.73017001152039
+    },
+    "quadratic": {
+      "total": 14,
+      "success": 14,
+      "root_discovery_rate": 0.9615384615384616,
+      "perfect_cases": 13,
+      "perfect_rate": 0.9285714285714286,
+      "avg_time": 715.5581869227545
+    },
+    "quartic": {
+      "total": 4,
+      "success": 4,
+      "root_discovery_rate": 1.0,
+      "perfect_cases": 4,
+      "perfect_rate": 1.0,
+      "avg_time": 530.7488021850586
+    },
+    "quintic": {
+      "total": 1,
+      "success": 1,
+      "root_discovery_rate": 1.0,
+      "perfect_cases": 1,
+      "perfect_rate": 1.0,
+      "avg_time": 811.5573794841766
+    },
+    "special": {
+      "total": 8,
+      "success": 8,
+      "root_discovery_rate": 0.8333333333333334,
+      "perfect_cases": 7,
+      "perfect_rate": 0.875,
+      "avg_time": 301.02741155028343
+    }
+  },
+  "by_difficulty": {
+    "easy": {
+      "total": 19,
+      "success": 19,
+      "root_discovery_rate": 1.0,
+      "perfect_cases": 19,
+      "perfect_rate": 1.0,
+      "avg_time": 266.5448052632181
+    },
+    "hard": {
+      "total": 5,
+      "success": 5,
+      "root_discovery_rate": 0.9411764705882353,
+      "perfect_cases": 4,
+      "perfect_rate": 0.8,
+      "avg_time": 1597.7314875602722
+    },
+    "medium": {
+      "total": 19,
+      "success": 19,
+      "root_discovery_rate": 0.9411764705882353,
+      "perfect_cases": 18,
+      "perfect_rate": 0.9473684210526315,
+      "avg_time": 350.01259498847156
+    }
+  }
+}

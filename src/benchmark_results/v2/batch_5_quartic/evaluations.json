@@ -1,0 +1,189 @@
+[
+  {
+    "name": "quartic_31_biquadratic",
+    "category": "quartic",
+    "difficulty": "medium",
+    "status": "success",
+    "time_seconds": 333.90684056282043,
+    "roots_expected": 2,
+    "roots_matched": 2,
+    "root_match_rate": 1.0,
+    "branch_count_correct": true,
+    "average_coverage": 1.0,
+    "match_details": [
+      {
+        "expected": "-sqrt(a)",
+        "discovered": "neg(safe_pow(a, 0.5))",
+        "match_fraction": 1.0,
+        "matched": true
+      },
+      {
+        "expected": "sqrt(a)",
+        "discovered": "safe_pow(a, 0.5)",
+        "match_fraction": 1.0,
+        "matched": true
+      }
+    ],
+    "any_error": null,
+    "num_branches_found": 2,
+    "unmatched_discovered": []
+  },
+  {
+    "name": "quartic_32_factored",
+    "category": "quartic",
+    "difficulty": "hard",
+    "status": "success",
+    "time_seconds": 676.9676294326782,
+    "roots_expected": 4,
+    "roots_matched": 4,
+    "root_match_rate": 1.0,
+    "branch_count_correct": true,
+    "average_coverage": 1.0,
+    "match_details": [
+      {
+        "expected": "-2*a",
+        "discovered": "a * -2.0",
+        "match_fraction": 1.0,
+        "matched": true
+      },
+      {
+        "expected": "-a",
+        "discovered": "neg(a)",
+        "match_fraction": 1.0,
+        "matched": true
+      },
+      {
+        "expected": "a",
+        "discovered": "a",
+        "match_fraction": 1.0,
+        "matched": true
+      },
+      {
+        "expected": "2*a",
+        "discovered": "a + a",
+        "match_fraction": 1.0,
+        "matched": true
+      }
+    ],
+    "any_error": null,
+    "num_branches_found": 4,
+    "unmatched_discovered": []
+  },
+  {
+    "name": "quartic_33_double_quadratic",
+    "category": "quartic",
+    "difficulty": "hard",
+    "status": "success",
+    "time_seconds": 784.460009098053,
+    "roots_expected": 4,
+    "roots_matched": 4,
+    "root_match_rate": 1.0,
+    "branch_count_correct": true,
+    "average_coverage": 1.0,
+    "match_details": [
+      {
+        "expected": "-sqrt(b)",
+        "discovered": "neg(safe_pow(b, 0.5))",
+        "match_fraction": 1.0,
+        "matched": true
+      },
+      {
+        "expected": "-sqrt(a)",
+        "discovered": "neg(safe_pow(a, 0.5))",
+        "match_fraction": 1.0,
+        "matched": true
+      },
+      {
+        "expected": "sqrt(a)",
+        "discovered": "safe_pow(a, 0.5)",
+        "match_fraction": 1.0,
+        "matched": true
+      },
+      {
+        "expected": "sqrt(b)",
+        "discovered": "safe_pow(b, 0.5)",
+        "match_fraction": 1.0,
+        "matched": true
+      }
+    ],
+    "any_error": null,
+    "num_branches_found": 4,
+    "unmatched_discovered": []
+  },
+  {
+    "name": "quintic_34_factored",
+    "category": "quintic",
+    "difficulty": "hard",
+    "status": "success",
+    "time_seconds": 811.5573794841766,
+    "roots_expected": 5,
+    "roots_matched": 5,
+    "root_match_rate": 1.0,
+    "branch_count_correct": true,
+    "average_coverage": 1.0,
+    "match_details": [
+      {
+        "expected": "-2*a",
+        "discovered": "a * -2.0",
+        "match_fraction": 1.0,
+        "matched": true
+      },
+      {
+        "expected": "-a",
+        "discovered": "neg(a)",
+        "match_fraction": 1.0,
+        "matched": true
+      },
+      {
+        "expected": "0",
+        "discovered": "-0.0",
+        "match_fraction": 1.0,
+        "matched": true
+      },
+      {
+        "expected": "a",
+        "discovered": "a",
+        "match_fraction": 1.0,
+        "matched": true
+      },
+      {
+        "expected": "2*a",
+        "discovered": "a + a",
+        "match_fraction": 1.0,
+        "matched": true
+      }
+    ],
+    "any_error": null,
+    "num_branches_found": 5,
+    "unmatched_discovered": []
+  },
+  {
+    "name": "quartic_35_repeated",
+    "category": "quartic",
+    "difficulty": "medium",
+    "status": "success",
+    "time_seconds": 327.66072964668274,
+    "roots_expected": 2,
+    "roots_matched": 2,
+    "root_match_rate": 1.0,
+    "branch_count_correct": true,
+    "average_coverage": 1.0,
+    "match_details": [
+      {
+        "expected": "-a",
+        "discovered": "neg(a)",
+        "match_fraction": 1.0,
+        "matched": true
+      },
+      {
+        "expected": "a",
+        "discovered": "a",
+        "match_fraction": 1.0,
+        "matched": true
+      }
+    ],
+    "any_error": null,
+    "num_branches_found": 2,
+    "unmatched_discovered": []
+  }
+]

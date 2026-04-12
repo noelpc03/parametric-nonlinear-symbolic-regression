@@ -1,0 +1,50 @@
+{
+  "total_cases": 7,
+  "status_distribution": {
+    "success": 7
+  },
+  "success_rate": 1.0,
+  "root_discovery_rate": 0.9230769230769231,
+  "perfect_cases": 6,
+  "perfect_rate": 0.8571428571428571,
+  "average_coverage": 0.8934151785714286,
+  "branch_count_accuracy": 0.8571428571428571,
+  "total_time_seconds": 7387.175631046295,
+  "average_time_seconds": 1055.310804435185,
+  "by_category": {
+    "quadratic": {
+      "total": 7,
+      "success": 7,
+      "root_discovery_rate": 0.9230769230769231,
+      "perfect_cases": 6,
+      "perfect_rate": 0.8571428571428571,
+      "avg_time": 1055.310804435185
+    }
+  },
+  "by_difficulty": {
+    "easy": {
+      "total": 2,
+      "success": 2,
+      "root_discovery_rate": 1.0,
+      "perfect_cases": 2,
+      "perfect_rate": 1.0,
+      "avg_time": 279.38315665721893
+    },
+    "hard": {
+      "total": 1,
+      "success": 1,
+      "root_discovery_rate": 0.5,
+      "perfect_cases": 0,
+      "perfect_rate": 0.0,
+      "avg_time": 5274.7428867816925
+    },
+    "medium": {
+      "total": 4,
+      "success": 4,
+      "root_discovery_rate": 1.0,
+      "perfect_cases": 4,
+      "perfect_rate": 1.0,
+      "avg_time": 388.4166077375412
+    }
+  }
+}

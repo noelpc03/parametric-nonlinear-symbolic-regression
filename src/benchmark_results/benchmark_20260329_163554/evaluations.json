@@ -1,0 +1,30 @@
+[
+  {
+    "name": "cubic_25_one_root",
+    "category": "cubic",
+    "difficulty": "medium",
+    "status": "success",
+    "time_seconds": 187.38679242134094,
+    "roots_expected": 1,
+    "roots_matched": 0,
+    "root_match_rate": 0.0,
+    "branch_count_correct": true,
+    "average_coverage": 1.0,
+    "match_details": [
+      {
+        "expected": "a**(1/3)",
+        "discovered": null,
+        "match_fraction": 0.0,
+        "matched": false,
+        "closest_discovered": null,
+        "closest_fraction": 0.0,
+        "closest_error": Infinity
+      }
+    ],
+    "any_error": null,
+    "num_branches_found": 1,
+    "unmatched_discovered": [
+      "safe_cbrt(a)"
+    ]
+  }
+]

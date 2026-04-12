@@ -1,0 +1,13 @@
+EXPRESIONES ANALÍTICAS DESCUBIERTAS
+======================================================================
+
+Ecuación original: a + x - 2 = 0
+Variables: ['x']
+Parámetros: ['a']
+
+
+RAMA 1 (raíz #1):
+----------------------------------------------------------------------
+Expresión única:
+  x = 2.0 - a
+  Puntos cubiertos: 50
