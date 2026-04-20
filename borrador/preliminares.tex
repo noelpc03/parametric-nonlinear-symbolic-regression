@@ -1,0 +1,222 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{bm}
+\usepackage[hidelinks]{hyperref}
+
+\newtheorem{definition}{Definición}
+\newtheorem{theorem}{Teorema}
+\newtheorem{remark}{Observación}
+
+\newcommand{\xvec}{\mathbf{x}}
+\newcommand{\thetavec}{\boldsymbol{\theta}}
+\newcommand{\Fvec}{\mathbf{F}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+\newcommand{\loss}{\mathcal{L}}
+\newcommand{\dataset}{\mathcal{D}}
+\newcommand{\jac}{\mathbf{J}}
+
+\title{Regresión simbólica para la expresión analítica de soluciones de ecuaciones no lineales}
+\author{Noel Pérez Calvo}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section*{Preliminares}
+
+El presente capítulo tiene como objetivo establecer los fundamentos teóricos necesarios para abordar el problema de descubrir expresiones analíticas de ceros de sistemas de ecuaciones no lineales mediante regresión simbólica. Se presentan los conceptos matemáticos subyacentes, las herramientas numéricas y las estrategias algorítmicas que constituirán la base de la metodología propuesta en este trabajo.
+
+En primer lugar, se introduce la notación y las propiedades de los sistemas de ecuaciones no lineales paramétricos, destacando la multiplicidad de soluciones que pueden existir para una misma tupla de parámetros. Se describen los métodos numéricos para el cálculo de ceros de tales sistemas, tanto los métodos iterativos clásicos como el método híbrido de Powell implementado en la biblioteca \texttt{SciPy} \cite{virtanen2020scipy}. Se definen formalmente los conceptos de distancia euclidiana y producto cartesiano, que serán utilizados en la generación del conjunto de datos de entrenamiento.
+
+Posteriormente, se abordan los principios de la regresión simbólica \cite{koza1992genetic}, una técnica de aprendizaje automático que permite inferir expresiones algebraicas a partir de datos. Se explican los fundamentos de la programación genética, las funciones de pérdida que guían el proceso evolutivo y los parámetros que controlan el comportamiento del algoritmo.
+
+\subsection*{Sistemas de ecuaciones no lineales paramétricos}
+
+En esta sección se formaliza el concepto de sistema de ecuaciones no lineales dependiente de parámetros, así como las herramientas numéricas y matemáticas necesarias para su estudio.
+
+\subsubsection*{Definición y notación}
+
+Un sistema de ecuaciones no lineales paramétrico se expresa como la búsqueda de vectores \(\xvec \in \R^n\) que satisfacen
+\begin{equation}
+    \Fvec(\xvec; \thetavec) = \mathbf{0},
+    \label{eq:sistema_general}
+\end{equation}
+donde:
+\begin{itemize}
+    \item \(\Fvec: \R^n \times \R^p \to \R^n\) es una función vectorial no lineal,
+    \item \(\xvec = (x_1, \dots, x_n)^T \in \R^n\) es el vector de variables incógnita,
+    \item \(\thetavec = (\theta_1, \dots, \theta_p)^T \in \R^p\) es el vector de parámetros del modelo,
+    \item \(\mathbf{0} \in \R^n\) denota el vector nulo.
+\end{itemize}
+La notación \(\Fvec(\xvec; \thetavec)\) indica que \(\Fvec\) depende explícitamente de las variables \(\xvec\) y de los parámetros \(\thetavec\), estos últimos considerados fijos durante el proceso de resolución.
+
+La no linealidad de \(\Fvec\) implica que, a diferencia de los sistemas lineales, no existe un método directo general para obtener todas las soluciones, y la estructura del conjunto solución puede ser compleja.
+
+\subsubsection*{Multiplicidad de soluciones y ramas}
+
+\begin{definition}[Rama de soluciones]
+Sea \(\Fvec: \R^n \times \R^p \to \R^n\) una función continua. Una \textbf{rama de soluciones} del sistema \(\Fvec(\xvec; \thetavec) = \mathbf{0}\) es una función continua \(\mathbf{g}: \Omega \subseteq \R^p \to \R^n\) definida sobre un conjunto abierto y conexo \(\Omega \subset \R^p\) tal que
+\[
+\Fvec(\mathbf{g}(\thetavec); \thetavec) = \mathbf{0}, \quad \forall \thetavec \in \Omega.
+\]
+\end{definition}
+
+Para una tupla fija de parámetros \(\thetavec_0 \in \Omega\), el valor \(\xvec_0 = \mathbf{g}(\thetavec_0)\) es una solución del sistema. El conjunto de todas las soluciones para \(\thetavec_0\) es la unión de las imágenes de todas las ramas que contienen a \(\thetavec_0\) en su dominio.
+
+En muchos sistemas de interés, el número de ramas es finito y localmente constante en regiones abiertas del espacio de parámetros. Sin embargo, pueden existir puntos o variedades de bifurcación donde el número de ramas cambia, o donde dos o más ramas se intersectan \cite{allgower1990numerical}. El estudio de la estructura global de ramas es objeto de la teoría de continuación numérica \cite{doedel2007numerical}.
+
+\subsubsection*{Métodos numéricos para el cálculo de ceros}
+
+\textbf{Métodos iterativos generales.} Para sistemas no lineales de cierta complejidad, la obtención de soluciones explícitas mediante métodos simbólicos resulta impracticable. En su lugar, se emplean métodos numéricos iterativos que, partiendo de una aproximación inicial \(\xvec^{(0)}\), generan una sucesión \(\{\xvec^{(k)}\}_{k=0}^{\infty}\) que converge a una solución \(\xvec^*\) bajo condiciones adecuadas.
+
+El método de Newton-Raphson para sistemas no lineales \cite{burden2010numerical} se define mediante la iteración
+\begin{equation}
+    \xvec^{(k+1)} = \xvec^{(k)} - \bigl[\jac_{\Fvec}(\xvec^{(k)})\bigr]^{-1} \Fvec(\xvec^{(k)}; \thetavec),
+    \label{eq:newton}
+\end{equation}
+donde:
+\begin{itemize}
+    \item \(\xvec^{(k)}\) es la aproximación en la iteración \(k\),
+    \item \(\Fvec(\xvec^{(k)}; \thetavec)\) es el valor de la función en dicha aproximación,
+    \item \(\jac_{\Fvec}(\xvec)\) es la matriz jacobiana de \(\Fvec\) respecto de \(\xvec\), de dimensiones \(n \times n\), definida por \((\jac_{\Fvec})_{ij} = \frac{\partial F_i}{\partial x_j}\).
+\end{itemize}
+Bajo condiciones de diferenciabilidad y no singularidad del jacobiano en la solución, el método converge cuadráticamente.
+
+Los métodos cuasi-Newton \cite{nocedal2006numerical} evitan el cálculo exacto del jacobiano, aproximándolo mediante actualizaciones de rango uno o dos. La iteración toma la forma
+\[
+\xvec^{(k+1)} = \xvec^{(k)} - \mathbf{B}_k^{-1} \Fvec(\xvec^{(k)}; \thetavec),
+\]
+donde \(\mathbf{B}_k\) es una aproximación del jacobiano que se actualiza en cada paso mediante fórmulas como la de Broyden \cite{broyden1965class}. Estos métodos reducen el coste computacional a cambio de una convergencia superlineal.
+
+\subsubsection*{Distancia euclidiana}
+
+\begin{definition}[Distancia euclidiana]
+Sean \(\mathbf{u} = (u_1, \dots, u_n)^T \in \R^n\) y \(\mathbf{v} = (v_1, \dots, v_n)^T \in \R^n\) dos vectores. La \textbf{distancia euclidiana} entre \(\mathbf{u}\) y \(\mathbf{v}\) se define como la norma euclidiana de su diferencia:
+\begin{equation}
+    d(\mathbf{u}, \mathbf{v}) = \norm{\mathbf{u} - \mathbf{v}}_2 = \sqrt{\sum_{i=1}^{n} (u_i - v_i)^2}.
+\end{equation}
+\end{definition}
+
+La distancia euclidiana constituye una métrica sobre \(\R^n\), ya que satisface las propiedades de no negatividad, simetría, identidad de los indiscernibles y desigualdad triangular. En el contexto del cálculo numérico de ceros, esta métrica se emplea para identificar soluciones numéricamente equivalentes cuando las diferencias entre ellas son atribuibles a errores de redondeo o a tolerancias de convergencia de los métodos iterativos.
+
+\subsubsection*{Producto cartesiano}
+
+\begin{definition}[Producto cartesiano]
+Sean \(A_1, A_2, \dots, A_m\) conjuntos arbitrarios. El \textbf{producto cartesiano} de estos conjuntos se define como el conjunto de todas las \(m\)-tuplas ordenadas \((a_1, a_2, \dots, a_m)\) tales que \(a_i \in A_i\) para cada \(i = 1, \dots, m\). Formalmente:
+\begin{equation}
+    A_1 \times A_2 \times \cdots \times A_m = \{(a_1, a_2, \dots, a_m) \mid a_i \in A_i,\; i=1,\dots,m\}.
+\end{equation}
+\end{definition}
+
+Si cada \(A_i\) es un conjunto finito, el cardinal del producto cartesiano es el producto de los cardinales: \(|A_1 \times \cdots \times A_m| = \prod_{i=1}^m |A_i|\). En el contexto de la discretización del espacio de parámetros, cada \(A_i\) corresponde a un conjunto finito de valores del parámetro \(\theta_i\), y el producto cartesiano proporciona un conjunto estructurado de tuplas \(\thetavec\) que cubre sistemáticamente la región de interés.
+
+\subsection*{Regresión simbólica}
+
+La regresión simbólica constituye el núcleo metodológico de este trabajo. A continuación se presentan sus fundamentos teóricos y los elementos que la componen.
+
+\subsubsection*{Concepto y objetivos}
+
+La regresión simbólica es una técnica de aprendizaje automático cuyo objetivo es descubrir, a partir de un conjunto de datos observados, una expresión matemática cerrada que describa la relación funcional entre variables de entrada y una variable de salida \cite{koza1992genetic}. A diferencia de la regresión tradicional, donde la estructura del modelo se fija de antemano y solo se ajustan los parámetros, la regresión simbólica explora simultáneamente el espacio de formas funcionales y de parámetros numéricos.
+
+Existen diversas implementaciones de regresión simbólica basadas en programación genética. Una de las más destacadas en la actualidad es \textbf{PySR} \cite{cranmer2023pysr}, una biblioteca de código abierto que combina un motor evolutivo en Julia con una interfaz en Python, ofreciendo alto rendimiento y operadores matemáticos protegidos para garantizar la estabilidad numérica durante la búsqueda.
+
+Formalmente, sea un conjunto de datos \(\dataset = \{(\mathbf{u}_i, v_i)\}_{i=1}^{N}\) donde:
+\begin{itemize}
+    \item \(\mathbf{u}_i \in \R^d\) es el vector de variables de entrada (o características) del \(i\)-ésimo ejemplo,
+    \item \(v_i \in \R\) es el valor observado de la variable de salida para dicho ejemplo.
+\end{itemize}
+Se busca una función \(f: \R^d \to \R\) perteneciente a un espacio de funciones \(\mathcal{F}\) que minimice una función de pérdida \(\loss\):
+\begin{equation}
+    f^* = \arg\min_{f \in \mathcal{F}} \loss(f; \dataset).
+\end{equation}
+El espacio \(\mathcal{F}\) está generado por un conjunto de operadores matemáticos básicos (suma, resta, multiplicación, división, funciones trigonométricas, exponenciales, logaritmos, etc.) y constantes numéricas. La tarea es intrínsecamente combinatoria y no convexa, por lo que se requieren métodos de búsqueda heurística.
+
+\subsubsection*{Fundamentos de programación genética}
+
+El enfoque predominante para la regresión simbólica se basa en la \textbf{programación genética}, una rama de los algoritmos evolutivos inspirada en la selección natural \cite{koza1992genetic}. En este paradigma, cada posible expresión matemática se codifica como un \textbf{árbol sintáctico}, cuyos nodos internos representan operadores matemáticos y cuyas hojas representan variables de entrada o constantes numéricas.
+
+La programación genética mantiene una población de individuos (árboles) que evoluciona a lo largo de generaciones mediante los siguientes operadores:
+
+\begin{itemize}
+    \item \textbf{Selección}: Los individuos con mejor aptitud (menor error en la predicción) tienen mayor probabilidad de ser elegidos para reproducirse.
+    \item \textbf{Cruce}: Dos árboles padres intercambian subárboles, generando dos hijos que combinan características de ambos progenitores.
+    \item \textbf{Mutación}: Un subárbol de un individuo se sustituye por otro generado aleatoriamente, introduciendo variabilidad genética.
+    \item \textbf{Elitismo}: Los mejores individuos de cada generación se preservan sin cambios para no perder soluciones de alta calidad.
+\end{itemize}
+
+Este proceso iterativo permite explorar eficientemente el vasto espacio de posibles expresiones algebraicas.
+
+\subsubsection*{Funciones de pérdida}
+
+La \textbf{función de pérdida} (o función de aptitud) es el criterio que evalúa la calidad de un individuo dentro de la población evolutiva. Cuantifica la discrepancia entre las predicciones del modelo simbólico y los valores observados.
+
+\textbf{Error cuadrático medio.} Para un conjunto de datos \(\{(\mathbf{u}_i, v_i)\}_{i=1}^{N}\) con \(\mathbf{u}_i \in \R^d\) y \(v_i \in \R\), y una función \(f: \R^d \to \R\), el error cuadrático medio (MSE, por sus siglas en inglés) se define como
+\begin{equation}
+    \text{MSE}(f) = \frac{1}{N} \sum_{i=1}^{N} \left( v_i - f(\mathbf{u}_i) \right)^2,
+\end{equation}
+donde:
+\begin{itemize}
+    \item \(N\) es el número total de ejemplos en el conjunto de datos,
+    \item \(v_i\) es el valor observado para el \(i\)-ésimo ejemplo,
+    \item \(f(\mathbf{u}_i)\) es el valor predicho por la función \(f\) para el vector de entrada \(\mathbf{u}_i\).
+\end{itemize}
+El MSE es una métrica diferenciable y penaliza cuadráticamente las desviaciones, siendo sensible a valores atípicos \cite{hastie2009elements}. Es la función de pérdida más utilizada en problemas de regresión \cite{bishop2006pattern}.
+
+\textbf{Pérdida por conteo de coincidencias.} Para un umbral de tolerancia \(\varepsilon > 0\), la pérdida por conteo de coincidencias se define como
+\begin{equation}
+    \loss_{\text{match}}(f) = 1 - \frac{1}{N} \sum_{i=1}^{N} \mathbb{I}\bigl( |v_i - f(\mathbf{u}_i)| < \varepsilon \bigr),
+\end{equation}
+donde:
+\begin{itemize}
+    \item \(\varepsilon\) es el umbral de tolerancia que define cuándo una predicción se considera correcta,
+    \item \(\mathbb{I}(\cdot)\) denota la función indicadora, que toma el valor \(1\) si la condición es verdadera y \(0\) en caso contrario,
+    \item \(|v_i - f(\mathbf{u}_i)|\) es el error absoluto entre el valor observado y el predicho.
+\end{itemize}
+Minimizar \(\loss_{\text{match}}\) equivale a maximizar el número de puntos cuya predicción difiere del valor real en menos de \(\varepsilon\). Esta métrica es no diferenciable debido a la presencia de la función indicadora.
+
+\textbf{Pérdida sigmoidal.} Para un umbral de tolerancia \(\varepsilon > 0\) y un parámetro de pendiente \(k > 0\), la pérdida sigmoidal se define como
+\begin{equation}
+    \loss_{\text{sig}}(f) = 1 - \frac{1}{N} \sum_{i=1}^{N} \frac{1}{1 + \exp\bigl( -k (\varepsilon - |v_i - f(\mathbf{u}_i)|) \bigr)},
+\end{equation}
+donde:
+\begin{itemize}
+    \item \(\varepsilon\) es el umbral de tolerancia análogo al de la pérdida por conteo,
+    \item \(k\) controla la pendiente de la transición: valores grandes de \(k\) hacen que la función se aproxime a un escalón, recuperando el comportamiento de la pérdida por conteo,
+    \item \(\exp(\cdot)\) denota la función exponencial,
+    \item \(|v_i - f(\mathbf{u}_i)|\) es el error absoluto entre el valor observado y el predicho.
+\end{itemize}
+A diferencia de la pérdida por conteo, la pérdida sigmoidal es diferenciable en todo su dominio, lo que facilita su uso en esquemas de optimización híbrida que combinan búsqueda evolutiva con ajuste local de constantes \cite{cranmer2023pysr}. Este tipo de funciones de pérdida suavizadas se emplea habitualmente en regresión simbólica para evitar los problemas de la no diferenciabilidad \cite{schmidt2009distilling}.
+
+\subsubsection*{Parámetros del algoritmo de regresión simbólica}
+
+El comportamiento de la regresión simbólica basada en programación genética está gobernado por un conjunto de parámetros que influyen en la calidad de las soluciones, el tiempo de cómputo y la interpretabilidad de los resultados \cite{koza1992genetic}.
+
+\textbf{Parámetros de la población.}
+\begin{itemize}
+    \item \textbf{Tamaño de la población} (\(P\)): Número de individuos que coexisten en cada generación. Una población grande aumenta la diversidad genética y la probabilidad de encontrar soluciones óptimas, a costa de un mayor esfuerzo computacional.
+    \item \textbf{Número de generaciones} (\(G\)): Cantidad de iteraciones del proceso evolutivo. Valores más altos permiten refinar las soluciones, pero pueden conducir a sobreajuste si no se controla la complejidad.
+    \item \textbf{Número de poblaciones independientes}: En algunas implementaciones se utiliza un modelo de islas con múltiples subpoblaciones que evolucionan en paralelo e intercambian individuos periódicamente.
+\end{itemize}
+
+\textbf{Parámetros de control de la complejidad.}
+\begin{itemize}
+    \item \textbf{Coeficiente de parsimonia} (\(\alpha\)): Penalización añadida a la función de aptitud proporcional al tamaño del árbol (número de nodos). La aptitud efectiva se calcula como \(\text{fitness} = \text{MSE} + \alpha \cdot \text{tamaño}\), favoreciendo expresiones más simples.
+    \item \textbf{Tamaño máximo del árbol} (\(S_{\max}\)): Límite en el número de nodos que puede tener un individuo. Evita la explosión de la complejidad y reduce el espacio de búsqueda.
+\end{itemize}
+
+\textbf{Probabilidades de operadores genéticos.}
+\begin{itemize}
+    \item \textbf{Probabilidad de cruce} (\(p_c\)): Fracción de la nueva generación generada mediante cruce de padres seleccionados.
+    \item \textbf{Probabilidad de mutación} (\(p_m\)): Fracción de individuos que sufren modificaciones aleatorias. Existen distintos tipos de mutación (de subárbol, de punto, de hoja) cuyas probabilidades individuales pueden ajustarse.
+    \item \textbf{Probabilidad de reproducción} (\(p_r\)): Fracción de individuos que pasan directamente a la siguiente generación sin cambios (elitismo), con \(p_r = 1 - p_c - p_m\).
+\end{itemize}
+
+\newpage
+\bibliographystyle{plain}
+\bibliography{referencias}
+
+\end{document}

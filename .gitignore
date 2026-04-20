@@ -51,3 +51,14 @@ progreso.log
 progreso.out
 progreso.synctex.gz
 progreso.toc
+
+# borrador
+preliminares.aux
+preliminares.bbl
+preliminares.blg
+preliminares.fdb_latexmk
+preliminares.fls
+preliminares.log
+preliminares.out
+preliminares.synctex.gz
+preliminares.toc
