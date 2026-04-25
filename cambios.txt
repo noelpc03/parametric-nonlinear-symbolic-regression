@@ -1,0 +1,263 @@
+================================================================================
+ CAMBIOS PARA EXTENDER EL PIPELINE A SISTEMAS DE ECUACIONES NO LINEALES
+================================================================================
+
+Objetivo: Modificar el pipeline existente para que:
+- Acepte sistemas de ecuaciones (lista de strings) con múltiples variables.
+- Use scipy.optimize.root con múltiples puntos iniciales aleatorios.
+- Filtre soluciones repetidas mediante distancia euclidiana (sin clustering).
+- Aplique la estrategia de anclaje en la regresión simbólica.
+- Genere expresiones simbólicas para cada coordenada de cada rama.
+
+-------------------------------------------------------------------------------
+1. config.py
+-------------------------------------------------------------------------------
+- Eliminar:
+    EQUATION_STRING
+- Agregar:
+    EQUATIONS = [
+        "(x1 - a)*(x2 - a*b)",
+        "x1*x2 - a*b**2"
+    ]
+    VARIABLES = ["x1", "x2"]
+    PARAMETERS = ["a", "b"]
+
+    SYSTEM_SOLVER_METHOD = 'scipy'
+    NUM_INITIAL_GUESSES = 20
+    GUESS_RANGES = {
+        "x1": (-10.0, 10.0),
+        "x2": (-10.0, 10.0)
+    }
+    DISTANCE_TOLERANCE = 1e-3
+    SOLVER_RESIDUE_TOL = 1e-6
+
+    ANCHOR_COORDINATE = 0
+    VALIDATION_TOL = 1e-4
+    MAX_ANCHOR_ITERATIONS = 10
+
+- Mantener los parámetros de regresión simbólica (EPSILON, K, NITERATIONS, etc.)
+
+-------------------------------------------------------------------------------
+2. equation_parser.py (en 1_equation_definition/)
+-------------------------------------------------------------------------------
+- Agregar nueva función parse_system:
+
+  def parse_system(equations_str, variables, parameters):
+      var_symbols = sp.symbols(variables)
+      param_symbols = sp.symbols(parameters)
+      # construir symbols_dict...
+      eqs = [sp.sympify(eq, locals=symbols_dict) for eq in equations_str]
+      return eqs, symbols_dict
+
+-------------------------------------------------------------------------------
+3. solver.py (en 3_zero_finding/)
+-------------------------------------------------------------------------------
+- Reemplazar completamente el contenido actual.
+- Importar: from scipy.optimize import root, import warnings, import numpy as np
+- Implementar la función solve_system_scipy:
+
+  def solve_system_scipy(equations, variables, param_values,
+                         num_guesses=20, guess_ranges=None,
+                         dist_tol=1e-3, residue_tol=1e-6):
+      # 1. Sustituir parámetros en las ecuaciones
+      eqs_sub = [eq.subs(param_values) for eq in equations]
+      # 2. Crear función evaluable con sp.lambdify
+      eval_func = sp.lambdify([variables], eqs_sub, modules='numpy')
+      def func(vec):
+          return eval_func(*vec)
+
+      found_solutions = []
+      for _ in range(num_guesses):
+          guess = [np.random.uniform(*guess_ranges[str(v)])
+                   for v in variables]
+          try:
+              with warnings.catch_warnings():
+                  warnings.simplefilter("ignore")
+                  sol = root(func, guess, method='hybr', tol=1e-8)
+              if sol.success and np.linalg.norm(sol.fun) < residue_tol:
+                  found_solutions.append(sol.x.real.tolist())
+          except Exception:
+              continue
+
+      # Filtrado por distancia euclidiana
+      unique = []
+      for sol in found_solutions:
+          if not any(np.linalg.norm(np.array(sol) - np.array(u)) < dist_tol
+                     for u in unique):
+              unique.append(sol)
+      return unique
+
+- Implementar la nueva solve_for_all_parameter_tuples:
+
+  def solve_for_all_parameter_tuples(equations, variables, param_names,
+                                     param_symbols, parameter_grid,
+                                     method='scipy', **kwargs):
+      results = []
+      for param_tuple in parameter_grid:
+          param_values = {param_symbols[name]: val 
+                          for name, val in zip(param_names, param_tuple)}
+          roots = solve_system_scipy(equations, variables,
+                                     param_values, **kwargs)
+          if roots:
+              results.append({
+                  'parameters': dict(zip(param_names, param_tuple)),
+                  'roots': roots,
+                  'num_roots': len(roots)
+              })
+      return results
+
+-------------------------------------------------------------------------------
+4. root_grouping.py (en 4_data_preparation/)
+-------------------------------------------------------------------------------
+- Reemplazar combine_all_roots por combine_all_solutions:
+
+  def combine_all_solutions(results, param_names):
+      all_params, all_solutions = [], []
+      tuple_ids, solution_ids = [], []
+      for t_idx, res in enumerate(results):
+          params = [res['parameters'][p] for p in param_names]
+          for s_idx, sol in enumerate(res['roots']):
+              all_params.append(params)
+              all_solutions.append(sol)
+              tuple_ids.append(t_idx)
+              solution_ids.append(s_idx)
+      X = np.array(all_params)
+      Y = np.array(all_solutions)
+      return {'X': X, 'Y': Y, 'tuple_id': np.array(tuple_ids),
+              'solution_id': np.array(solution_ids),
+              'num_variables': Y.shape[1]}
+
+- Adaptar expand_tuples y group_by_root_branch para trabajar con Y 2D.
+
+-------------------------------------------------------------------------------
+5. regression_adapter.py (en 5_symbolic_regression/)
+-------------------------------------------------------------------------------
+- Eliminar funciones existentes (o renombrarlas). Agregar la función principal:
+
+  def run_anchored_symbolic_regression(combined_data, param_names,
+                                       equations, variables,
+                                       anchor_coord=0,
+                                       epsilon=..., k=..., niterations=...,
+                                       min_points=..., max_iterations=...,
+                                       validation_tol=...):
+      X = combined_data['X']
+      Y = combined_data['Y']
+      remaining_mask = np.ones(len(X), dtype=bool)
+      all_indices = np.arange(len(X))
+      results = []
+
+      while np.sum(remaining_mask) >= min_points:
+          # 1. Preparar datos ancla
+          X_cur = X[remaining_mask]
+          y_anchor = Y[remaining_mask, anchor_coord]
+          cur_indices = all_indices[remaining_mask]
+
+          # 2. SR iterativa sobre el ancla (una sola ecuación)
+          anchor_result = iterative_symbolic_regression(
+              X_cur, y_anchor, param_names,
+              epsilon=epsilon, k=k, niterations=niterations,
+              min_points=min_points, max_iterations=1
+          )[0]
+          matched_local = anchor_result['matched_indices']
+          matched_global = cur_indices[matched_local]
+
+          # 3. Para cada otra coordenada, SR simple sobre el subconjunto
+          branch_exprs = [None] * Y.shape[1]
+          branch_exprs[anchor_coord] = anchor_result['equation']
+          for coord in range(Y.shape[1]):
+              if coord == anchor_coord:
+                  continue
+              y_sub = Y[matched_global, coord]
+              # Si todos los valores son casi iguales, usar constante
+              if np.allclose(y_sub, y_sub[0], rtol=1e-5):
+                  branch_exprs[coord] = str(y_sub[0])
+                  continue
+              model = train_symbolic_model(X[matched_global], y_sub,
+                                           param_names, ...)
+              best = _evaluate_hall_of_fame(model, X[matched_global],
+                                            y_sub, epsilon)
+              branch_exprs[coord] = best['equation_str'] if best else "?"
+
+          # 4. Validar la rama completa
+          if validate_branch(branch_exprs, param_names,
+                             X[matched_global], Y[matched_global],
+                             equations, variables,
+                             tol=validation_tol):
+              results.append({
+                  'expressions': branch_exprs,
+                  'matched_indices': matched_global,
+                  'num_matched': len(matched_global)
+              })
+              remaining_mask[matched_global] = False
+          else:
+              # Descartar rama, quitar puntos problemáticos
+              remaining_mask[matched_global] = False
+
+      return results
+
+- Implementar validate_branch: parsea expresiones, construye funciones con sympy,
+  evalúa el sistema y calcula el residuo medio. Si es menor que validation_tol,
+  retorna True.
+
+-------------------------------------------------------------------------------
+6. symbolic_regression.py (en 5_symbolic_regression/)
+-------------------------------------------------------------------------------
+- Sin cambios internos. Se usa igual.
+
+-------------------------------------------------------------------------------
+7. utils.py (en 5_symbolic_regression/)
+-------------------------------------------------------------------------------
+- Sin cambios.
+
+-------------------------------------------------------------------------------
+8. main.py
+-------------------------------------------------------------------------------
+- Modificar imports para usar:
+    from equation_parser import parse_system
+    from config import (EQUATIONS, VARIABLES, PARAMETERS,
+                        SYSTEM_SOLVER_METHOD, NUM_INITIAL_GUESSES,
+                        GUESS_RANGES, DISTANCE_TOLERANCE, ...)
+    from regression_adapter import run_anchored_symbolic_regression
+
+- Paso 1: equations, symbols = parse_system(EQUATIONS, VARIABLES, PARAMETERS)
+- Paso 3: results = solve_for_all_parameter_tuples(
+              equations, var_symbols, param_names, param_symbols, grid,
+              method=SYSTEM_SOLVER_METHOD,
+              num_guesses=NUM_INITIAL_GUESSES,
+              guess_ranges=GUESS_RANGES,
+              dist_tol=DISTANCE_TOLERANCE,
+              residue_tol=SOLVER_RESIDUE_TOL
+          )
+- Paso 4: combined_data = combine_all_solutions(results, param_names)
+- Paso 5: all_results = run_anchored_symbolic_regression(
+              combined_data, param_names,
+              equations=equations, variables=var_symbols,
+              anchor_coord=ANCHOR_COORDINATE,
+              epsilon=EPSILON, k=K, niterations=NITERATIONS,
+              min_points=MIN_POINTS,
+              max_iterations=MAX_ANCHOR_ITERATIONS,
+              validation_tol=VALIDATION_TOL
+          )
+- Paso 6: Adaptar presentación de resultados para mostrar cada rama con sus
+  expresiones (ej. "Rama 1: x1 = a, x2 = a*b").
+
+-------------------------------------------------------------------------------
+9. Dependencias
+-------------------------------------------------------------------------------
+- Asegurar que scipy esté instalado (normalmente ya lo está).
+- No se requiere scikit-learn (sin clustering).
+
+-------------------------------------------------------------------------------
+Secuencia recomendada
+-------------------------------------------------------------------------------
+1. Actualizar config.py
+2. Añadir parse_system
+3. Reescribir solver.py
+4. Modificar root_grouping.py
+5. Crear run_anchored_symbolic_regression + validate_branch
+6. Ajustar main.py
+7. Probar con el sistema de ejemplo:
+   a=1..3, b=1..3, grid producto cartesiano.
+   Se esperan dos ramas: (x1=a, x2=a*b) y (x1=b, x2=a*b).
+
+================================================================================

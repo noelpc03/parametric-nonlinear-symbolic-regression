@@ -1,0 +1,1215 @@
+[
+  {
+    "name": "linear_01_basic",
+    "category": "linear",
+    "difficulty": "easy",
+    "status": "success",
+    "time_seconds": 391.0627052783966,
+    "roots_expected": 1,
+    "roots_matched": 1,
+    "root_match_rate": 1.0,
+    "branch_count_correct": true,
+    "average_coverage": 1.0,
+    "match_details": [
+      {
+        "expected": "2 - a",
+        "discovered": "2.0 - a",
+        "match_fraction": 1.0,
+        "matched": true
+      }
+    ],
+    "any_error": null,
+    "num_branches_found": 1,
+    "unmatched_discovered": []
+  },
+  {
+    "name": "linear_02_scaled",
+    "category": "linear",
+    "difficulty": "easy",
+    "status": "success",
+    "time_seconds": 61.347153663635254,
+    "roots_expected": 1,
+    "roots_matched": 1,
+    "root_match_rate": 1.0,
+    "branch_count_correct": true,
+    "average_coverage": 1.0,
+    "match_details": [
+      {
+        "expected": "a / 2",
+        "discovered": "a * 0.5",
+        "match_fraction": 1.0,
+        "matched": true
+      }
+    ],
+    "any_error": null,
+    "num_branches_found": 1,
+    "unmatched_discovered": []
+  },
+  {
+    "name": "linear_03_offset",
+    "category": "linear",
+    "difficulty": "easy",
+    "status": "success",
+    "time_seconds": 57.29352116584778,
+    "roots_expected": 1,
+    "roots_matched": 1,
+    "root_match_rate": 1.0,
+    "branch_count_correct": true,
+    "average_coverage": 1.0,
+    "match_details": [
+      {
+        "expected": "3*a - 5",
+        "discovered": "(-1.6666666 + a) * 3.0",
+        "match_fraction": 1.0,
+        "matched": true
+      }
+    ],
+    "any_error": null,
+    "num_branches_found": 1,
+    "unmatched_discovered": []
+  },
+  {
+    "name": "linear_04_fraction",
+    "category": "linear",
+    "difficulty": "easy",
+    "status": "success",
+    "time_seconds": 58.01293897628784,
+    "roots_expected": 1,
+    "roots_matched": 1,
+    "root_match_rate": 1.0,
+    "branch_count_correct": true,
+    "average_coverage": 1.0,
+    "match_details": [
+      {
+        "expected": "(6 - a) / 3",
+        "discovered": "2.0 - (a * 0.33333334)",
+        "match_fraction": 1.0,
+        "matched": true
+      }
+    ],
+    "any_error": null,
+    "num_branches_found": 1,
+    "unmatched_discovered": []
+  },
+  {
+    "name": "linear_05_negative",
+    "category": "linear",
+    "difficulty": "easy",
+    "status": "success",
+    "time_seconds": 62.65601944923401,
+    "roots_expected": 1,
+    "roots_matched": 1,
+    "root_match_rate": 1.0,
+    "branch_count_correct": true,
+    "average_coverage": 1.0,
+    "match_details": [
+      {
+        "expected": "a + 1",
+        "discovered": "a + 1.0",
+        "match_fraction": 1.0,
+        "matched": true
+      }
+    ],
+    "any_error": null,
+    "num_branches_found": 1,
+    "unmatched_discovered": []
+  },
+  {
+    "name": "linear_06_two_params",
+    "category": "linear",
+    "difficulty": "easy",
+    "status": "success",
+    "time_seconds": 81.0891318321228,
+    "roots_expected": 1,
+    "roots_matched": 1,
+    "root_match_rate": 1.0,
+    "branch_count_correct": true,
+    "average_coverage": 1.0,
+    "match_details": [
+      {
+        "expected": "a + b",
+        "discovered": "b + a",
+        "match_fraction": 1.0,
+        "matched": true
+      }
+    ],
+    "any_error": null,
+    "num_branches_found": 1,
+    "unmatched_discovered": []
+  },
+  {
+    "name": "linear_07_scaled_params",
+    "category": "linear",
+    "difficulty": "easy",
+    "status": "success",
+    "time_seconds": 345.45587515830994,
+    "roots_expected": 1,
+    "roots_matched": 1,
+    "root_match_rate": 1.0,
+    "branch_count_correct": true,
+    "average_coverage": 1.0,
+    "match_details": [
+      {
+        "expected": "2*a - 3*b",
+        "discovered": "((b - a) * -2.0) - b",
+        "match_fraction": 1.0,
+        "matched": true
+      }
+    ],
+    "any_error": null,
+    "num_branches_found": 1,
+    "unmatched_discovered": []
+  },
+  {
+    "name": "linear_08_product_param",
+    "category": "linear",
+    "difficulty": "medium",
+    "status": "success",
+    "time_seconds": 491.3841347694397,
+    "roots_expected": 1,
+    "roots_matched": 1,
+    "root_match_rate": 1.0,
+    "branch_count_correct": true,
+    "average_coverage": 1.0,
+    "match_details": [
+      {
+        "expected": "a*b",
+        "discovered": "a * b",
+        "match_fraction": 1.0,
+        "matched": true
+      }
+    ],
+    "any_error": null,
+    "num_branches_found": 1,
+    "unmatched_discovered": []
+  },
+  {
+    "name": "linear_09_division",
+    "category": "linear",
+    "difficulty": "medium",
+    "status": "success",
+    "time_seconds": 385.0294728279114,
+    "roots_expected": 1,
+    "roots_matched": 1,
+    "root_match_rate": 1.0,
+    "branch_count_correct": true,
+    "average_coverage": 1.0,
+    "match_details": [
+      {
+        "expected": "b / a",
+        "discovered": "b / a",
+        "match_fraction": 1.0,
+        "matched": true
+      }
+    ],
+    "any_error": null,
+    "num_branches_found": 1,
+    "unmatched_discovered": []
+  },
+  {
+    "name": "linear_10_three_params",
+    "category": "linear",
+    "difficulty": "easy",
+    "status": "success",
+    "time_seconds": 102.03364944458008,
+    "roots_expected": 1,
+    "roots_matched": 1,
+    "root_match_rate": 1.0,
+    "branch_count_correct": true,
+    "average_coverage": 1.0,
+    "match_details": [
+      {
+        "expected": "a + b + c",
+        "discovered": "(b + c) + a",
+        "match_fraction": 1.0,
+        "matched": true
+      }
+    ],
+    "any_error": null,
+    "num_branches_found": 1,
+    "unmatched_discovered": []
+  },
+  {
+    "name": "quadratic_11_simple",
+    "category": "quadratic",
+    "difficulty": "easy",
+    "status": "success",
+    "time_seconds": 136.50421142578125,
+    "roots_expected": 2,
+    "roots_matched": 2,
+    "root_match_rate": 1.0,
+    "branch_count_correct": true,
+    "average_coverage": 1.0,
+    "match_details": [
+      {
+        "expected": "-sqrt(a)",
+        "discovered": "neg(safe_sqrt(a))",
+        "match_fraction": 1.0,
+        "matched": true
+      },
+      {
+        "expected": "sqrt(a)",
+        "discovered": "safe_sqrt(a)",
+        "match_fraction": 1.0,
+        "matched": true
+      }
+    ],
+    "any_error": null,
+    "num_branches_found": 2,
+    "unmatched_discovered": []
+  },
+  {
+    "name": "quadratic_12_shifted",
+    "category": "quadratic",
+    "difficulty": "easy",
+    "status": "success",
+    "time_seconds": 62.9913375377655,
+    "roots_expected": 1,
+    "roots_matched": 1,
+    "root_match_rate": 1.0,
+    "branch_count_correct": true,
+    "average_coverage": 1.0,
+    "match_details": [
+      {
+        "expected": "a",
+        "discovered": "a",
+        "match_fraction": 1.0,
+        "matched": true
+      }
+    ],
+    "any_error": null,
+    "num_branches_found": 1,
+    "unmatched_discovered": []
+  },
+  {
+    "name": "quadratic_13_factored",
+    "category": "quadratic",
+    "difficulty": "easy",
+    "status": "success",
+    "time_seconds": 133.69883155822754,
+    "roots_expected": 2,
+    "roots_matched": 2,
+    "root_match_rate": 1.0,
+    "branch_count_correct": true,
+    "average_coverage": 1.0,
+    "match_details": [
+      {
+        "expected": "-a",
+        "discovered": "neg(a)",
+        "match_fraction": 1.0,
+        "matched": true
+      },
+      {
+        "expected": "a",
+        "discovered": "a",
+        "match_fraction": 1.0,
+        "matched": true
+      }
+    ],
+    "any_error": null,
+    "num_branches_found": 2,
+    "unmatched_discovered": []
+  },
+  {
+    "name": "quadratic_14_linear_coeff",
+    "category": "quadratic",
+    "difficulty": "easy",
+    "status": "success",
+    "time_seconds": 131.71007180213928,
+    "roots_expected": 2,
+    "roots_matched": 2,
+    "root_match_rate": 1.0,
+    "branch_count_correct": true,
+    "average_coverage": 1.0,
+    "match_details": [
+      {
+        "expected": "-a",
+        "discovered": "neg(a)",
+        "match_fraction": 1.0,
+        "matched": true
+      },
+      {
+        "expected": "0",
+        "discovered": "1.2396909e-09",
+        "match_fraction": 1.0,
+        "matched": true
+      }
+    ],
+    "any_error": null,
+    "num_branches_found": 2,
+    "unmatched_discovered": []
+  },
+  {
+    "name": "quadratic_15_full",
+    "category": "quadratic",
+    "difficulty": "medium",
+    "status": "success",
+    "time_seconds": 126.93396234512329,
+    "roots_expected": 2,
+    "roots_matched": 2,
+    "root_match_rate": 1.0,
+    "branch_count_correct": true,
+    "average_coverage": 1.0,
+    "match_details": [
+      {
+        "expected": "a",
+        "discovered": "a",
+        "match_fraction": 1.0,
+        "matched": true
+      },
+      {
+        "expected": "2*a",
+        "discovered": "a + a",
+        "match_fraction": 1.0,
+        "matched": true
+      }
+    ],
+    "any_error": null,
+    "num_branches_found": 2,
+    "unmatched_discovered": []
+  },
+  {
+    "name": "quadratic_16_irrational",
+    "category": "quadratic",
+    "difficulty": "medium",
+    "status": "success",
+    "time_seconds": 137.1867949962616,
+    "roots_expected": 2,
+    "roots_matched": 2,
+    "root_match_rate": 1.0,
+    "branch_count_correct": true,
+    "average_coverage": 1.0,
+    "match_details": [
+      {
+        "expected": "1 - sqrt(1 + a)",
+        "discovered": "0.99999994 - safe_sqrt(a + 0.9999998)",
+        "match_fraction": 1.0,
+        "matched": true
+      },
+      {
+        "expected": "1 + sqrt(1 + a)",
+        "discovered": "safe_sqrt(a + 1.0000001) + 0.99999994",
+        "match_fraction": 1.0,
+        "matched": true
+      }
+    ],
+    "any_error": null,
+    "num_branches_found": 2,
+    "unmatched_discovered": []
+  },
+  {
+    "name": "quadratic_17_param_coeff",
+    "category": "quadratic",
+    "difficulty": "medium",
+    "status": "success",
+    "time_seconds": 125.8118679523468,
+    "roots_expected": 2,
+    "roots_matched": 2,
+    "root_match_rate": 1.0,
+    "branch_count_correct": true,
+    "average_coverage": 1.0,
+    "match_details": [
+      {
+        "expected": "-1/sqrt(a)",
+        "discovered": "-1.0 / safe_sqrt(a)",
+        "match_fraction": 1.0,
+        "matched": true
+      },
+      {
+        "expected": "1/sqrt(a)",
+        "discovered": "safe_sqrt(-1.0 / a)",
+        "match_fraction": 1.0,
+        "matched": true
+      }
+    ],
+    "any_error": null,
+    "num_branches_found": 2,
+    "unmatched_discovered": []
+  },
+  {
+    "name": "quadratic_18_two_params",
+    "category": "quadratic",
+    "difficulty": "medium",
+    "status": "success",
+    "time_seconds": 350.02757692337036,
+    "roots_expected": 2,
+    "roots_matched": 1,
+    "root_match_rate": 0.5,
+    "branch_count_correct": false,
+    "average_coverage": 1.0,
+    "match_details": [
+      {
+        "expected": "(a - sqrt(a**2 + 4*b)) / 2",
+        "discovered": null,
+        "match_fraction": 0.0,
+        "matched": false,
+        "closest_discovered": "b / (((b + 0.2457586) / (-1.0055693 - a)) - a)",
+        "closest_fraction": 0.03,
+        "closest_error": 0.02485929643686641
+      },
+      {
+        "expected": "(a + sqrt(a**2 + 4*b)) / 2",
+        "discovered": "a + (b / (safe_sqrt((a * (a * 0.25000826)) + b) + (a * 0.50000554)))",
+        "match_fraction": 1.0,
+        "matched": true
+      }
+    ],
+    "any_error": null,
+    "num_branches_found": 4,
+    "unmatched_discovered": [
+      "safe_root9(safe_pow((b - 0.58253026) * -0.03224886, a) - 0.0005700894) * safe_sqrt(b)",
+      "(b / ((b / ((b / (((b - -0.70593905) / (-1.7705153 + a)) + a)) + a)) + a)) + a",
+      "b / (((b + 0.2457586) / (-1.0055693 - a)) - a)"
+    ]
+  },
+  {
+    "name": "quadratic_19_full_abc",
+    "category": "quadratic",
+    "difficulty": "hard",
+    "status": "success",
+    "time_seconds": 640.6808843612671,
+    "roots_expected": 2,
+    "roots_matched": 0,
+    "root_match_rate": 0.0,
+    "branch_count_correct": false,
+    "average_coverage": 0.99609375,
+    "match_details": [
+      {
+        "expected": "(-b - sqrt(b**2 - 4*a*c)) / (2*a)",
+        "discovered": null,
+        "match_fraction": 0.0,
+        "matched": false,
+        "closest_discovered": "(c / (b - (c * (a / (b - ((a * (c * 0.63960135)) / b)))))) - (b / a)",
+        "closest_fraction": 0.3333333333333333,
+        "closest_error": 0.00679320186121368
+      },
+      {
+        "expected": "(-b + sqrt(b**2 - 4*a*c)) / (2*a)",
+        "discovered": null,
+        "match_fraction": 0.0,
+        "matched": false,
+        "closest_discovered": "c * ((-0.7212142 / (b - (a * (c / (b * 1.098151))))) - (0.23976354 / b))",
+        "closest_fraction": 0.0,
+        "closest_error": 0.03803419273993267
+      }
+    ],
+    "any_error": null,
+    "num_branches_found": 7,
+    "unmatched_discovered": [
+      "c * ((-0.7212142 / (b - (a * (c / (b * 1.098151))))) - (0.23976354 / b))",
+      "(c / (b - (c * (a / (b - ((a * (c * 0.63960135)) / b)))))) - (b / a)",
+      "safe_root5(b) * ((-0.29487363 / a) - safe_sqrt((c / a) * 1.3697363))",
+      "(((-0.18500514 / a) + safe_sqrt(c / a)) * b) * 2.3104618",
+      "safe_cbrt((c * (b / ((((safe_pow(c, a) * -0.0036016975) * a) - a) * a))) / -0.25083604)",
+      "(c / (safe_root8((c + a) + -1.1107008) * (b * (a + 0.80621284)))) * -1.3352988",
+      "safe_root7((((a + c) - -0.4822669) * b) * 0.10139067) - b"
+    ]
+  },
+  {
+    "name": "quadratic_20_factored_two",
+    "category": "quadratic",
+    "difficulty": "easy",
+    "status": "success",
+    "time_seconds": 205.98786616325378,
+    "roots_expected": 2,
+    "roots_matched": 2,
+    "root_match_rate": 1.0,
+    "branch_count_correct": true,
+    "average_coverage": 1.0,
+    "match_details": [
+      {
+        "expected": "b",
+        "discovered": "b",
+        "match_fraction": 1.0,
+        "matched": true
+      },
+      {
+        "expected": "a",
+        "discovered": "a",
+        "match_fraction": 1.0,
+        "matched": true
+      }
+    ],
+    "any_error": null,
+    "num_branches_found": 2,
+    "unmatched_discovered": []
+  },
+  {
+    "name": "quadratic_21_sum_product",
+    "category": "quadratic",
+    "difficulty": "medium",
+    "status": "success",
+    "time_seconds": 202.71602487564087,
+    "roots_expected": 2,
+    "roots_matched": 2,
+    "root_match_rate": 1.0,
+    "branch_count_correct": true,
+    "average_coverage": 1.0,
+    "match_details": [
+      {
+        "expected": "b",
+        "discovered": "b",
+        "match_fraction": 1.0,
+        "matched": true
+      },
+      {
+        "expected": "a",
+        "discovered": "a",
+        "match_fraction": 1.0,
+        "matched": true
+      }
+    ],
+    "any_error": null,
+    "num_branches_found": 2,
+    "unmatched_discovered": []
+  },
+  {
+    "name": "quadratic_22_symmetric",
+    "category": "quadratic",
+    "difficulty": "medium",
+    "status": "success",
+    "time_seconds": 179.63818359375,
+    "roots_expected": 2,
+    "roots_matched": 2,
+    "root_match_rate": 1.0,
+    "branch_count_correct": true,
+    "average_coverage": 1.0,
+    "match_details": [
+      {
+        "expected": "-sqrt(a**2 + b**2)",
+        "discovered": "neg(safe_sqrt((b * b) + (a * a)))",
+        "match_fraction": 1.0,
+        "matched": true
+      },
+      {
+        "expected": "sqrt(a**2 + b**2)",
+        "discovered": "safe_sqrt((b * b) + (a * a))",
+        "match_fraction": 1.0,
+        "matched": true
+      }
+    ],
+    "any_error": null,
+    "num_branches_found": 2,
+    "unmatched_discovered": []
+  },
+  {
+    "name": "quadratic_23_nested",
+    "category": "quadratic",
+    "difficulty": "medium",
+    "status": "success",
+    "time_seconds": 164.54116106033325,
+    "roots_expected": 2,
+    "roots_matched": 2,
+    "root_match_rate": 1.0,
+    "branch_count_correct": true,
+    "average_coverage": 1.0,
+    "match_details": [
+      {
+        "expected": "-2*sqrt(a*b)",
+        "discovered": "safe_sqrt(a * b) * -2.0",
+        "match_fraction": 1.0,
+        "matched": true
+      },
+      {
+        "expected": "2*sqrt(a*b)",
+        "discovered": "safe_sqrt((b * a) * -4.0)",
+        "match_fraction": 1.0,
+        "matched": true
+      }
+    ],
+    "any_error": null,
+    "num_branches_found": 2,
+    "unmatched_discovered": []
+  },
+  {
+    "name": "quadratic_24_depressed",
+    "category": "quadratic",
+    "difficulty": "easy",
+    "status": "success",
+    "time_seconds": 66.2819299697876,
+    "roots_expected": 1,
+    "roots_matched": 1,
+    "root_match_rate": 1.0,
+    "branch_count_correct": true,
+    "average_coverage": 1.0,
+    "match_details": [
+      {
+        "expected": "-a/2",
+        "discovered": "a * -0.5",
+        "match_fraction": 1.0,
+        "matched": true
+      }
+    ],
+    "any_error": null,
+    "num_branches_found": 1,
+    "unmatched_discovered": []
+  },
+  {
+    "name": "cubic_25_one_root",
+    "category": "cubic",
+    "difficulty": "medium",
+    "status": "success",
+    "time_seconds": 66.18021178245544,
+    "roots_expected": 1,
+    "roots_matched": 0,
+    "root_match_rate": 0.0,
+    "branch_count_correct": true,
+    "average_coverage": 1.0,
+    "match_details": [
+      {
+        "expected": "a**(1/3)",
+        "discovered": null,
+        "match_fraction": 0.0,
+        "matched": false,
+        "closest_discovered": null,
+        "closest_fraction": 0.0,
+        "closest_error": Infinity
+      }
+    ],
+    "any_error": null,
+    "num_branches_found": 1,
+    "unmatched_discovered": [
+      "safe_cbrt(a)"
+    ]
+  },
+  {
+    "name": "cubic_26_factored",
+    "category": "cubic",
+    "difficulty": "easy",
+    "status": "success",
+    "time_seconds": 232.07530236244202,
+    "roots_expected": 3,
+    "roots_matched": 3,
+    "root_match_rate": 1.0,
+    "branch_count_correct": true,
+    "average_coverage": 1.0,
+    "match_details": [
+      {
+        "expected": "-a",
+        "discovered": "neg(a)",
+        "match_fraction": 1.0,
+        "matched": true
+      },
+      {
+        "expected": "0",
+        "discovered": "0.0",
+        "match_fraction": 1.0,
+        "matched": true
+      },
+      {
+        "expected": "a",
+        "discovered": "a",
+        "match_fraction": 1.0,
+        "matched": true
+      }
+    ],
+    "any_error": null,
+    "num_branches_found": 3,
+    "unmatched_discovered": []
+  },
+  {
+    "name": "cubic_27_quadratic_factor",
+    "category": "cubic",
+    "difficulty": "easy",
+    "status": "success",
+    "time_seconds": 68.39763045310974,
+    "roots_expected": 1,
+    "roots_matched": 1,
+    "root_match_rate": 1.0,
+    "branch_count_correct": true,
+    "average_coverage": 1.0,
+    "match_details": [
+      {
+        "expected": "a",
+        "discovered": "a",
+        "match_fraction": 1.0,
+        "matched": true
+      }
+    ],
+    "any_error": null,
+    "num_branches_found": 1,
+    "unmatched_discovered": []
+  },
+  {
+    "name": "cubic_28_depressed",
+    "category": "cubic",
+    "difficulty": "hard",
+    "status": "success",
+    "time_seconds": 138.79421496391296,
+    "roots_expected": 2,
+    "roots_matched": 2,
+    "root_match_rate": 1.0,
+    "branch_count_correct": true,
+    "average_coverage": 1.0,
+    "match_details": [
+      {
+        "expected": "-2*sqrt(a)",
+        "discovered": "safe_sqrt(a) * -2.0",
+        "match_fraction": 1.0,
+        "matched": true
+      },
+      {
+        "expected": "sqrt(a)",
+        "discovered": "safe_sqrt(a)",
+        "match_fraction": 1.0,
+        "matched": true
+      }
+    ],
+    "any_error": null,
+    "num_branches_found": 2,
+    "unmatched_discovered": []
+  },
+  {
+    "name": "cubic_29_two_params",
+    "category": "cubic",
+    "difficulty": "medium",
+    "status": "success",
+    "time_seconds": 276.45555114746094,
+    "roots_expected": 3,
+    "roots_matched": 3,
+    "root_match_rate": 1.0,
+    "branch_count_correct": true,
+    "average_coverage": 1.0,
+    "match_details": [
+      {
+        "expected": "-sqrt(a*b)",
+        "discovered": "neg(safe_sqrt(a * b))",
+        "match_fraction": 1.0,
+        "matched": true
+      },
+      {
+        "expected": "0",
+        "discovered": "-2.0680749e-11",
+        "match_fraction": 1.0,
+        "matched": true
+      },
+      {
+        "expected": "sqrt(a*b)",
+        "discovered": "safe_sqrt(a * b)",
+        "match_fraction": 1.0,
+        "matched": true
+      }
+    ],
+    "any_error": null,
+    "num_branches_found": 3,
+    "unmatched_discovered": []
+  },
+  {
+    "name": "cubic_30_triple",
+    "category": "cubic",
+    "difficulty": "easy",
+    "status": "success",
+    "time_seconds": 67.71167540550232,
+    "roots_expected": 1,
+    "roots_matched": 1,
+    "root_match_rate": 1.0,
+    "branch_count_correct": true,
+    "average_coverage": 1.0,
+    "match_details": [
+      {
+        "expected": "a",
+        "discovered": "a",
+        "match_fraction": 1.0,
+        "matched": true
+      }
+    ],
+    "any_error": null,
+    "num_branches_found": 1,
+    "unmatched_discovered": []
+  },
+  {
+    "name": "quartic_31_biquadratic",
+    "category": "quartic",
+    "difficulty": "medium",
+    "status": "success",
+    "time_seconds": 136.67710494995117,
+    "roots_expected": 2,
+    "roots_matched": 2,
+    "root_match_rate": 1.0,
+    "branch_count_correct": true,
+    "average_coverage": 1.0,
+    "match_details": [
+      {
+        "expected": "-sqrt(a)",
+        "discovered": "neg(safe_sqrt(a))",
+        "match_fraction": 1.0,
+        "matched": true
+      },
+      {
+        "expected": "sqrt(a)",
+        "discovered": "safe_sqrt(a)",
+        "match_fraction": 1.0,
+        "matched": true
+      }
+    ],
+    "any_error": null,
+    "num_branches_found": 2,
+    "unmatched_discovered": []
+  },
+  {
+    "name": "quartic_32_factored",
+    "category": "quartic",
+    "difficulty": "hard",
+    "status": "success",
+    "time_seconds": 302.7447671890259,
+    "roots_expected": 4,
+    "roots_matched": 4,
+    "root_match_rate": 1.0,
+    "branch_count_correct": true,
+    "average_coverage": 1.0,
+    "match_details": [
+      {
+        "expected": "-2*a",
+        "discovered": "a * -2.0",
+        "match_fraction": 1.0,
+        "matched": true
+      },
+      {
+        "expected": "-a",
+        "discovered": "neg(a)",
+        "match_fraction": 1.0,
+        "matched": true
+      },
+      {
+        "expected": "a",
+        "discovered": "a",
+        "match_fraction": 1.0,
+        "matched": true
+      },
+      {
+        "expected": "2*a",
+        "discovered": "a + a",
+        "match_fraction": 1.0,
+        "matched": true
+      }
+    ],
+    "any_error": null,
+    "num_branches_found": 4,
+    "unmatched_discovered": []
+  },
+  {
+    "name": "quartic_33_double_quadratic",
+    "category": "quartic",
+    "difficulty": "hard",
+    "status": "success",
+    "time_seconds": 334.6323211193085,
+    "roots_expected": 4,
+    "roots_matched": 4,
+    "root_match_rate": 1.0,
+    "branch_count_correct": true,
+    "average_coverage": 1.0,
+    "match_details": [
+      {
+        "expected": "-sqrt(b)",
+        "discovered": "neg(safe_sqrt(b))",
+        "match_fraction": 1.0,
+        "matched": true
+      },
+      {
+        "expected": "-sqrt(a)",
+        "discovered": "neg(safe_sqrt(a))",
+        "match_fraction": 1.0,
+        "matched": true
+      },
+      {
+        "expected": "sqrt(a)",
+        "discovered": "safe_sqrt(a)",
+        "match_fraction": 1.0,
+        "matched": true
+      },
+      {
+        "expected": "sqrt(b)",
+        "discovered": "safe_sqrt(b)",
+        "match_fraction": 1.0,
+        "matched": true
+      }
+    ],
+    "any_error": null,
+    "num_branches_found": 4,
+    "unmatched_discovered": []
+  },
+  {
+    "name": "quintic_34_factored",
+    "category": "quintic",
+    "difficulty": "hard",
+    "status": "success",
+    "time_seconds": 395.31319880485535,
+    "roots_expected": 5,
+    "roots_matched": 5,
+    "root_match_rate": 1.0,
+    "branch_count_correct": true,
+    "average_coverage": 1.0,
+    "match_details": [
+      {
+        "expected": "-2*a",
+        "discovered": "a * -2.0",
+        "match_fraction": 1.0,
+        "matched": true
+      },
+      {
+        "expected": "-a",
+        "discovered": "neg(a)",
+        "match_fraction": 1.0,
+        "matched": true
+      },
+      {
+        "expected": "0",
+        "discovered": "-1.7687212e-09",
+        "match_fraction": 1.0,
+        "matched": true
+      },
+      {
+        "expected": "a",
+        "discovered": "a",
+        "match_fraction": 1.0,
+        "matched": true
+      },
+      {
+        "expected": "2*a",
+        "discovered": "a + a",
+        "match_fraction": 1.0,
+        "matched": true
+      }
+    ],
+    "any_error": null,
+    "num_branches_found": 5,
+    "unmatched_discovered": []
+  },
+  {
+    "name": "quartic_35_repeated",
+    "category": "quartic",
+    "difficulty": "medium",
+    "status": "success",
+    "time_seconds": 144.04930663108826,
+    "roots_expected": 2,
+    "roots_matched": 2,
+    "root_match_rate": 1.0,
+    "branch_count_correct": true,
+    "average_coverage": 1.0,
+    "match_details": [
+      {
+        "expected": "-a",
+        "discovered": "neg(a)",
+        "match_fraction": 1.0,
+        "matched": true
+      },
+      {
+        "expected": "a",
+        "discovered": "a",
+        "match_fraction": 1.0,
+        "matched": true
+      }
+    ],
+    "any_error": null,
+    "num_branches_found": 2,
+    "unmatched_discovered": []
+  },
+  {
+    "name": "special_36_reciprocal",
+    "category": "special",
+    "difficulty": "easy",
+    "status": "success",
+    "time_seconds": 66.99428510665894,
+    "roots_expected": 1,
+    "roots_matched": 1,
+    "root_match_rate": 1.0,
+    "branch_count_correct": true,
+    "average_coverage": 1.0,
+    "match_details": [
+      {
+        "expected": "1/a",
+        "discovered": "1.0 / a",
+        "match_fraction": 1.0,
+        "matched": true
+      }
+    ],
+    "any_error": null,
+    "num_branches_found": 1,
+    "unmatched_discovered": []
+  },
+  {
+    "name": "special_37_ratio",
+    "category": "special",
+    "difficulty": "easy",
+    "status": "success",
+    "time_seconds": 87.28463697433472,
+    "roots_expected": 1,
+    "roots_matched": 1,
+    "root_match_rate": 1.0,
+    "branch_count_correct": true,
+    "average_coverage": 1.0,
+    "match_details": [
+      {
+        "expected": "b/a",
+        "discovered": "b / a",
+        "match_fraction": 1.0,
+        "matched": true
+      }
+    ],
+    "any_error": null,
+    "num_branches_found": 1,
+    "unmatched_discovered": []
+  },
+  {
+    "name": "special_38_quadratic_ratio",
+    "category": "special",
+    "difficulty": "medium",
+    "status": "success",
+    "time_seconds": 165.12371945381165,
+    "roots_expected": 2,
+    "roots_matched": 2,
+    "root_match_rate": 1.0,
+    "branch_count_correct": true,
+    "average_coverage": 1.0,
+    "match_details": [
+      {
+        "expected": "-sqrt(a/b)",
+        "discovered": "neg(safe_sqrt(a / b))",
+        "match_fraction": 1.0,
+        "matched": true
+      },
+      {
+        "expected": "sqrt(a/b)",
+        "discovered": "safe_sqrt(a / b)",
+        "match_fraction": 1.0,
+        "matched": true
+      }
+    ],
+    "any_error": null,
+    "num_branches_found": 2,
+    "unmatched_discovered": []
+  },
+  {
+    "name": "special_39_difference_of_squares",
+    "category": "special",
+    "difficulty": "medium",
+    "status": "success",
+    "time_seconds": 173.95496082305908,
+    "roots_expected": 2,
+    "roots_matched": 2,
+    "root_match_rate": 1.0,
+    "branch_count_correct": true,
+    "average_coverage": 1.0,
+    "match_details": [
+      {
+        "expected": "-(a - b)",
+        "discovered": "b - a",
+        "match_fraction": 1.0,
+        "matched": true
+      },
+      {
+        "expected": "a - b",
+        "discovered": "a - b",
+        "match_fraction": 1.0,
+        "matched": true
+      }
+    ],
+    "any_error": null,
+    "num_branches_found": 2,
+    "unmatched_discovered": []
+  },
+  {
+    "name": "special_40_linear_three_params",
+    "category": "special",
+    "difficulty": "medium",
+    "status": "success",
+    "time_seconds": 101.41033053398132,
+    "roots_expected": 1,
+    "roots_matched": 1,
+    "root_match_rate": 1.0,
+    "branch_count_correct": true,
+    "average_coverage": 1.0,
+    "match_details": [
+      {
+        "expected": "c / (a + b)",
+        "discovered": "c / (b + a)",
+        "match_fraction": 1.0,
+        "matched": true
+      }
+    ],
+    "any_error": null,
+    "num_branches_found": 1,
+    "unmatched_discovered": []
+  },
+  {
+    "name": "special_41_square_root_form",
+    "category": "special",
+    "difficulty": "medium",
+    "status": "success",
+    "time_seconds": 183.00656509399414,
+    "roots_expected": 2,
+    "roots_matched": 2,
+    "root_match_rate": 1.0,
+    "branch_count_correct": true,
+    "average_coverage": 1.0,
+    "match_details": [
+      {
+        "expected": "-(a + b)",
+        "discovered": "neg(a) - b",
+        "match_fraction": 1.0,
+        "matched": true
+      },
+      {
+        "expected": "a + b",
+        "discovered": "b + a",
+        "match_fraction": 1.0,
+        "matched": true
+      }
+    ],
+    "any_error": null,
+    "num_branches_found": 2,
+    "unmatched_discovered": []
+  },
+  {
+    "name": "special_42_cubic_simple",
+    "category": "special",
+    "difficulty": "medium",
+    "status": "success",
+    "time_seconds": 68.82234573364258,
+    "roots_expected": 1,
+    "roots_matched": 1,
+    "root_match_rate": 1.0,
+    "branch_count_correct": true,
+    "average_coverage": 1.0,
+    "match_details": [
+      {
+        "expected": "a",
+        "discovered": "a",
+        "match_fraction": 1.0,
+        "matched": true
+      }
+    ],
+    "any_error": null,
+    "num_branches_found": 1,
+    "unmatched_discovered": []
+  },
+  {
+    "name": "special_43_mixed",
+    "category": "special",
+    "difficulty": "medium",
+    "status": "success",
+    "time_seconds": 209.3243682384491,
+    "roots_expected": 2,
+    "roots_matched": 2,
+    "root_match_rate": 1.0,
+    "branch_count_correct": true,
+    "average_coverage": 1.0,
+    "match_details": [
+      {
+        "expected": "b",
+        "discovered": "b",
+        "match_fraction": 1.0,
+        "matched": true
+      },
+      {
+        "expected": "a",
+        "discovered": "a",
+        "match_fraction": 1.0,
+        "matched": true
+      }
+    ],
+    "any_error": null,
+    "num_branches_found": 2,
+    "unmatched_discovered": []
+  }
+]
