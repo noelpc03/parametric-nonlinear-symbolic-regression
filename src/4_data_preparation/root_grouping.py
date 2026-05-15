@@ -78,6 +78,71 @@ def combine_all_roots(results: List[Dict[str, Any]],
     return {'X': X, 'y': y}
 
 
+def combine_all_solutions(results: List[Dict[str, Any]],
+                          param_names: List[str]) -> Dict[str, Any]:
+    """
+    Combina TODAS las soluciones (vectores multidimensionales) en un dataset unificado.
+    
+    Para sistemas de ecuaciones, cada "solución" es un vector (x1, x2, ..., xn).
+    Esta función prepara los datos para la regresión simbólica con anclaje.
+    
+    Args:
+        results: Lista de diccionarios con:
+                 - 'parameters': dict con valores de parámetros
+                 - 'roots': lista de arrays numpy (vectores solución)
+                 - 'num_roots': cantidad de soluciones para esta tupla
+        param_names: Lista de nombres de parámetros
+    
+    Returns:
+        Dict con:
+            'X': Array (M, num_params) con valores de parámetros
+            'Y': Array (M, num_variables) con soluciones vectoriales
+            'tuple_id': Array (M,) índice de tupla origen de cada solución
+            'solution_id': Array (M,) índice de solución dentro de su tupla
+            'num_variables': int, cantidad de variables en cada solución
+    """
+    all_params = []
+    all_solutions = []
+    tuple_ids = []
+    solution_ids = []
+    
+    for t_idx, result in enumerate(results):
+        params = [result['parameters'][p] for p in param_names]
+        roots = result['roots']  # Lista de arrays (cada uno es una solución)
+        
+        # Crear una fila por cada solución
+        for s_idx, sol_vec in enumerate(roots):
+            all_params.append(params)
+            all_solutions.append(sol_vec)
+            tuple_ids.append(t_idx)
+            solution_ids.append(s_idx)
+    
+    X = np.array(all_params)  # Shape: (M, num_params)
+    Y = np.array(all_solutions)  # Shape: (M, num_variables)
+    
+    # Conteo de información
+    num_roots_dist = {}
+    for result in results:
+        n = result['num_roots']
+        num_roots_dist[n] = num_roots_dist.get(n, 0) + 1
+    
+    print(f"\n📊 Datos combinados (sistema de ecuaciones):")
+    print(f"  Puntos totales: {len(Y)}")
+    print(f"  Tuplas de parámetros: {len(results)}")
+    print(f"  Variables por solución: {Y.shape[1]}")
+    print(f"  Dimensión X: {X.shape}")
+    print(f"  Dimensión Y: {Y.shape}")
+    print(f"  Distribución de soluciones por tupla: {num_roots_dist}\n")
+    
+    return {
+        'X': X,
+        'Y': Y,
+        'tuple_id': np.array(tuple_ids),
+        'solution_id': np.array(solution_ids),
+        'num_variables': Y.shape[1] if len(Y) > 0 else 0
+    }
+
+
 def group_by_root_branch(results: List[Dict[str, Any]], 
                         param_names: List[str]) -> List[Dict[str, np.ndarray]]:
     """

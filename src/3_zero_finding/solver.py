@@ -1,176 +1,159 @@
 """
-Resolución de ecuaciones para encontrar ceros.
+Resolución de sistemas de ecuaciones no lineales paramétricas.
 
-Dos métodos disponibles:
-  - 'solve':  resolución simbólica (SymPy solve) — exacta, encuentra todas las raíces
-  - 'nsolve': resolución numérica (SymPy nsolve) — aproximada, útil cuando solve falla
+Usa scipy.optimize.root con múltiples puntos iniciales para encontrar
+todas las soluciones de un sistema F(x; θ) = 0.
+
+Métodos:
+  - 'scipy': scipy.optimize.root con método híbrido (Broyden + line search)
 """
 import numpy as np
 import sympy as sp
-from typing import List, Dict, Any
+import warnings
+from typing import List, Dict, Any, Tuple
+from scipy.optimize import root
 from tqdm import tqdm
 
 
-def _nsolve_multiple(equation, variable, guesses, complex_tol=1e-10, root_tol=1e-8):
+def solve_system_scipy(equations: List[sp.Expr],
+                       variables: List[sp.Symbol],
+                       param_values: Dict[sp.Symbol, float],
+                       guess_ranges: Dict[str, Tuple[float, float]],
+                       num_guesses: int = 20,
+                       dist_tol: float = 1e-3,
+                       residue_tol: float = 1e-6) -> List[np.ndarray]:
     """
-    Ejecuta sp.nsolve con múltiples puntos iniciales para encontrar
-    varias raíces de la ecuación.
-
-    nsolve solo encuentra UNA raíz por vez (la más cercana al guess),
-    así que probamos con muchos guesses y eliminamos duplicados.
-
+    Resuelve un sistema de ecuaciones F(x; θ) = 0 para una tupla de parámetros fija.
+    
+    Usa scipy.optimize.root con múltiples puntos iniciales aleatorios y filtra
+    soluciones duplicadas usando distancia euclidiana.
+    
     Args:
-        equation:    expresión SymPy ya sustituida (sin parámetros, solo con x)
-        variable:    símbolo de la incógnita
-        guesses:     lista de puntos iniciales a probar
-        complex_tol: tolerancia para considerar una raíz como real
-        root_tol:    tolerancia para considerar dos raíces como la misma
-
+        equations: Lista de expresiones SymPy (el sistema)
+        variables: Lista de símbolos SymPy (las incógnitas x1, x2, ...)
+        param_values: Dict {símbolo: valor numérico} con los parámetros fijos
+        guess_ranges: Dict {nombre_variable: (min, max)} para generar puntos iniciales
+        num_guesses: Número de puntos iniciales aleatorios a probar
+        dist_tol: Tolerancia euclidiana para considerar dos soluciones como iguales
+        residue_tol: Tolerancia del residuo ||F(x; θ)|| < tol para aceptar
+    
     Returns:
-        roots: lista de raíces reales únicas encontradas
+        unique_solutions: Lista de arrays numpy (vectores solución únicos)
     """
-    found_roots = []
-
-    for guess in guesses:
+    # Sustituir parámetros en las ecuaciones
+    eqs_sub = [eq.subs(param_values) for eq in equations]
+    
+    # Crear función evaluable usando lambdify
+    # lambdify devuelve una función que toma los valores de las variables en orden
+    eval_func = sp.lambdify(variables, eqs_sub, modules='numpy')
+    
+    def system_func(vec):
+        """Wrapper que evalúa el sistema en el punto vec."""
         try:
-            sol = sp.nsolve(equation, variable, guess)
-            val = complex(sol)
-
-            # Descartar raíces complejas
-            if abs(val.imag) > complex_tol:
-                continue
-
-            real_val = val.real
-
-            # Verificar que no sea duplicada de una ya encontrada
-            is_duplicate = any(abs(real_val - r) < root_tol for r in found_roots)
-            if not is_duplicate:
-                found_roots.append(real_val)
-
-        except (sp.calculus.util.AccumBounds, ValueError, ZeroDivisionError):
-            # nsolve no convergió desde este guess — ignorar
-            continue
+            result = eval_func(*vec)
+            # Si hay una sola ecuación, lambdify devuelve un escalar; convertir a array
+            if np.isscalar(result):
+                return np.array([result])
+            return np.asarray(result).flatten()
         except Exception:
+            # Si hay error de evaluación, retornar residuo grande
+            return np.full(len(equations), 1e10)
+    
+    found_solutions = []
+    
+    # Probar múltiples puntos iniciales
+    for _ in range(num_guesses):
+        # Generar punto inicial aleatorio
+        guess = []
+        for var in variables:
+            var_name = str(var)
+            if var_name in guess_ranges:
+                min_val, max_val = guess_ranges[var_name]
+            else:
+                # Si no está en guess_ranges, usar rango por defecto
+                min_val, max_val = -10.0, 10.0
+            
+            guess.append(np.random.uniform(min_val, max_val))
+        
+        guess = np.array(guess)
+        
+        try:
+            # Suprimir warnings de scipy
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                
+                # Resolver con scipy.optimize.root (método híbrido por defecto)
+                sol = root(system_func, guess, method='hybr', tol=1e-8)
+            
+            # Verificar si convergió y el residuo es aceptable
+            if sol.success and np.linalg.norm(sol.fun) < residue_tol:
+                found_solutions.append(sol.x.real)
+        
+        except Exception:
+            # Ignorar excepciones en esta iteración
             continue
-
-    return found_roots
-
-
-def solve_equation_for_parameters(equation: sp.Expr, 
-                                  variable: sp.Symbol,
-                                  param_symbols: Dict[str, sp.Symbol],
-                                  param_values: Dict[str, float],
-                                  method: str = 'solve',
-                                  filter_complex: bool = True,
-                                  complex_tol: float = 1e-10,
-                                  sort_roots: bool = True) -> List[float]:
-    """
-    Resuelve f(x; params) = 0 para una tupla específica de parámetros.
     
-    Args:
-        equation: Expresión SymPy de la ecuación
-        variable: Variable a resolver
-        param_symbols: Diccionario {nombre: símbolo} de parámetros
-        param_values: Diccionario {nombre: valor} con valores numéricos
-        method: 'solve' (simbólico, exacto) o 'nsolve' (numérico, aproximado)
-        filter_complex: Si True, filtra raíces complejas
-        complex_tol: Tolerancia para considerar una raíz como real
-        sort_roots: Si True, ordena las raíces numéricamente
-    
-    Returns:
-        roots: Lista de raíces reales
-    """
-    # Sustituir parámetros en la ecuación
-    eq_substituted = equation.subs(param_values)
-    
-    try:
-        if method == 'solve':
-            # Resolver simbólicamente — encuentra TODAS las raíces exactas
-            solutions = sp.solve(eq_substituted, variable)
-
-            # Convertir a valores numéricos
-            roots = []
-            for sol in solutions:
-                try:
-                    val = complex(sol.evalf())
-
-                    if filter_complex:
-                        if abs(val.imag) < complex_tol:
-                            roots.append(val.real)
-                    else:
-                        roots.append(val)
-                except Exception:
-                    continue
-
-        elif method == 'nsolve':
-            # Resolver numéricamente — prueba múltiples guesses
-            guesses = np.linspace(-10, 10, 41)  # 41 puntos de -10 a 10
-            roots = _nsolve_multiple(
-                eq_substituted, variable, guesses, complex_tol=complex_tol
-            )
-
-        else:
-            raise ValueError(f"Método desconocido: {method}")
+    # Filtrar soluciones duplicadas por distancia euclidiana
+    unique_solutions = []
+    for sol in found_solutions:
+        is_duplicate = False
+        for unique_sol in unique_solutions:
+            if np.linalg.norm(np.array(sol) - np.array(unique_sol)) < dist_tol:
+                is_duplicate = True
+                break
         
-        # Ordenar raíces
-        if sort_roots and len(roots) > 0:
-            roots = sorted(roots)
-        
-        return roots
+        if not is_duplicate:
+            unique_solutions.append(sol)
     
-    except Exception:
-        return []
+    return unique_solutions
 
 
-def solve_for_all_parameter_tuples(equation: sp.Expr,
+def solve_for_all_parameter_tuples(equations: List[sp.Expr],
                                    variables: List[sp.Symbol],
                                    param_names: List[str],
                                    param_symbols: Dict[str, sp.Symbol],
                                    parameter_grid: np.ndarray,
-                                   method: str = 'solve',
-                                   filter_complex: bool = True,
-                                   complex_tol: float = 1e-10,
-                                   sort_roots: bool = True) -> List[Dict[str, Any]]:
+                                   method: str = 'scipy',
+                                   **scipy_kwargs) -> List[Dict[str, Any]]:
     """
-    Resuelve la ecuación para todas las tuplas de parámetros.
+    Resuelve el sistema para todas las tuplas de parámetros en el grid.
     
     Args:
-        equation: Ecuación a resolver
-        variables: Lista de variables incógnita a resolver
-        param_names: Lista de nombres de parámetros en el orden del grid
-        param_symbols: Diccionario {nombre: símbolo} de parámetros
+        equations: Lista de expresiones SymPy del sistema
+        variables: Lista de símbolos SymPy (las incógnitas)
+        param_names: Nombres de los parámetros (para mapping en results)
+        param_symbols: Dict {nombre: símbolo} de los parámetros
         parameter_grid: Array (N, num_params) con tuplas de parámetros
-        method: Método de resolución ('solve' o 'nsolve')
-        filter_complex: Si True, filtra raíces complejas
-        complex_tol: Tolerancia para considerar una raíz como real
-        sort_roots: Si True, ordena las raíces numéricamente
+        method: Método de resolución (solo 'scipy' por ahora)
+        **scipy_kwargs: Argumentos adicionales para solve_system_scipy
+                       (num_guesses, dist_tol, residue_tol, guess_ranges)
     
     Returns:
-        results: Lista de diccionarios con resultados por tupla
+        results: Lista de dicts con estructura:
+                 {
+                   'parameters': {param_name: value, ...},
+                   'roots': [array1, array2, ...],
+                   'num_roots': int
+                 }
     """
+    if method != 'scipy':
+        raise ValueError(f"Método desconocido: {method}")
+    
     results = []
     
-    # Solo soportamos una variable por ahora
-    if len(variables) > 1:
-        raise NotImplementedError("Por ahora solo se soporta una variable")
-    
-    variable = variables[0]
-    
-    print(f"Resolviendo ecuación para {len(parameter_grid)} tuplas de parámetros...")
+    print(f"\nResolviendo sistema para {len(parameter_grid)} tuplas de parámetros...")
     
     for param_tuple in tqdm(parameter_grid):
         # Crear diccionario de valores de parámetros
-        param_values = {param_symbols[name]: val 
-                       for name, val in zip(param_names, param_tuple)}
+        param_values = {}
+        for name, val in zip(param_names, param_tuple):
+            if name in param_symbols:
+                param_values[param_symbols[name]] = val
         
-        # Resolver ecuación
-        roots = solve_equation_for_parameters(
-            equation, variable, param_symbols, param_values,
-            method=method, filter_complex=filter_complex,
-            complex_tol=complex_tol, sort_roots=sort_roots
-        )
+        # Resolver sistema
+        roots = solve_system_scipy(equations, variables, param_values, **scipy_kwargs)
         
-        # Guardar resultados
+        # Guardar resultados solo si hay soluciones
         if len(roots) > 0:
             results.append({
                 'parameters': dict(zip(param_names, param_tuple)),
@@ -178,7 +161,7 @@ def solve_for_all_parameter_tuples(equation: sp.Expr,
                 'num_roots': len(roots)
             })
     
-    print(f"Completado. {len(results)} tuplas con raíces válidas.")
+    print(f"Completado. {len(results)}/{len(parameter_grid)} tuplas con soluciones válidas.\n")
     return results
 
 
@@ -186,40 +169,41 @@ if __name__ == "__main__":
     import os, sys
     _parent = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
     sys.path.insert(0, _parent)
-    from config import (SOLVER_METHOD, FILTER_COMPLEX, COMPLEX_TOLERANCE, SORT_ROOTS,
-                        EQUATION_STRING, VARIABLES, PARAMETERS,
-                        PARAMETER_RANGES)
+    from config import (
+        EQUATIONS, VARIABLES, PARAMETERS, PARAMETER_RANGES,
+        SYSTEM_SOLVER_METHOD, NUM_INITIAL_GUESSES, GUESS_RANGES,
+        DISTANCE_TOLERANCE, SOLVER_RESIDUE_TOL
+    )
 
     # Añadir carpetas hermanas al path
     sys.path.insert(0, os.path.join(_parent, '1_equation_definition'))
     sys.path.insert(0, os.path.join(_parent, '2_parameter_grid'))
 
-    from equation_parser import parse_equation
+    from equation_parser import parse_system
     from grid_generator import generate_grid
     
-    # Parsear ecuación
-    equation, symbols = parse_equation(EQUATION_STRING, VARIABLES, PARAMETERS)
+    # Parsear sistema de ecuaciones
+    equations_sympy, symbols_dict = parse_system(EQUATIONS, VARIABLES, PARAMETERS)
+    var_symbols = [symbols_dict[v] for v in VARIABLES]
+    param_symbols = {p: symbols_dict[p] for p in PARAMETERS}
     
-    # Generar grid
-    grid, param_names = generate_grid(PARAMETER_RANGES)
+    # Generar grid de parámetros
+    grid, _ = generate_grid(PARAMETER_RANGES)
     
-    # Usar solo primeras 10 tuplas para prueba
-    grid_test = grid[:10]
-    
-    # Resolver
-    var_symbols = [symbols[v] for v in VARIABLES]
-    param_symbols = {p: symbols[p] for p in PARAMETERS}
-    
+    # Resolver sistema
     results = solve_for_all_parameter_tuples(
-        equation, var_symbols, param_names, param_symbols, grid_test,
-        method=SOLVER_METHOD, filter_complex=FILTER_COMPLEX,
-        complex_tol=COMPLEX_TOLERANCE, sort_roots=SORT_ROOTS
+        equations_sympy, var_symbols, PARAMETERS, param_symbols, grid,
+        method=SYSTEM_SOLVER_METHOD,
+        num_guesses=NUM_INITIAL_GUESSES,
+        guess_ranges=GUESS_RANGES,
+        dist_tol=DISTANCE_TOLERANCE,
+        residue_tol=SOLVER_RESIDUE_TOL
     )
     
     # Mostrar resultados
-    print("\n" + "=" * 60)
-    print("RESULTADOS DE RESOLUCIÓN")
-    print("=" * 60)
-    for i, result in enumerate(results[:5]):
-        print(f"\nTupla {i+1}: {result['parameters']}")
-        print(f"  Raíces: {result['roots']}")
+    print(f"\nTotal de tuplas con soluciones: {len(results)}")
+    if len(results) > 0:
+        print(f"Primera tupla: {results[0]['parameters']}")
+        print(f"  Soluciones encontradas: {results[0]['num_roots']}")
+        for i, root_vec in enumerate(results[0]['roots']):
+            print(f"    Raíz {i+1}: {root_vec}")

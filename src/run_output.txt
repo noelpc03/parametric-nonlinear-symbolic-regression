@@ -1,0 +1,48 @@
+
+═══════════════════════════════════════════════════════════════════════════
+ 🔬 PIPELINE DE REGRESIÓN SIMBÓLICA PARA SISTEMAS DE ECUACIONES
+═══════════════════════════════════════════════════════════════════════════
+Inicio: 2026-04-28 16:31:26
+
+───────────────────────────────────────────────────────────────────────────
+ PASO 1: Parsear Sistema de Ecuaciones
+───────────────────────────────────────────────────────────────────────────
+📋 Sistema:
+   [1] (x1 - a)*(x2 - a*b) = 0
+   [2] x1*x2 - a*b**2 = 0
+
+📌 Variables (incógnitas): ['x1', 'x2']
+🔧 Parámetros: ['a', 'b']
+✓ Sistema parseado correctamente (2 ecuaciones)
+
+───────────────────────────────────────────────────────────────────────────
+ PASO 2: Generar Grid de Parámetros
+───────────────────────────────────────────────────────────────────────────
+📊 Rangos de parámetros:
+   a: [0.1, 3] × 4 puntos
+   b: [0.1, 3] × 4 puntos
+✗ Error al generar grid: generate_grid() takes 1 positional argument but 2 were given
+
+═══════════════════════════════════════════════════════════════════════════
+ 🔬 PIPELINE DE REGRESIÓN SIMBÓLICA PARA SISTEMAS DE ECUACIONES
+═══════════════════════════════════════════════════════════════════════════
+Inicio: 2026-04-28 16:31:26
+
+───────────────────────────────────────────────────────────────────────────
+ PASO 1: Parsear Sistema de Ecuaciones
+───────────────────────────────────────────────────────────────────────────
+📋 Sistema:
+   [1] (x1 - a)*(x2 - a*b) = 0
+   [2] x1*x2 - a*b**2 = 0
+
+📌 Variables (incógnitas): ['x1', 'x2']
+🔧 Parámetros: ['a', 'b']
+✓ Sistema parseado correctamente (2 ecuaciones)
+
+───────────────────────────────────────────────────────────────────────────
+ PASO 2: Generar Grid de Parámetros
+───────────────────────────────────────────────────────────────────────────
+📊 Rangos de parámetros:
+   a: [0.1, 3] × 4 puntos
+   b: [0.1, 3] × 4 puntos
+✗ Error al generar grid: generate_grid() takes 1 positional argument but 2 were given

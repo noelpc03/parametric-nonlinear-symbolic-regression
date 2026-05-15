@@ -1,14 +1,14 @@
 """
-Pipeline principal para descubrir expresiones analíticas de ceros de ecuaciones
-mediante regresión simbólica
+Pipeline principal para descubrir expresiones analíticas de SISTEMAS DE ECUACIONES
+mediante regresión simbólica con estrategia de anclaje.
 
 Pipeline:
-1. Definir ecuación f(x; params) = 0
+1. Parsear sistema de ecuaciones F(x; θ) = 0
 2. Generar grid de parámetros
-3. Resolver f = 0 para cada tupla de parámetros
-4. Agrupar raíces por rama
-5. Aplicar regresión simbólica a cada rama
-6. Reportar funciones encontradas por rama
+3. Resolver el sistema para cada tupla de parámetros (múltiples soluciones)
+4. Combinar todas las soluciones vectoriales
+5. Aplicar regresión simbólica con anclaje (descubre ramas)
+6. Validar y reportar funciones encontradas
 """
 
 import os
@@ -16,20 +16,22 @@ import sys
 import json
 from datetime import datetime
 import numpy as np
+import sympy as sp
 
 # ── Añadir src/ al path para que config sea importable ──
 base_dir = os.path.dirname(os.path.abspath(__file__))
 if base_dir not in sys.path:
     sys.path.insert(0, base_dir)
 
-# ── Configuración unificada ──
+# ── Configuración unificada para sistemas de ecuaciones ──
 from config import (
     OUTPUT_DIR, VERBOSE, SAVE_INTERMEDIATE, EXPERIMENT_NAME,
-    EQUATION_STRING, VARIABLES, PARAMETERS,
+    EQUATIONS, VARIABLES, PARAMETERS,
     PARAMETER_RANGES,
-    SOLVER_METHOD, FILTER_COMPLEX, COMPLEX_TOLERANCE, SORT_ROOTS,
+    SYSTEM_SOLVER_METHOD, NUM_INITIAL_GUESSES, GUESS_RANGES,
+    DISTANCE_TOLERANCE, SOLVER_RESIDUE_TOL,
+    ANCHOR_COORDINATE, VALIDATION_TOL, MAX_ANCHOR_ITERATIONS,
     EPSILON, K, NITERATIONS, MIN_POINTS,
-    MAX_ITERATIONS, SR_INPUT_MODE,
 )
 
 # ── Añadir subdirectorios al path para importar módulos ──
@@ -40,229 +42,241 @@ for subdir in ['1_equation_definition', '2_parameter_grid', '3_zero_finding',
         sys.path.insert(0, _p)
 
 # ── Importar módulos del pipeline ──
-from equation_parser import parse_equation
+from equation_parser import parse_system
 from grid_generator import generate_grid
 from solver import solve_for_all_parameter_tuples
-from root_grouping import group_by_root_branch, combine_all_roots
-from regression_adapter import run_for_all_branches, run_combined_symbolic_regression
+from root_grouping import combine_all_solutions
+from regression_adapter import run_anchored_symbolic_regression
 
 
-def print_section(title):
-    """Imprime una sección del pipeline"""
-    print("\n" + "="*70)
+def print_section(title, symbol="="):
+    """Imprime una sección del pipeline con borde"""
+    print(f"\n{symbol * 75}")
     print(f" {title}")
-    print("="*70)
-
-
-def save_results(output_dir, equation_info, branches, all_results, param_names):
-    """Guarda todos los resultados del pipeline"""
-    
-    # Crear directorio de salida
-    os.makedirs(output_dir, exist_ok=True)
-    
-    # Guardar configuración
-    config_data = {
-        'equation': str(equation_info['equation']),
-        'equation_latex': equation_info['latex'],
-        'variables': VARIABLES,
-        'parameters': PARAMETERS,
-        'parameter_ranges': {k: list(v) for k, v in PARAMETER_RANGES.items()},
-        'sampling_method': 'grid',
-        'solver_method': SOLVER_METHOD,
-        'timestamp': datetime.now().isoformat()
-    }
-    
-    with open(os.path.join(output_dir, 'config.json'), 'w') as f:
-        json.dump(config_data, f, indent=2)
-    
-    # Guardar resultados por rama
-    summary = []
-    
-    for branch_idx, branch_results in enumerate(all_results):
-        branch_info = {
-            'branch_index': branch_idx + 1,
-            'num_data_points': len(branches[branch_idx]['y']),
-            'num_functions_found': len(branch_results),
-            'functions': []
-        }
-        
-        for func_idx, func in enumerate(branch_results):
-            func_info = {
-                'function_index': func_idx + 1,
-                'equation': str(func['equation']),
-                'points_matched': int(func['num_matched']),
-                'matched_indices': func['matched_indices'].tolist() if hasattr(func['matched_indices'], 'tolist') else list(func['matched_indices'])
-            }
-            branch_info['functions'].append(func_info)
-        
-        summary.append(branch_info)
-    
-    # Guardar resumen
-    with open(os.path.join(output_dir, 'results_summary.json'), 'w') as f:
-        json.dump(summary, f, indent=2)
-    
-    # Guardar expresiones finales en texto legible
-    with open(os.path.join(output_dir, 'final_expressions.txt'), 'w') as f:
-        f.write("EXPRESIONES ANALÍTICAS DESCUBIERTAS\n")
-        f.write("="*70 + "\n\n")
-        f.write(f"Ecuación original: {equation_info['equation']} = 0\n")
-        f.write(f"Variables: {VARIABLES}\n")
-        f.write(f"Parámetros: {PARAMETERS}\n\n")
-        
-        for branch_idx, branch_results in enumerate(all_results):
-            f.write(f"\nRAMA {branch_idx + 1} (raíz #{branch_idx + 1}):\n")
-            f.write("-"*70 + "\n")
-            
-            if len(branch_results) == 1:
-                f.write(f"Expresión única:\n")
-                f.write(f"  {VARIABLES[0]} = {branch_results[0]['equation']}\n")
-                f.write(f"  Puntos cubiertos: {branch_results[0]['num_matched']}\n")
-            else:
-                f.write(f"Múltiples funciones encontradas ({len(branch_results)}):\n")
-                for func_idx, func in enumerate(branch_results):
-                    f.write(f"\n  Función {func_idx + 1}:\n")
-                    f.write(f"    {VARIABLES[0]} = {func['equation']}\n")
-                    f.write(f"    Puntos cubiertos: {func['num_matched']}\n")
-    
-    print(f"\nResultados guardados en: {output_dir}")
+    print(f"{symbol * 75}")
 
 
 def main():
-    """Ejecuta el pipeline completo"""
+    """Ejecuta el pipeline completo de descubrimiento de sistemas de ecuaciones."""
     
-    print("\n" + "="*70)
-    print(" DESCUBRIMIENTO DE EXPRESIONES ANALÍTICAS")
-    print(" Pipeline de Regresión Simbólica para Ceros de Ecuaciones")
-    print("="*70)
-
-    input_mode = str(SR_INPUT_MODE).strip().lower()
-    if input_mode not in ("combined", "branches"):
-        raise ValueError(
-            f"SR_INPUT_MODE inválido: {SR_INPUT_MODE}. Usa 'combined' o 'branches'."
-        )
-
-    print(f"Modo de entrada SR: {input_mode}")
+    print_section("🔬 PIPELINE DE REGRESIÓN SIMBÓLICA PARA SISTEMAS DE ECUACIONES", "═")
+    print(f"Inicio: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     
-    # ============================================================
-    # PASO 1: Definir ecuación
-    # ============================================================
-    print_section("PASO 1: Definición de ecuación")
+    # ════════════════════════════════════════════════════════════════════════════
+    # PASO 1: Parsear el sistema de ecuaciones
+    # ════════════════════════════════════════════════════════════════════════════
+    print_section("PASO 1: Parsear Sistema de Ecuaciones", "─")
     
-    equation, symbols = parse_equation(EQUATION_STRING, VARIABLES, PARAMETERS)
+    print(f"📋 Sistema:")
+    for i, eq in enumerate(EQUATIONS):
+        print(f"   [{i+1}] {eq} = 0")
     
-    print(f"Ecuación: {equation} = 0")
-    print(f"Variables (incógnitas): {VARIABLES}")
-    print(f"Parámetros: {PARAMETERS}")
+    print(f"\n📌 Variables (incógnitas): {VARIABLES}")
+    print(f"🔧 Parámetros: {PARAMETERS}")
     
-    # ============================================================
+    try:
+        equations_sympy, symbols_dict = parse_system(EQUATIONS, VARIABLES, PARAMETERS)
+        var_symbols = [symbols_dict[v] for v in VARIABLES]
+        param_symbols = {p: symbols_dict[p] for p in PARAMETERS}
+        print(f"✓ Sistema parseado correctamente ({len(equations_sympy)} ecuaciones)")
+    except Exception as e:
+        print(f"✗ Error al parsear el sistema: {e}")
+        return
+    
+    # ════════════════════════════════════════════════════════════════════════════
     # PASO 2: Generar grid de parámetros
-    # ============================================================
-    print_section("PASO 2: Generación de grid de parámetros")
+    # ════════════════════════════════════════════════════════════════════════════
+    print_section("PASO 2: Generar Grid de Parámetros", "─")
     
-    grid, param_names = generate_grid(PARAMETER_RANGES)
+    print(f"📊 Rangos de parámetros:")
+    for p, (min_val, max_val, n_points) in PARAMETER_RANGES.items():
+        print(f"   {p}: [{min_val}, {max_val}] × {n_points} puntos")
     
-    print(f"Grid generado: {grid.shape[0]} tuplas de parámetros")
-    print(f"Dimensiones: {grid.shape[1]} parámetros")
+    try:
+        grid, grid_param_names = generate_grid(PARAMETER_RANGES)
+        if grid_param_names != PARAMETERS:
+            print(f"⚠ Orden de parámetros en grid ({grid_param_names}) difiere de PARAMETERS ({PARAMETERS})")
+        print(f"✓ Grid generado: {len(grid)} tuplas (producto cartesiano)")
+        if len(grid) <= 10:
+            for i, t in enumerate(grid):
+                print(f"   [{i+1}] {dict(zip(PARAMETERS, t))}")
+    except Exception as e:
+        print(f"✗ Error al generar grid: {e}")
+        return
     
-    # ============================================================
-    # PASO 3: Resolver ecuación para cada tupla
-    # ============================================================
-    print_section("PASO 3: Resolución de ecuación")
+    # ════════════════════════════════════════════════════════════════════════════
+    # PASO 3: Resolver el sistema para cada tupla de parámetros
+    # ════════════════════════════════════════════════════════════════════════════
+    print_section("PASO 3: Resolver Sistema para Cada Tupla de Parámetros", "─")
     
-    var_symbols = [symbols[v] for v in VARIABLES]
-    param_symbols = {p: symbols[p] for p in PARAMETERS}
+    print(f"🔧 Configuración del solver:")
+    print(f"   Método: {SYSTEM_SOLVER_METHOD}")
+    print(f"   Intentos por tupla: {NUM_INITIAL_GUESSES}")
+    print(f"   Tolerancia de distancia: {DISTANCE_TOLERANCE}")
+    print(f"   Tolerancia de residuo: {SOLVER_RESIDUE_TOL}")
     
-    results = solve_for_all_parameter_tuples(
-        equation, var_symbols, param_names, param_symbols, grid,
-        method=SOLVER_METHOD, 
-        filter_complex=FILTER_COMPLEX,
-        complex_tol=COMPLEX_TOLERANCE, 
-        sort_roots=SORT_ROOTS
-    )
+    try:
+        results = solve_for_all_parameter_tuples(
+            equations_sympy, var_symbols, PARAMETERS, param_symbols, grid,
+            method=SYSTEM_SOLVER_METHOD,
+            num_guesses=NUM_INITIAL_GUESSES,
+            guess_ranges=GUESS_RANGES,
+            dist_tol=DISTANCE_TOLERANCE,
+            residue_tol=SOLVER_RESIDUE_TOL
+        )
+        
+        # Estadísticas
+        total_solutions = sum(r['num_roots'] for r in results)
+        avg_solutions = total_solutions / len(results) if len(results) > 0 else 0
+        max_solutions = max((r['num_roots'] for r in results), default=0)
+        
+        print(f"✓ Resolución completada:")
+        print(f"   Tuplas con soluciones: {len(results)}/{len(grid)}")
+        print(f"   Total de soluciones: {total_solutions}")
+        print(f"   Promedio por tupla: {avg_solutions:.2f}")
+        print(f"   Máximo por tupla: {max_solutions}")
+        
+        # Mostrar primeras soluciones
+        if len(results) > 0:
+            print(f"\n📍 Ejemplo de primeras tuplas:")
+            for i, res in enumerate(results[:3]):
+                print(f"\n   Tupla {i+1}: {res['parameters']}")
+                for j, root in enumerate(res['roots']):
+                    print(f"      Solución {j+1}: {root}")
     
-    print(f"Tuplas con raíces válidas: {len(results)}")
-    if len(results) > 0:
-        num_roots_dist = {}
-        for r in results:
-            n = r['num_roots']
-            num_roots_dist[n] = num_roots_dist.get(n, 0) + 1
-        print(f"Distribución de número de raíces: {num_roots_dist}")
+    except Exception as e:
+        print(f"✗ Error durante resolución: {e}")
+        import traceback
+        traceback.print_exc()
+        return
     
-    # ============================================================
-    # PASO 4: Preparar datos para regresión simbólica
-    # ============================================================
-    print_section("PASO 4: Preparación de datos para SR")
-
-    if input_mode == "combined":
-        combined_data = combine_all_roots(results, param_names)
-        branches = [{"X": combined_data["X"], "y": combined_data["y"]}]
-        print(f"Tuplas combinadas para SR: {len(combined_data['y'])}")
-    else:
-        combined_data = None
-        branches = group_by_root_branch(results, param_names)
-        print(f"Ramas identificadas: {len(branches)}")
-        for i, branch in enumerate(branches):
-            print(f"  Rama {i+1}: {len(branch['y'])} puntos")
+    # ════════════════════════════════════════════════════════════════════════════
+    # PASO 4: Combinar todas las soluciones
+    # ════════════════════════════════════════════════════════════════════════════
+    print_section("PASO 4: Combinar Soluciones Vectoriales", "─")
     
-    # ============================================================
-    # PASO 5: Regresión simbólica por rama
-    # ============================================================
-    print_section("PASO 5: Regresión simbólica")
-
-    if input_mode == "combined":
-        combined_results = run_combined_symbolic_regression(
-            combined_data,
-            param_names,
+    try:
+        combined_data = combine_all_solutions(results, PARAMETERS)
+        print(f"✓ Datos combinados:")
+        print(f"   Dimensión X (parámetros): {combined_data['X'].shape}")
+        print(f"   Dimensión Y (soluciones): {combined_data['Y'].shape}")
+        print(f"   Variables: {combined_data['num_variables']}")
+    
+    except Exception as e:
+        print(f"✗ Error al combinar soluciones: {e}")
+        return
+    
+    # ════════════════════════════════════════════════════════════════════════════
+    # PASO 5: Regresión simbólica con anclaje
+    # ════════════════════════════════════════════════════════════════════════════
+    print_section("PASO 5: Regresión Simbólica Multidimensional", "─")
+    
+    print(f"⚙️  Configuración:")
+    print(f"   Variable ancla: {VARIABLES[ANCHOR_COORDINATE]} (índice {ANCHOR_COORDINATE})")
+    print(f"   Máximo de iteraciones: {MAX_ANCHOR_ITERATIONS}")
+    print(f"   Tolerancia de validación: {VALIDATION_TOL}")
+    print(f"   EPSILON: {EPSILON}, K: {K}, NITERATIONS: {NITERATIONS}")
+    
+    try:
+        sr_results = run_anchored_symbolic_regression(
+            combined_data, PARAMETERS,
+            equations=equations_sympy,
+            variables=var_symbols,
+            anchor_coord=ANCHOR_COORDINATE,
             epsilon=EPSILON,
             k=K,
             niterations=NITERATIONS,
             min_points=MIN_POINTS,
-            max_iterations=MAX_ITERATIONS,
+            max_iterations=MAX_ANCHOR_ITERATIONS,
+            validation_tol=VALIDATION_TOL
         )
-        all_results = [combined_results]
+    
+    except Exception as e:
+        print(f"✗ Error durante regresión simbólica: {e}")
+        import traceback
+        traceback.print_exc()
+        return
+    
+    # ════════════════════════════════════════════════════════════════════════════
+    # PASO 6: Reporte final
+    # ════════════════════════════════════════════════════════════════════════════
+    print_section("PASO 6: Reporte Final de Resultados", "─")
+    
+    if len(sr_results) == 0:
+        print("⚠️  No se encontraron ramas válidas.")
     else:
-        all_results = run_for_all_branches(
-            branches, param_names,
-            epsilon=EPSILON, k=K,
-            niterations=NITERATIONS, min_points=MIN_POINTS
-        )
-    
-    # ============================================================
-    # PASO 6: Reportar funciones encontradas
-    # ============================================================
-    print_section("PASO 6: Funciones encontradas")
-    
-    for branch_idx, branch_results in enumerate(all_results):
-        print(f"\nRama {branch_idx + 1}:")
+        print(f"✓ Se encontraron {len(sr_results)} ramas válidas:\n")
         
-        if len(branch_results) == 0:
-            print("  No se encontraron funciones")
-        elif len(branch_results) == 1:
-            print(f"  Expresión única: {branch_results[0]['equation']}")
-            print(f"  Puntos matcheados: {branch_results[0]['num_matched']}")
-        else:
-            print(f"  Múltiples funciones ({len(branch_results)}):")
-            for i, func in enumerate(branch_results):
-                print(f"    {i+1}. {func['equation']} ({func['num_matched']} puntos)")
+        for branch_idx, branch in enumerate(sr_results):
+            print(f"{'─'*75}")
+            print(f"RAMA {branch_idx + 1}")
+            print(f"{'─'*75}")
+            
+            print(f"Expresiones encontradas (para {len(branch['expressions'])} variables):")
+            for var_idx, var in enumerate(var_symbols):
+                expr = branch['expressions'][var_idx]
+                print(f"  {var} = {expr}")
+            
+            print(f"\nEstadísticas:")
+            print(f"  Puntos matcheados: {branch['num_matched']}")
+            print(f"  Iteración: {branch['iteration']}")
+            print()
     
-    # ============================================================
+    # ════════════════════════════════════════════════════════════════════════════
     # Guardar resultados
-    # ============================================================
-    print_section("Guardando resultados")
+    # ════════════════════════════════════════════════════════════════════════════
+    print_section("Guardando Resultados", "─")
     
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    output_dir = os.path.join(OUTPUT_DIR, f"{EXPERIMENT_NAME}_{timestamp}")
+    output_dir = os.path.join(OUTPUT_DIR, f"{timestamp}_system_results")
+    os.makedirs(output_dir, exist_ok=True)
     
-    equation_info = {
-        'equation': equation,
-        'latex': symbols  # Ajustar según necesidad
-    }
+    try:
+        # Guardar configuración
+        config_data = {
+            'equations': EQUATIONS,
+            'variables': VARIABLES,
+            'parameters': PARAMETERS,
+            'parameter_ranges': {k: list(v) for k, v in PARAMETER_RANGES.items()},
+            'solver_method': SYSTEM_SOLVER_METHOD,
+            'anchor_coordinate': ANCHOR_COORDINATE,
+            'timestamp': datetime.now().isoformat(),
+            'num_branches_found': len(sr_results)
+        }
+        
+        with open(os.path.join(output_dir, 'config.json'), 'w') as f:
+            json.dump(config_data, f, indent=2)
+        
+        # Guardar resultados
+        results_data = {
+            'num_branches': len(sr_results),
+            'branches': []
+        }
+        
+        for i, branch in enumerate(sr_results):
+            branch_info = {
+                'branch_index': i + 1,
+                'expressions': {
+                    str(var): expr
+                    for var, expr in zip(var_symbols, branch['expressions'])
+                },
+                'num_matched': branch['num_matched'],
+                'iteration': branch['iteration']
+            }
+            results_data['branches'].append(branch_info)
+        
+        with open(os.path.join(output_dir, 'results.json'), 'w') as f:
+            json.dump(results_data, f, indent=2)
+        
+        print(f"✓ Resultados guardados en: {output_dir}")
+        print(f"  - config.json: Configuración del experimento")
+        print(f"  - results.json: Ramas encontradas")
     
-    save_results(output_dir, {'equation': equation, 'latex': str(equation)}, 
-                branches, all_results, param_names)
+    except Exception as e:
+        print(f"✗ Error al guardar resultados: {e}")
     
-    print_section("PIPELINE COMPLETADO")
-    print(f"Resultados en: {output_dir}")
+    print_section("✓ PIPELINE COMPLETADO", "═")
+    print(f"Fin: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
 
 
 if __name__ == "__main__":

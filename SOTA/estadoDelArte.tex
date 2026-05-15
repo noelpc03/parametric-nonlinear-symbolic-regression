@@ -1,50 +1,26 @@
 \documentclass[12pt,a4paper]{article}
 
-% Paquetes necesarios
-\usepackage[utf8]{inputenc}
-\usepackage[spanish]{babel}
-\usepackage{amsmath,amsfonts,amssymb}
-\usepackage{graphicx}
-\usepackage{geometry}
-\usepackage{hyperref}
-\usepackage{cite}
-\usepackage{array}
-\usepackage{longtable}
-\usepackage{pdflscape}  % Para rotar páginas
-\usepackage{tabularx}   % Para tablas más flexibles
-\usepackage{adjustbox}  % Para centrar y ajustar tablas
+% Paquetes necesarios \usepackage[utf8]{inputenc} \usepackage[spanish]{babel} \usepackage{amsmath,amsfonts,amssymb} \usepackage{graphicx} \usepackage{geometry} \usepackage{hyperref} \usepackage{cite} \usepackage{array} \usepackage{longtable} \usepackage{pdflscape}  % Para rotar páginas \usepackage{tabularx}  % Para tablas más flexibles \usepackage{adjustbox}  % Para centrar y ajustar tablas
 
 \geometry{left=2.5cm,right=2.5cm,top=2.5cm,bottom=2.5cm}
 
-\hypersetup{
-    colorlinks=true,
-    linkcolor=blue,
-    urlcolor=cyan,
-    citecolor=blue
-}
+\hypersetup{ colorlinks=true, linkcolor=blue, urlcolor=cyan, citecolor=blue }
 
-\title{Estado del Arte\\
-\large Regresión Simbólica para Sistemas No Lineales}
-\author{Noel Pérez Calvo}
-\date{}
+\title{Estado del Arte\\ \large Regresión Simbólica para Sistemas No Lineales} \author{Noel Pérez Calvo} \date{}
 
 \begin{document}
 
 \maketitle
 
-% ============================================================
-% INTRODUCCIÓN
-% ============================================================
+% ============================================================ % INTRODUCCIÓN % ============================================================
 
 \section*{Introducción}
 
-El objetivo general de esta tesis es desarrollar un método de regresión simbólica capaz de producir funciones analíticas que describan con precisión sistemas no lineales, garantizando que las expresiones obtenidas pasen exactamente por los puntos del conjunto de datos original. 
+El objetivo general de esta tesis es desarrollar un método de regresión simbólica capaz de producir funciones analíticas que describan con precisión sistemas no lineales, garantizando que las expresiones obtenidas pasen exactamente por los puntos del conjunto de datos original.
 
 Para lograrlo, se propone un proceso iterativo con una función de pérdida basada en una sigmoide suave que actúa como versión diferenciable de una función indicadora 0/1. Esta función de pérdida permite identificar subconjuntos de puntos ``cubiertos’’ por una expresión simbólica, y posteriormente retirarlos para repetir el proceso hasta cubrir todos los datos.
 
-% ============================================================
-% LÍNEA DE TIEMPO
-% ============================================================
+% ============================================================ % LÍNEA DE TIEMPO % ============================================================
 
 \section*{Línea de tiempo del desarrollo histórico relacionado con la tesis}
 
@@ -70,83 +46,35 @@ Para lograrlo, se propone un proceso iterativo con una función de pérdida basa
     \item \textbf{2025 — Esta tesis}: Se plantea un método simbólico iterativo para cubrir puntos mediante funciones suaves basadas en sigmoides y eliminación sucesiva de subconjuntos cubiertos.
 \end{itemize}
 
-% ============================================================
-% TABLA COMPARATIVA
-% ============================================================
+% ============================================================ % TABLA COMPARATIVA % ============================================================
 
 \section*{Tabla comparativa de documentos relevantes}
 
 \begin{table}[ht]
-\centering
-\footnotesize
-\label{tab:comparativa_sr}
+\centering \footnotesize \label{tab:comparativa_sr}
 \begin{tabular}{|p{2.2cm}|c|p{3.5cm}|p{3.2cm}|p{1.3cm}|p{4.5cm}|}
-\hline
-\textbf{Referencia} & \textbf{Año} & \textbf{Problema / Ámbito} & \textbf{Método / Enfoque} & \textbf{Pérdida suave} & \textbf{Aportación principal} \\ \hline
+\hline \textbf{Referencia} & \textbf{Año} & \textbf{Problema / Ámbito} & \textbf{Método / Enfoque} & \textbf{Pérdida suave} & \textbf{Aportación principal} \\ \hline
 
-Koza — \textit{Genetic Programming} \cite{koza1992}
-& 1992
-& Fundamentos teóricos de SR
-& Programación genética
-& No
-& Base formal de árboles y operadores evolutivos. \\ \hline
+Koza — \textit{Genetic Programming} \cite{koza1992} & 1992 & Fundamentos teóricos de SR & Programación genética & No & Base formal de árboles y operadores evolutivos. \\ \hline
 
-Bongard \& Lipson \cite{bongard2007}
-& 2007
-& Descubrimiento de dinámicas no lineales
-& SR evolutiva aplicada a EDOs
-& No
-& Primeros resultados sólidos en ingeniería inversa. \\ \hline
+Bongard \& Lipson \cite{bongard2007} & 2007 & Descubrimiento de dinámicas no lineales & SR evolutiva aplicada a EDOs & No & Primeros resultados sólidos en ingeniería inversa. \\ \hline
 
-Schmidt \& Lipson — Eureqa \cite{schmidt2009}
-& 2009
-& Descubrimiento de leyes físicas
-& SR evolutiva con heurísticas
-& No
-& Populariza SR con datos ruidosos. \\ \hline
+Schmidt \& Lipson — Eureqa \cite{schmidt2009} & 2009 & Descubrimiento de leyes físicas & SR evolutiva con heurísticas & No & Populariza SR con datos ruidosos. \\ \hline
 
-La Cava et al. — SRBench \cite{lacava2021}
-& 2021
-& Evaluación estandarizada
-& Benchmarking SR
-& No
-& Primer marco estándar de evaluación. \\ \hline
+La Cava et al. — SRBench \cite{lacava2021} & 2021 & Evaluación estandarizada & Benchmarking SR & No & Primer marco estándar de evaluación. \\ \hline
 
-Kamienny et al. \cite{kamienny2022}
-& 2022
-& Síntesis simbólica neuronal
-& Transformers
-& No
-& Enfoque E2E sin evolución. \\ \hline
+Kamienny et al. \cite{kamienny2022} & 2022 & Síntesis simbólica neuronal & Transformers & No & Enfoque E2E sin evolución. \\ \hline
 
-RILS-ROLS \cite{kartelj2023_rils}
-& 2023
-& Robustez al ruido
-& ILS + OLS + pérdidas robustas
-& Parcial
-& Motiva explorar pérdidas no-MSE. \\ \hline
+RILS-ROLS \cite{kartelj2023_rils} & 2023 & Robustez al ruido & ILS + OLS + pérdidas robustas & Parcial & Motiva explorar pérdidas no-MSE. \\ \hline
 
-Cranmer — PySR \cite{cranmer2023_pysr}
-& 2023
-& Búsqueda simbólica eficiente
-& Evolución + pérdida personalizable
-& Sí
-& Herramienta ideal para implementar la pérdida sigmoidal. \\ \hline
+Cranmer — PySR \cite{cranmer2023_pysr} & 2023 & Búsqueda simbólica eficiente & Evolución + pérdida personalizable & Sí & Herramienta ideal para implementar la pérdida sigmoidal. \\ \hline
 
-SSS — Su et al. \cite{su2024_sss}
-& 2024
-& Suavizar decisiones discretas
-& Sustitución sigmoidal
-& Sí
-& Formaliza el surrogate sigmoidal. \\ \hline
-
+SSS — Su et al. \cite{su2024_sss} & 2024 & Suavizar decisiones discretas & Sustitución sigmoidal & Sí & Formaliza el surrogate sigmoidal. \\ \hline
 
 \end{tabular}
 \end{table}
 
-% ============================================================
-% DESCRIPCIÓN DETALLADA DE LOS DOCUMENTOS RECIENTES
-% ============================================================
+% ============================================================ % DESCRIPCIÓN DETALLADA DE LOS DOCUMENTOS RECIENTES % ============================================================
 
 \section*{Descripción breve y detallada de los trabajos más relevantes (últimos 10 años)}
 
@@ -165,55 +93,27 @@ Es la biblioteca moderna más utilizada para descubrimiento simbólico científi
 \subsection*{Smooth Sigmoid Surrogate (SSS, 2024)}
 Formaliza matemáticamente el uso de sigmoides para reemplazar funciones indicadoras no diferenciables. Este trabajo es clave para justificar el uso de una sigmoide como aproximación suave para medir ``cobertura’’ en la función de pérdida de esta tesis.
 
-% ============================================================
-% BIBLIOGRAFÍA
-% ============================================================
+% ============================================================ % BIBLIOGRAFÍA % ============================================================
 
 \begin{thebibliography}{99}
 
-\bibitem{koza1992}
-Koza, J. (1992).
-\textit{Genetic Programming}. MIT Press.
+\bibitem{koza1992} Koza, J. (1992). \textit{Genetic Programming}. MIT Press.
 
-\bibitem{bongard2007}
-Bongard, J., \& Lipson, H. (2007).
-\textit{Automated Reverse Engineering of Nonlinear Dynamical Systems}.
-PNAS.
+\bibitem{bongard2007} Bongard, J., \& Lipson, H. (2007). \textit{Automated Reverse Engineering of Nonlinear Dynamical Systems}. PNAS.
 
-\bibitem{schmidt2009}
-Schmidt, M., \& Lipson, H. (2009).
-\textit{Distilling Free-Form Natural Laws from Experimental Data}.
-Science.
+\bibitem{schmidt2009} Schmidt, M., \& Lipson, H. (2009). \textit{Distilling Free-Form Natural Laws from Experimental Data}. Science.
 
-\bibitem{keijzer2012}
-Keijzer, M. (2012).
-\textit{A Question About Symbolic Regression Using Step vs Sigmoid Functions}.
-JMLR.
+\bibitem{keijzer2012} Keijzer, M. (2012). \textit{A Question About Symbolic Regression Using Step vs Sigmoid Functions}. JMLR.
 
-\bibitem{lacava2021}
-La Cava, W. et al. (2021).
-\textit{Contemporary Symbolic Regression Methods and Benchmarks}.
-Nature Machine Intelligence.
+\bibitem{lacava2021} La Cava, W. et al. (2021). \textit{Contemporary Symbolic Regression Methods and Benchmarks}. Nature Machine Intelligence.
 
-\bibitem{kamienny2022}
-Kamienny, P. et al. (2022).
-\textit{End-to-End Symbolic Regression with Transformers}.
-ICML.
+\bibitem{kamienny2022} Kamienny, P. et al. (2022). \textit{End-to-End Symbolic Regression with Transformers}. ICML.
 
-\bibitem{kartelj2023_rils}
-Kartelj, A. et al. (2023).
-\textit{RILS-ROLS: A Robust Iterated Local Search Method for Symbolic Regression}.
-arXiv.
+\bibitem{kartelj2023_rils} Kartelj, A. et al. (2023). \textit{RILS-ROLS: A Robust Iterated Local Search Method for Symbolic Regression}. arXiv.
 
-\bibitem{cranmer2023_pysr}
-Cranmer, M. (2023).
-\textit{PySR: High-Performance Symbolic Regression in Python}.
-Documentación oficial.
+\bibitem{cranmer2023_pysr} Cranmer, M. (2023). \textit{PySR: High-Performance Symbolic Regression in Python}. Documentación oficial.
 
-\bibitem{su2024_sss}
-Su, F. et al. (2024).
-\textit{Smooth Sigmoid Surrogate: A Differentiable Alternative to Greedy Search in Trees}.
-Mathematics (MDPI).
+\bibitem{su2024_sss} Su, F. et al. (2024). \textit{Smooth Sigmoid Surrogate: A Differentiable Alternative to Greedy Search in Trees}. Mathematics (MDPI).
 
 \end{thebibliography}
 

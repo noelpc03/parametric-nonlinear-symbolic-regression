@@ -26,20 +26,26 @@ SAVE_INTERMEDIATE = True
 EXPERIMENT_NAME = "test_1"
 
 # ============================================================
-# 2. DEFINICIÓN DE LA ECUACIÓN
+# 2. DEFINICIÓN DEL SISTEMA DE ECUACIONES
 # ============================================================
 
-# Ecuación a resolver: f(x; params) = 0
-# Caso quadratic_13_factored
-# (x - a) * (x + a) = 0  -> raíces esperadas: -a y a
-EQUATION_STRING = "(x - a) * (x + a)"
-VARIABLES = ["x"]
-PARAMETERS = ["a"]
+# Sistema de ecuaciones no lineales paramétricas: F(x; θ) = 0
+# Formato: lista de strings, una ecuación por elemento
+# Ejemplo (desde la tesis, capítulo de Propuesta de solución):
+#   (x1 - a)*(x2 - a*b) = 0
+#   x1*x2 - a*b**2 = 0
+# Espera dos soluciones: (x1=a, x2=a*b) y (x1=b, x2=a*b)
 
-# Para ecuaciones con múltiples variables, por ejemplo:
-# EQUATION_STRING = "(x - a**2) * (y - a*b)"
-# VARIABLES = ["x", "y"]
-# PARAMETERS = ["a", "b"]
+EQUATIONS = [
+    "(x1 - a)*(x2 - a*b)",
+    "x1*x2 - a*b**2"
+]
+
+# Variables (incógnitas del sistema)
+VARIABLES = ["x1", "x2"]
+
+# Parámetros (fijos durante la resolución de cada tupla)
+PARAMETERS = ["a", "b"]
 
 # ============================================================
 # 3. GRID DE PARÁMETROS
@@ -48,7 +54,8 @@ PARAMETERS = ["a"]
 # Rangos para cada parámetro
 # Formato: {nombre_parametro: (min, max, num_puntos)}
 PARAMETER_RANGES = {
-  "a": (0.1, 5, 50),
+  "a": (0.1, 3, 4),  # [0.1, 1.1, 2.1, 3.0]
+  "b": (0.1, 3, 4),  # [0.1, 1.1, 2.1, 3.0]
 }
 
 # Método: producto cartesiano (grid regular)
@@ -57,26 +64,26 @@ PARAMETER_RANGES = {
 # combinaciones posibles.
 
 # ============================================================
-# 4. RESOLUCIÓN (ZERO-FINDING)
+# 4. RESOLUCIÓN (ZERO-FINDING) CON SCIPY
 # ============================================================
 
-# Método de resolución
-# 'solve': SymPy solve (simbólico, puede ser lento)
-# 'nsolve': SymPy nsolve (numérico, más rápido pero requiere guess)
-# 'roots': numpy.roots (solo para polinomios)
-SOLVER_METHOD = 'solve'
+# Método de resolución numérica
+SYSTEM_SOLVER_METHOD = 'scipy'  # Usa scipy.optimize.root
 
-# Para nsolve: punto inicial
-INITIAL_GUESS = 0.0
+# Número de intentos con puntos iniciales aleatorios
+NUM_INITIAL_GUESSES = 20
 
-# Filtrar raíces complejas (quedarse solo con reales)
-FILTER_COMPLEX = True
+# Rangos para generar puntos iniciales aleatorios
+GUESS_RANGES = {
+    "x1": (-10.0, 10.0),
+    "x2": (-10.0, 10.0),
+}
 
-# Tolerancia para considerar una raíz como real (parte imaginaria < tol)
-COMPLEX_TOLERANCE = 1e-10
+# Tolerancia euclidiana para filtrar soluciones duplicadas
+DISTANCE_TOLERANCE = 1e-3
 
-# Ordenar raíces por valor (True) o por orden de aparición (False)
-SORT_ROOTS = True
+# Tolerancia del residuo: ||F(x; θ)|| < SOLVER_RESIDUE_TOL para aceptar
+SOLVER_RESIDUE_TOL = 1e-6
 
 # Timeout por tupla de parámetros (segundos, None = sin límite)
 TIMEOUT_PER_TUPLE = 5.0
@@ -124,15 +131,23 @@ USE_SIGMOID_LOSS = False  # False = usar MSE estándar
 USE_MATCH_COUNT_LOSS = False
 MATCH_COUNT_EPSILON = 1e-4
 
+# ── Parámetros del anclaje (estrategia de regresión simbólica multidimensional) ──
+
+# Índice de la coordenada "ancla" (usada para guiar la separación de ramas)
+ANCHOR_COORDINATE = 0  # Usar x1 como ancla
+
+# Tolerancia para validar una rama completa
+VALIDATION_TOL = 1e-4
+
+# Máximo número de iteraciones del algoritmo de anclaje
+MAX_ANCHOR_ITERATIONS = 10
+
 # ── Parámetros del algoritmo iterativo ──
 MIN_POINTS = 5  # Mínimo de puntos para continuar
 MAX_ITERATIONS = None  # Sin límite de iteraciones
 MAX_CONSECUTIVE_NO_MATCH = 3  # Corte global: parar tras N iteraciones consecutivas sin matches
 
-# Modo de entrada para la regresión simbólica:
-#   - 'combined': usa todas las tuplas (params -> root) juntas
-#                 y el algoritmo iterativo descubre ecuaciones secuencialmente.
-#   - 'branches': separa por rama antes de SR (modo legacy).
+# Modo de entrada para la regresión simbólica (mantenido por compatibilidad)
 SR_INPUT_MODE = 'combined'
 
 # ── Estrategia multi-intento por iteración ──
