@@ -101,7 +101,7 @@ K = 100  # No se usa con MSE loss, solo para matcheo
 # ── Parámetros del modelo PySR ──
 NITERATIONS = 500 
 POPULATIONS = 30  
-UNARY_OPERATORS = ["neg"]
+UNARY_OPERATORS = ["neg", "sin", "cos", "exp"]
 BINARY_OPERATORS = ["+", "-", "*", "/"]
 
 # Operadores custom para PySR (fuente única de verdad).

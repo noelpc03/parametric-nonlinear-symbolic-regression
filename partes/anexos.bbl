@@ -1,0 +1,13 @@
+\begin{thebibliography}{1}
+
+\bibitem{cranmer2023pysr}
+Miles Cranmer.
+\newblock {PySR}: Fast \& parallelized symbolic regression in {Python/Julia}.
+\newblock {\em Journal of Open Source Software}, 8(89):5308, 2023.
+
+\bibitem{virtanen2020scipy}
+Pauli Virtanen, Ralf Gommers, Travis~E. Oliphant, et~al.
+\newblock {SciPy} 1.0: fundamental algorithms for scientific computing in {Python}.
+\newblock {\em Nature Methods}, 17(3):261--272, 2020.
+
+\end{thebibliography}

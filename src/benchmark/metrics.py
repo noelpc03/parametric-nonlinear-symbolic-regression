@@ -21,7 +21,15 @@ def _parse_expr(expr_str, param_names):
     _neg = lambda x: -x
     # safe_pow(x, y) = sign(x) * abs(x)^y
     _safe_pow = lambda x, y: sp.sign(x) * sp.Pow(sp.Abs(x), y)
-    local_dict = {**param_syms, 'sqrt': sp.sqrt, 'neg': _neg, 'safe_pow': _safe_pow}
+    local_dict = {
+        **param_syms,
+        'sqrt': sp.sqrt,
+        'sin': sp.sin,
+        'cos': sp.cos,
+        'exp': sp.exp,
+        'neg': _neg,
+        'safe_pow': _safe_pow,
+    }
     try:
         expr = sympify(clean, locals=local_dict)
         return expr
@@ -81,11 +89,24 @@ def _expressions_equivalent(discovered_str, expected_str, param_names,
     try:
         f_discovered = sp.lambdify(
             param_syms, discovered,
-            modules=[{'sqrt': safe_sqrt_np, 'Abs': np.abs, 'safe_pow': safe_pow_np}, 'numpy']
+            modules=[{
+                'sqrt': safe_sqrt_np,
+                'sin': np.sin,
+                'cos': np.cos,
+                'exp': np.exp,
+                'Abs': np.abs,
+                'safe_pow': safe_pow_np,
+            }, 'numpy']
         )
         f_expected = sp.lambdify(
             param_syms, expected,
-            modules=[{'sqrt': np.sqrt, 'Abs': np.abs}, 'numpy']
+            modules=[{
+                'sqrt': np.sqrt,
+                'sin': np.sin,
+                'cos': np.cos,
+                'exp': np.exp,
+                'Abs': np.abs,
+            }, 'numpy']
         )
     except Exception:
         return False, 0.0, float('inf')

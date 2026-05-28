@@ -1,0 +1,104 @@
+\begin{thebibliography}{10}
+
+\bibitem{allgower1990numerical}
+Eugene~L. Allgower and Kurt Georg.
+\newblock {\em Numerical Continuation Methods: An Introduction}.
+\newblock Springer, 1990.
+
+\bibitem{bartnik2024mdcm}
+Adam Bartnik et~al.
+\newblock Mdcm: A multi-dimensional continuation method for solving parametric nonlinear systems.
+\newblock {\em Journal of Computational Science}, 2024.
+\newblock Describes a multidimensional bisection method to find all real roots of a nonlinear system within a bounded domain.
+
+\bibitem{burden2010numerical}
+Richard~L. Burden and J.~Douglas Faires.
+\newblock {\em Numerical Analysis}.
+\newblock Brooks/Cole, 9th edition, 2010.
+
+\bibitem{cranmer2023pysr}
+Miles Cranmer.
+\newblock {PySR}: Fast \& parallelized symbolic regression in {Python/Julia}.
+\newblock {\em Journal of Open Source Software}, 8(89):5308, 2023.
+
+\bibitem{diniz2025symbolfit}
+M.~A. Diniz et~al.
+\newblock Symbolfit: Automatic parametric modeling with symbolic regression.
+\newblock {\em Information Sciences}, 2025.
+\newblock Framework that automates parametric modeling using symbolic regression to find a single function that fits the entire dataset.
+
+\bibitem{eldred2009formulations}
+MS~Eldred and BJ~Bichon.
+\newblock Formulations for surrogate-based optimization under uncertainty.
+\newblock In {\em 49th AIAA/ASME/ASCE/AHS/ASC Structures, Structural Dynamics, and Materials Conference}. 2009.
+\newblock AIAA 2009-2282.
+
+\bibitem{forrester2008engineering}
+Alexander~IJ Forrester and Andy~J Keane.
+\newblock {\em Engineering Design via Surrogate Modelling}.
+\newblock John Wiley \& Sons, 2008.
+
+\bibitem{gershenfeld2012nature}
+Neil Gershenfeld.
+\newblock {\em The Nature of Mathematical Modeling}.
+\newblock Cambridge University Press, 2012.
+
+\bibitem{leaf2024}
+R.~Goldman et~al.
+\newblock leaf: A flexible framework for symbolic regression in complex systems.
+\newblock {\em R Journal}, 2024.
+\newblock Unified R package for symbolic regression in nonlinear systems that require model combination.
+
+\bibitem{horowitz2015art}
+Paul Horowitz and Winfield Hill.
+\newblock {\em The Art of Electronics}.
+\newblock Cambridge University Press, 2015.
+
+\bibitem{koza1992genetic}
+John~R. Koza.
+\newblock {\em Genetic Programming: On the Programming of Computers by Means of Natural Selection}.
+\newblock MIT Press, Cambridge, MA, USA, 1992.
+
+\bibitem{laidler1987chemical}
+Keith~J Laidler.
+\newblock {\em Chemical Kinetics}.
+\newblock Harper \& Row, 1987.
+
+\bibitem{meleshko1991nonlinear}
+I~Meleshko.
+\newblock {\em Nonlinear Systems: Analysis, Stability, and Control}.
+\newblock Springer, 1991.
+
+\bibitem{merlet2024mixing}
+Cyril Merlet et~al.
+\newblock Mixing neural networks, continuation and symbolic computation to solve parametric systems of nonlinear equations.
+\newblock {\em Mathematics and Computers in Simulation}, 2024.
+\newblock Uses neural networks trained on numerical solutions to predict initial guesses for Newton's method; does not produce explicit analytical expressions.
+
+\bibitem{nocedal2006numerical}
+Jorge Nocedal and Stephen~J. Wright.
+\newblock {\em Numerical Optimization}.
+\newblock Springer, 2nd edition, 2006.
+
+\bibitem{ojika1983deflation}
+T~Ojika, S~Watanabe, and T~Mitsui.
+\newblock Deflation algorithm for the multiple roots of a system of nonlinear equations.
+\newblock {\em Journal of Mathematical Analysis and Applications}, 96(2):463--479, 1983.
+
+\bibitem{saltelli2008global}
+Andrea Saltelli, Marco Ratto, Terry Andres, Francesca Campolongo, Jessica Cariboni, Debora Gatelli, Michaela Saisana, and Stefano Tarantola.
+\newblock {\em Global Sensitivity Analysis: The Primer}.
+\newblock John Wiley \& Sons, 2008.
+
+\bibitem{strogatz2018nonlinear}
+Steven~H Strogatz.
+\newblock {\em Nonlinear Dynamics and Chaos}.
+\newblock CRC Press, 2018.
+
+\bibitem{ukorigho2023competitive}
+O.~Ukorigho and O.~Owoyele.
+\newblock A competitive learning approach for specialized models: A solution for symbolic regression of specialized physics systems.
+\newblock {\em Proceedings of the 2023 ...}, 2023.
+\newblock Proposes competitive learning for symbolic regression when data contain multiple functional regimes.
+
+\end{thebibliography}

@@ -1,0 +1,1277 @@
+{
+  "metadata": {
+    "version": "1.1",
+    "description": "Test cases from casos_sistemas.txt - parametric systems of equations (Asymmetric & Unique Strings Version)",
+    "total_cases": 30
+  },
+  "test_cases": [
+    {
+      "id": 1,
+      "name": "system_linear_01",
+      "type": "system",
+      "description": "2x2 linear system",
+      "equations": [
+        "x + y - a",
+        "x - y - b"
+      ],
+      "variables": [
+        "x",
+        "y"
+      ],
+      "parameters": [
+        "a",
+        "b"
+      ],
+      "parameter_ranges": {
+        "a": [
+          0.1,
+          3,
+          10
+        ],
+        "b": [
+          0.1,
+          3,
+          10
+        ]
+      },
+      "expected_solutions": [
+        {
+          "branch": 1,
+          "x": "(a + b) / 2",
+          "y": "(a - b) / 2"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "system_linear_02",
+      "type": "system",
+      "description": "2x2 linear system with scaled terms",
+      "equations": [
+        "2*x - y - (3*a - 3*b)",
+        "x + y - 3*a"
+      ],
+      "variables": [
+        "x",
+        "y"
+      ],
+      "parameters": [
+        "a",
+        "b"
+      ],
+      "parameter_ranges": {
+        "a": [
+          0.1,
+          3,
+          10
+        ],
+        "b": [
+          0.1,
+          3,
+          10
+        ]
+      },
+      "expected_solutions": [
+        {
+          "branch": 1,
+          "x": "2*a - b",
+          "y": "a + b"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "system_linear_03",
+      "type": "system",
+      "description": "2x2 linear system with 3 parameters",
+      "equations": [
+        "a*x + b*y - c",
+        "a*x - b*y + c"
+      ],
+      "variables": [
+        "x",
+        "y"
+      ],
+      "parameters": [
+        "a",
+        "b",
+        "c"
+      ],
+      "parameter_ranges": {
+        "a": [
+          0.5,
+          3,
+          8
+        ],
+        "b": [
+          0.5,
+          3,
+          8
+        ],
+        "c": [
+          0.1,
+          3,
+          8
+        ]
+      },
+      "expected_solutions": [
+        {
+          "branch": 1,
+          "x": "0",
+          "y": "c / b"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "system_linear_04",
+      "type": "system",
+      "description": "2x2 linear system with 1 parameter",
+      "equations": [
+        "2*x - y - (a + 5)",
+        "x + y - (8*a + 1)"
+      ],
+      "variables": [
+        "x",
+        "y"
+      ],
+      "parameters": [
+        "a"
+      ],
+      "parameter_ranges": {
+        "a": [
+          0.1,
+          3,
+          15
+        ]
+      },
+      "expected_solutions": [
+        {
+          "branch": 1,
+          "x": "3*a + 2",
+          "y": "5*a - 1"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "system_linear_05",
+      "type": "system",
+      "description": "2x2 linear system with parameter-dependent coefficients",
+      "equations": [
+        "(b + c)*x + (a - c)*y - (a + b)",
+        "(b + c)*x - (a - c)*y - (a - b)"
+      ],
+      "variables": [
+        "x",
+        "y"
+      ],
+      "parameters": [
+        "a",
+        "b",
+        "c"
+      ],
+      "parameter_ranges": {
+        "a": [
+          1.0,
+          3,
+          8
+        ],
+        "b": [
+          0.5,
+          2,
+          8
+        ],
+        "c": [
+          0.1,
+          1,
+          8
+        ]
+      },
+      "expected_solutions": [
+        {
+          "branch": 1,
+          "x": "a / (b + c)",
+          "y": "b / (a - c)"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "name": "system_quadratic_01",
+      "type": "system",
+      "description": "Quadratic system with 1 parameter, 2 branches",
+      "equations": [
+        "x**2 - a",
+        "y - x"
+      ],
+      "variables": [
+        "x",
+        "y"
+      ],
+      "parameters": [
+        "a"
+      ],
+      "parameter_ranges": {
+        "a": [
+          0.1,
+          3,
+          15
+        ]
+      },
+      "expected_solutions": [
+        {
+          "branch": 1,
+          "x": "sqrt(a)",
+          "y": "sqrt(a)"
+        },
+        {
+          "branch": 2,
+          "x": "-sqrt(a)",
+          "y": "-sqrt(a)"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "name": "system_quadratic_02",
+      "type": "system",
+      "description": "Quadratic with factored form, asymmetric 2 branches",
+      "equations": [
+        "x**2 - (a + b)*x + a*b",
+        "y - 2*x"
+      ],
+      "variables": [
+        "x",
+        "y"
+      ],
+      "parameters": [
+        "a",
+        "b"
+      ],
+      "parameter_ranges": {
+        "a": [
+          0.5,
+          3,
+          12
+        ],
+        "b": [
+          0.5,
+          3,
+          12
+        ]
+      },
+      "expected_solutions": [
+        {
+          "branch": 1,
+          "x": "a",
+          "y": "2*a"
+        },
+        {
+          "branch": 2,
+          "x": "b",
+          "y": "2*b"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "name": "system_quadratic_04",
+      "type": "system",
+      "description": "Coupled biquadratic system, strictly unique branches",
+      "equations": [
+        "(x**2 - a**2)*(x**2 - b**2)",
+        "y - x**2 - x"
+      ],
+      "variables": [
+        "x",
+        "y"
+      ],
+      "parameters": [
+        "a",
+        "b"
+      ],
+      "parameter_ranges": {
+        "a": [
+          0.5,
+          3,
+          12
+        ],
+        "b": [
+          0.5,
+          3,
+          12
+        ]
+      },
+      "expected_solutions": [
+        {
+          "branch": 1,
+          "x": "a",
+          "y": "a**2 + a"
+        },
+        {
+          "branch": 2,
+          "x": "-a",
+          "y": "a**2 - a"
+        },
+        {
+          "branch": 3,
+          "x": "b",
+          "y": "b**2 + b"
+        },
+        {
+          "branch": 4,
+          "x": "-b",
+          "y": "b**2 - b"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "name": "system_quadratic_06",
+      "type": "system",
+      "description": "Asymmetric system with unique scaled quadratics",
+      "equations": [
+        "x**2 - y**2 - a",
+        "x - 2*y - b"
+      ],
+      "variables": [
+        "x",
+        "y"
+      ],
+      "parameters": [
+        "a",
+        "b"
+      ],
+      "parameter_ranges": {
+        "a": [
+          0.1,
+          2,
+          12
+        ],
+        "b": [
+          0.1,
+          2,
+          12
+        ]
+      },
+      "expected_solutions": [
+        {
+          "branch": 1,
+          "x": "(-b + 2*sqrt(3*a + b**2)) / 3",
+          "y": "(-2*b + sqrt(3*a + b**2)) / 3"
+        },
+        {
+          "branch": 2,
+          "x": "(-b - 2*sqrt(3*a + b**2)) / 3",
+          "y": "(-2*b - sqrt(3*a + b**2)) / 3"
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "name": "system_quadratic_07",
+      "type": "system",
+      "description": "Quadratic coupled avoiding zero overlap",
+      "equations": [
+        "x**2 - a*x",
+        "y - 2*x + b"
+      ],
+      "variables": [
+        "x",
+        "y"
+      ],
+      "parameters": [
+        "a",
+        "b"
+      ],
+      "parameter_ranges": {
+        "a": [
+          0.1,
+          3,
+          15
+        ],
+        "b": [
+          0.1,
+          3,
+          15
+        ]
+      },
+      "expected_solutions": [
+        {
+          "branch": 1,
+          "x": "0",
+          "y": "-b"
+        },
+        {
+          "branch": 2,
+          "x": "a",
+          "y": "2*a - b"
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "name": "system_quadratic_08",
+      "type": "system",
+      "description": "Multi-branch quadratic avoiding negative root overlap",
+      "equations": [
+        "x**4 - 5*a*x**2 + 4*a**2",
+        "y - x**2 - x - b"
+      ],
+      "variables": [
+        "x",
+        "y"
+      ],
+      "parameters": [
+        "a",
+        "b"
+      ],
+      "parameter_ranges": {
+        "a": [
+          0.5,
+          2,
+          10
+        ],
+        "b": [
+          0.5,
+          2,
+          10
+        ]
+      },
+      "expected_solutions": [
+        {
+          "branch": 1,
+          "x": "sqrt(a)",
+          "y": "a + sqrt(a) + b"
+        },
+        {
+          "branch": 2,
+          "x": "-sqrt(a)",
+          "y": "a - sqrt(a) + b"
+        },
+        {
+          "branch": 3,
+          "x": "2*sqrt(a)",
+          "y": "4*a + 2*sqrt(a) + b"
+        },
+        {
+          "branch": 4,
+          "x": "-2*sqrt(a)",
+          "y": "4*a - 2*sqrt(a) + b"
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "name": "system_cubic_01",
+      "type": "system",
+      "description": "Cubic with factored distinct roots and linear shift",
+      "equations": [
+        "(x - a)*(x - b)*(x + a + b)",
+        "y - 2*x + c"
+      ],
+      "variables": [
+        "x",
+        "y"
+      ],
+      "parameters": [
+        "a",
+        "b",
+        "c"
+      ],
+      "parameter_ranges": {
+        "a": [
+          0.1,
+          2,
+          15
+        ],
+        "b": [
+          0.1,
+          2,
+          15
+        ],
+        "c": [
+          0.1,
+          2,
+          15
+        ]
+      },
+      "expected_solutions": [
+        {
+          "branch": 1,
+          "x": "a",
+          "y": "2*a - c"
+        },
+        {
+          "branch": 2,
+          "x": "b",
+          "y": "2*b - c"
+        },
+        {
+          "branch": 3,
+          "x": "-a - b",
+          "y": "-2*a - 2*b - c"
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "name": "system_cubic_03",
+      "type": "system",
+      "description": "Cubic root form with parameter",
+      "equations": [
+        "x**3 - a",
+        "y - x**2"
+      ],
+      "variables": [
+        "x",
+        "y"
+      ],
+      "parameters": [
+        "a"
+      ],
+      "parameter_ranges": {
+        "a": [
+          0.1,
+          5,
+          12
+        ]
+      },
+      "expected_solutions": [
+        {
+          "branch": 1,
+          "x": "a**(1/3)",
+          "y": "a**(2/3)"
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "name": "system_quadratic_09",
+      "type": "system",
+      "description": "Coupled linear and product with scaled variable",
+      "equations": [
+        "2*x + y - 3",
+        "x*y - a"
+      ],
+      "variables": [
+        "x",
+        "y"
+      ],
+      "parameters": [
+        "a"
+      ],
+      "parameter_ranges": {
+        "a": [
+          -10,
+          -2,
+          1
+        ]
+      },
+      "expected_solutions": [
+        {
+          "branch": 1,
+          "x": "(3 + sqrt(9 - 8*a)) / 4",
+          "y": "(3 - sqrt(9 - 8*a)) / 2"
+        },
+        {
+          "branch": 2,
+          "x": "(3 - sqrt(9 - 8*a)) / 4",
+          "y": "(3 + sqrt(9 - 8*a)) / 2"
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "name": "system_cubic_04",
+      "type": "system",
+      "description": "Triple-factor cubic",
+      "equations": [
+        "(x - a)*(x - b)*(x - a - b)",
+        "x + y - a"
+      ],
+      "variables": [
+        "x",
+        "y"
+      ],
+      "parameters": [
+        "a",
+        "b"
+      ],
+      "parameter_ranges": {
+        "a": [
+          1.0,
+          3,
+          10
+        ],
+        "b": [
+          0.5,
+          2,
+          10
+        ]
+      },
+      "expected_solutions": [
+        {
+          "branch": 1,
+          "x": "a",
+          "y": "0"
+        },
+        {
+          "branch": 2,
+          "x": "b",
+          "y": "a - b"
+        },
+        {
+          "branch": 3,
+          "x": "a + b",
+          "y": "-b"
+        }
+      ]
+    },
+    {
+      "id": 16,
+      "name": "system_special_01",
+      "type": "system",
+      "description": "Product and ratio constraints",
+      "equations": [
+        "x*y - 1",
+        "x/y - a/b"
+      ],
+      "variables": [
+        "x",
+        "y"
+      ],
+      "parameters": [
+        "a",
+        "b"
+      ],
+      "parameter_ranges": {
+        "a": [
+          0.5,
+          2,
+          12
+        ],
+        "b": [
+          0.5,
+          2,
+          12
+        ]
+      },
+      "expected_solutions": [
+        {
+          "branch": 1,
+          "x": "sqrt(a/b)",
+          "y": "sqrt(b/a)"
+        },
+        {
+          "branch": 2,
+          "x": "-sqrt(a/b)",
+          "y": "-sqrt(b/a)"
+        }
+      ]
+    },
+    {
+      "id": 17,
+      "name": "system_special_02",
+      "type": "system",
+      "description": "Difference of squares and product",
+      "equations": [
+        "x**2 - y**2 - 4*a*b",
+        "x*y - (a**2 - b**2)"
+      ],
+      "variables": [
+        "x",
+        "y"
+      ],
+      "parameters": [
+        "a",
+        "b"
+      ],
+      "parameter_ranges": {
+        "a": [
+          0.5,
+          2,
+          10
+        ],
+        "b": [
+          0.5,
+          2,
+          10
+        ]
+      },
+      "expected_solutions": [
+        {
+          "branch": 1,
+          "x": "a + b",
+          "y": "a - b"
+        },
+        {
+          "branch": 2,
+          "x": "-a - b",
+          "y": "-a + b"
+        }
+      ]
+    },
+    {
+      "id": 18,
+      "name": "system_special_03",
+      "type": "system",
+      "description": "Coupled linear with parameter coefficients",
+      "equations": [
+        "(b + c)*x + (a + b)*y - (a + c)",
+        "(b + c)*x - (a + b)*y - (a - c)"
+      ],
+      "variables": [
+        "x",
+        "y"
+      ],
+      "parameters": [
+        "a",
+        "b",
+        "c"
+      ],
+      "parameter_ranges": {
+        "a": [
+          0.5,
+          2,
+          8
+        ],
+        "b": [
+          0.5,
+          2,
+          8
+        ],
+        "c": [
+          0.5,
+          2,
+          8
+        ]
+      },
+      "expected_solutions": [
+        {
+          "branch": 1,
+          "x": "a / (b + c)",
+          "y": "c / (a + b)"
+        }
+      ]
+    },
+    {
+      "id": 19,
+      "name": "system_special_04",
+      "type": "system",
+      "description": "Coupled roots explicitly distinct string states",
+      "equations": [
+        "(x**2 - a**2)*(x**2 - (a + b)**2)",
+        "y - x**2 - 2*x - c"
+      ],
+      "variables": [
+        "x",
+        "y"
+      ],
+      "parameters": [
+        "a",
+        "b",
+        "c"
+      ],
+      "parameter_ranges": {
+        "a": [
+          0.1,
+          1,
+          12
+        ],
+        "b": [
+          0.1,
+          1,
+          12
+        ],
+        "c": [
+          0.1,
+          1,
+          10
+        ]
+      },
+      "expected_solutions": [
+        {
+          "branch": 1,
+          "x": "a",
+          "y": "a**2 + 2*a + c"
+        },
+        {
+          "branch": 2,
+          "x": "-a",
+          "y": "a**2 - 2*a + c"
+        },
+        {
+          "branch": 3,
+          "x": "a + b",
+          "y": "(a + b)**2 + 2*(a + b) + c"
+        },
+        {
+          "branch": 4,
+          "x": "-a - b",
+          "y": "(a + b)**2 - 2*(a + b) + c"
+        }
+      ]
+    },
+    {
+      "id": 20,
+      "name": "system_cubic_05",
+      "type": "system",
+      "description": "Nested cubic-quadratic system",
+      "equations": [
+        "x**2 - 2*x - a",
+        "y**2 - x"
+      ],
+      "variables": [
+        "x",
+        "y"
+      ],
+      "parameters": [
+        "a"
+      ],
+      "parameter_ranges": {
+        "a": [
+          -0.9,
+          -0.5,
+          0.0
+        ]
+      },
+      "expected_solutions": [
+        {
+          "branch": 1,
+          "x": "1 + sqrt(1 + a)",
+          "y": "sqrt(1 + sqrt(1 + a))"
+        },
+        {
+          "branch": 2,
+          "x": "1 - sqrt(1 + a)",
+          "y": "sqrt(1 - sqrt(1 + a))"
+        }
+      ]
+    },
+    {
+      "id": 21,
+      "name": "system_special_07",
+      "type": "system",
+      "description": "Product and ratio form",
+      "equations": [
+        "x*y - a",
+        "y/x - b/a"
+      ],
+      "variables": [
+        "x",
+        "y"
+      ],
+      "parameters": [
+        "a",
+        "b"
+      ],
+      "parameter_ranges": {
+        "a": [
+          0.5,
+          2,
+          12
+        ],
+        "b": [
+          0.5,
+          2,
+          12
+        ]
+      },
+      "expected_solutions": [
+        {
+          "branch": 1,
+          "x": "sqrt(a**2/b)",
+          "y": "sqrt(b)"
+        },
+        {
+          "branch": 2,
+          "x": "-sqrt(a**2/b)",
+          "y": "-sqrt(b)"
+        }
+      ]
+    },
+    {
+      "id": 22,
+      "name": "system_special_08",
+      "type": "system",
+      "description": "Scaled asymmetry avoiding permuted additions",
+      "equations": [
+        "3*x + y - a",
+        "x*y - b"
+      ],
+      "variables": [
+        "x",
+        "y"
+      ],
+      "parameters": [
+        "a",
+        "b"
+      ],
+      "parameter_ranges": {
+        "a": [
+          6.0,
+          8.0,
+          12.0
+        ],
+        "b": [
+          0.1,
+          1.0,
+          2.0
+        ]
+      },
+      "expected_solutions": [
+        {
+          "branch": 1,
+          "x": "(a + sqrt(a**2 - 12*b)) / 6",
+          "y": "(a - sqrt(a**2 - 12*b)) / 2"
+        },
+        {
+          "branch": 2,
+          "x": "(a - sqrt(a**2 - 12*b)) / 6",
+          "y": "(a + sqrt(a**2 - 12*b)) / 2"
+        }
+      ]
+    },
+    {
+      "id": 23,
+      "name": "system_special_09",
+      "type": "system",
+      "description": "Deeply coupled special roots preventing state collisions",
+      "equations": [
+        "(x**2 - a)*(x**2 - 2*a)",
+        "y - x**3 - 2*x"
+      ],
+      "variables": [
+        "x",
+        "y"
+      ],
+      "parameters": [
+        "a"
+      ],
+      "parameter_ranges": {
+        "a": [
+          0.1,
+          1,
+          10
+        ]
+      },
+      "expected_solutions": [
+        {
+          "branch": 1,
+          "x": "sqrt(a)",
+          "y": "a*sqrt(a) + 2*sqrt(a)"
+        },
+        {
+          "branch": 2,
+          "x": "-sqrt(a)",
+          "y": "-a*sqrt(a) - 2*sqrt(a)"
+        },
+        {
+          "branch": 3,
+          "x": "sqrt(2*a)",
+          "y": "2*a*sqrt(2*a) + 2*sqrt(2*a)"
+        },
+        {
+          "branch": 4,
+          "x": "-sqrt(2*a)",
+          "y": "-2*a*sqrt(2*a) - 2*sqrt(2*a)"
+        }
+      ]
+    },
+    {
+      "id": 24,
+      "name": "system_special_10",
+      "type": "system",
+      "description": "Factored polynomial with quadratic coupling",
+      "equations": [
+        "(x - a)*(x - b)",
+        "y - x**2 + c"
+      ],
+      "variables": [
+        "x",
+        "y"
+      ],
+      "parameters": [
+        "a",
+        "b",
+        "c"
+      ],
+      "parameter_ranges": {
+        "a": [
+          0.5,
+          2,
+          10
+        ],
+        "b": [
+          2.5,
+          4,
+          10
+        ],
+        "c": [
+          0.1,
+          1,
+          10
+        ]
+      },
+      "expected_solutions": [
+        {
+          "branch": 1,
+          "x": "a",
+          "y": "a**2 - c"
+        },
+        {
+          "branch": 2,
+          "x": "b",
+          "y": "b**2 - c"
+        }
+      ]
+    },
+    {
+      "id": 25,
+      "name": "system_special_05",
+      "type": "system",
+      "description": "Rational explicit distinct strings",
+      "equations": [
+        "(x**2 - (a/b)**2)*(x**2 - (b/a)**2)",
+        "y - x**2 + 3*x - a"
+      ],
+      "variables": [
+        "x",
+        "y"
+      ],
+      "parameters": [
+        "a",
+        "b"
+      ],
+      "parameter_ranges": {
+        "a": [
+          0.5,
+          2,
+          10
+        ],
+        "b": [
+          0.5,
+          2,
+          10
+        ]
+      },
+      "expected_solutions": [
+        {
+          "branch": 1,
+          "x": "a/b",
+          "y": "(a/b)**2 - 3*(a/b) + a"
+        },
+        {
+          "branch": 2,
+          "x": "-a/b",
+          "y": "(a/b)**2 + 3*(a/b) + a"
+        },
+        {
+          "branch": 3,
+          "x": "b/a",
+          "y": "(b/a)**2 - 3*(b/a) + a"
+        },
+        {
+          "branch": 4,
+          "x": "-b/a",
+          "y": "(b/a)**2 + 3*(b/a) + a"
+        }
+      ]
+    },
+    {
+      "id": 26,
+      "name": "system_trig_01",
+      "type": "system",
+      "description": "Trigonometric unit circle with angle parameter",
+      "equations": [
+        "x**2 + y**2 - 1",
+        "x*cos(a) - y*sin(a)"
+      ],
+      "variables": [
+        "x",
+        "y"
+      ],
+      "parameters": [
+        "a"
+      ],
+      "parameter_ranges": {
+        "a": [
+          0.1,
+          3.0,
+          12
+        ]
+      },
+      "expected_solutions": [
+        {
+          "branch": 1,
+          "x": "sin(a)",
+          "y": "cos(a)"
+        },
+        {
+          "branch": 2,
+          "x": "-sin(a)",
+          "y": "-cos(a)"
+        }
+      ]
+    },
+    {
+      "id": 27,
+      "name": "system_exp_01",
+      "type": "system",
+      "description": "Exponential coupled system ensuring independent variable strings",
+      "equations": [
+        "2*x + y - exp(a)",
+        "x - y - exp(b)"
+      ],
+      "variables": [
+        "x",
+        "y"
+      ],
+      "parameters": [
+        "a",
+        "b"
+      ],
+      "parameter_ranges": {
+        "a": [
+          -1.0,
+          1.0,
+          11
+        ],
+        "b": [
+          -1.0,
+          1.0,
+          11
+        ]
+      },
+      "expected_solutions": [
+        {
+          "branch": 1,
+          "x": "(exp(a) + exp(b)) / 3",
+          "y": "(exp(a) - 2*exp(b)) / 3"
+        }
+      ]
+    },
+    {
+      "id": 28,
+      "name": "system_trig_02",
+      "type": "system",
+      "description": "Trigonometric radius and angle",
+      "equations": [
+        "x**2 + y**2 - a**2",
+        "x*sin(b) - y*cos(b)"
+      ],
+      "variables": [
+        "x",
+        "y"
+      ],
+      "parameters": [
+        "a",
+        "b"
+      ],
+      "parameter_ranges": {
+        "a": [
+          0.5,
+          3.0,
+          10
+        ],
+        "b": [
+          0.1,
+          3.0,
+          10
+        ]
+      },
+      "expected_solutions": [
+        {
+          "branch": 1,
+          "x": "a*cos(b)",
+          "y": "a*sin(b)"
+        },
+        {
+          "branch": 2,
+          "x": "-a*cos(b)",
+          "y": "-a*sin(b)"
+        }
+      ]
+    },
+    {
+      "id": 29,
+      "name": "system_exp_02",
+      "type": "system",
+      "description": "Exponential ratio and product",
+      "equations": [
+        "x*y - 1",
+        "x/y - exp(2*a)"
+      ],
+      "variables": [
+        "x",
+        "y"
+      ],
+      "parameters": [
+        "a"
+      ],
+      "parameter_ranges": {
+        "a": [
+          -1.0,
+          1.0,
+          11
+        ]
+      },
+      "expected_solutions": [
+        {
+          "branch": 1,
+          "x": "exp(a)",
+          "y": "exp(-a)"
+        },
+        {
+          "branch": 2,
+          "x": "-exp(a)",
+          "y": "-exp(-a)"
+        }
+      ]
+    },
+    {
+      "id": 30,
+      "name": "system_mixed_01",
+      "type": "system",
+      "description": "Mixed exponential radius and trigonometric angle",
+      "equations": [
+        "x**2 + y**2 - exp(2*a)",
+        "x*sin(b) - y*cos(b)"
+      ],
+      "variables": [
+        "x",
+        "y"
+      ],
+      "parameters": [
+        "a",
+        "b"
+      ],
+      "parameter_ranges": {
+        "a": [
+          -1.0,
+          1.0,
+          11
+        ],
+        "b": [
+          0.1,
+          3.0,
+          10
+        ]
+      },
+      "expected_solutions": [
+        {
+          "branch": 1,
+          "x": "exp(a)*cos(b)",
+          "y": "exp(a)*sin(b)"
+        },
+        {
+          "branch": 2,
+          "x": "-exp(a)*cos(b)",
+          "y": "-exp(a)*sin(b)"
+        }
+      ]
+    }
+  ]
+}

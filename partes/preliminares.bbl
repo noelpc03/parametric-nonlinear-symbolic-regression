@@ -1,0 +1,83 @@
+\begin{thebibliography}{10}
+
+\bibitem{bishop2006pattern}
+Christopher~M. Bishop.
+\newblock {\em Pattern Recognition and Machine Learning}.
+\newblock Springer, New York, 2006.
+
+\bibitem{broyden1965class}
+Charles~G. Broyden.
+\newblock A class of methods for solving nonlinear simultaneous equations.
+\newblock {\em Mathematics of Computation}, 19(92):577--593, 1965.
+
+\bibitem{burden2010numerical}
+Richard~L. Burden and J.~Douglas Faires.
+\newblock {\em Numerical Analysis}.
+\newblock Brooks/Cole, 9th edition, 2010.
+
+\bibitem{costa2021occamnet}
+Allan Costa, R\'egis Pacheco, Ralph Deters, and Luis~C. Lamb.
+\newblock Occamnet: A fast neural model for symbolic regression at scale.
+\newblock {\em arXiv preprint arXiv:2007.10799}, 2021.
+
+\bibitem{cranmer2023pysr}
+Miles Cranmer.
+\newblock {PySR}: Fast \& parallelized symbolic regression in {Python/Julia}.
+\newblock {\em Journal of Open Source Software}, 8(89):5308, 2023.
+
+\bibitem{deng2024operator}
+Yusong Deng, Min Wu, Lina Yu, Jingyi Liu, Shu Wei, Yanjie Li, and Weijun Li.
+\newblock Operator feature neural network for symbolic regression.
+\newblock {\em arXiv preprint arXiv:2408.07719}, 2024.
+
+\bibitem{hastie2009elements}
+Trevor Hastie, Robert Tibshirani, and Jerome Friedman.
+\newblock {\em The Elements of Statistical Learning: Data Mining, Inference, and Prediction}.
+\newblock Springer, New York, 2nd edition, 2009.
+
+\bibitem{kantor2021simulated}
+Daniel Kantor, Fernando~J. Von~Zuben, and Fabricio~Olivetti de~Franca.
+\newblock Simulated annealing for symbolic regression.
+\newblock In {\em Proceedings of the Genetic and Evolutionary Computation Conference (GECCO '21)}, 2021.
+
+\bibitem{koza1992genetic}
+John~R. Koza.
+\newblock {\em Genetic Programming: On the Programming of Computers by Means of Natural Selection}.
+\newblock MIT Press, Cambridge, MA, USA, 1992.
+
+\bibitem{montgomery2017applied}
+Douglas~C. Montgomery and George~C. Runger.
+\newblock {\em Applied Statistics and Probability for Engineers}.
+\newblock Wiley, 7 edition, 2017.
+
+\bibitem{nocedal2006numerical}
+Jorge Nocedal and Stephen~J. Wright.
+\newblock {\em Numerical Optimization}.
+\newblock Springer, 2nd edition, 2006.
+
+\bibitem{schmidt2009distilling}
+Michael Schmidt and Hod Lipson.
+\newblock Distilling free-form natural laws from experimental data.
+\newblock {\em Science}, 324(5923):81--85, 2009.
+
+\bibitem{sotto2017probabilistic}
+L\'eo Fran\c{c}oso Dal~Piccol Sotto and Vin\'icius~Veloso de~Melo.
+\newblock A probabilistic linear genetic programming with stochastic context-free grammar for solving symbolic regression problems.
+\newblock In {\em Proceedings of the Genetic and Evolutionary Computation Conference (GECCO '17)}, 2017.
+
+\bibitem{virgolin2022np}
+Marco Virgolin, Tanja Alderliesten, and Peter A.~N. Bosman.
+\newblock Symbolic regression is {NP}-hard.
+\newblock {\em arXiv preprint arXiv:2207.01018}, 2022.
+
+\bibitem{virtanen2020scipy}
+Pauli Virtanen, Ralf Gommers, Travis~E. Oliphant, et~al.
+\newblock {SciPy} 1.0: fundamental algorithms for scientific computing in {Python}.
+\newblock {\em Nature Methods}, 17(3):261--272, 2020.
+
+\bibitem{whitley1990island}
+Darrell Whitley, Soraya Rana, and Robert~B. Heckendorn.
+\newblock The island model genetic algorithm: On separability, population size and convergence.
+\newblock {\em Journal of Computing and Information Technology}, 1990.
+
+\end{thebibliography}

@@ -35,8 +35,13 @@ def parse_equation(equation_str: str, variables: List[str], parameters: List[str
     for name, symbol in zip(parameters, param_symbols):
         symbols_dict[name] = symbol
     
-    # Parsear la ecuación
-    equation = sp.sympify(equation_str, locals=symbols_dict)
+    # Parsear la ecuacion
+    func_symbols = {
+        "sin": sp.sin,
+        "cos": sp.cos,
+        "exp": sp.exp,
+    }
+    equation = sp.sympify(equation_str, locals={**symbols_dict, **func_symbols})
     
     return equation, symbols_dict
 
@@ -101,10 +106,15 @@ def parse_system(equations: List[str], variables: List[str], parameters: List[st
     for name, symbol in zip(parameters, param_symbols):
         symbols_dict[name] = symbol
     
-    # Parsear cada ecuación
+    # Parsear cada ecuacion
+    func_symbols = {
+        "sin": sp.sin,
+        "cos": sp.cos,
+        "exp": sp.exp,
+    }
     equations_sympy = []
     for eq_str in equations:
-        eq = sp.sympify(eq_str, locals=symbols_dict)
+        eq = sp.sympify(eq_str, locals={**symbols_dict, **func_symbols})
         equations_sympy.append(eq)
     
     return equations_sympy, symbols_dict

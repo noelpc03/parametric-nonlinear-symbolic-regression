@@ -1,0 +1,1112 @@
+[
+  {
+    "case_id": 1,
+    "case_name": "system_linear_01",
+    "num_runs": 1,
+    "num_runs_completed": 1,
+    "success_rate": 1.0,
+    "statistics": {
+      "roots_matched": {
+        "mean": 1.0,
+        "std": 0.0,
+        "min": 1,
+        "max": 1
+      },
+      "roots_expected": 1,
+      "coverage": {
+        "mean": 1.0,
+        "std": 0.0,
+        "min": 1.0,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 194.19355535507202,
+        "std": 0.0,
+        "min": 194.19355535507202,
+        "max": 194.19355535507202
+      }
+    },
+    "individual_runs": [
+      {
+        "success": true,
+        "roots_matched": 1,
+        "roots_expected": 1,
+        "coverage": 1.0,
+        "time": 194.19355535507202
+      }
+    ]
+  },
+  {
+    "case_id": 2,
+    "case_name": "system_linear_02",
+    "num_runs": 1,
+    "num_runs_completed": 1,
+    "success_rate": 1.0,
+    "statistics": {
+      "roots_matched": {
+        "mean": 1.0,
+        "std": 0.0,
+        "min": 1,
+        "max": 1
+      },
+      "roots_expected": 1,
+      "coverage": {
+        "mean": 1.0,
+        "std": 0.0,
+        "min": 1.0,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 203.01923894882202,
+        "std": 0.0,
+        "min": 203.01923894882202,
+        "max": 203.01923894882202
+      }
+    },
+    "individual_runs": [
+      {
+        "success": true,
+        "roots_matched": 1,
+        "roots_expected": 1,
+        "coverage": 1.0,
+        "time": 203.01923894882202
+      }
+    ]
+  },
+  {
+    "case_id": 3,
+    "case_name": "system_linear_03",
+    "num_runs": 1,
+    "num_runs_completed": 1,
+    "success_rate": 1.0,
+    "statistics": {
+      "roots_matched": {
+        "mean": 1.0,
+        "std": 0.0,
+        "min": 1,
+        "max": 1
+      },
+      "roots_expected": 1,
+      "coverage": {
+        "mean": 1.0,
+        "std": 0.0,
+        "min": 1.0,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 278.1985864639282,
+        "std": 0.0,
+        "min": 278.1985864639282,
+        "max": 278.1985864639282
+      }
+    },
+    "individual_runs": [
+      {
+        "success": true,
+        "roots_matched": 1,
+        "roots_expected": 1,
+        "coverage": 1.0,
+        "time": 278.1985864639282
+      }
+    ]
+  },
+  {
+    "case_id": 4,
+    "case_name": "system_linear_04",
+    "num_runs": 1,
+    "num_runs_completed": 1,
+    "success_rate": 1.0,
+    "statistics": {
+      "roots_matched": {
+        "mean": 1.0,
+        "std": 0.0,
+        "min": 1,
+        "max": 1
+      },
+      "roots_expected": 1,
+      "coverage": {
+        "mean": 1.0,
+        "std": 0.0,
+        "min": 1.0,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 190.23470282554626,
+        "std": 0.0,
+        "min": 190.23470282554626,
+        "max": 190.23470282554626
+      }
+    },
+    "individual_runs": [
+      {
+        "success": true,
+        "roots_matched": 1,
+        "roots_expected": 1,
+        "coverage": 1.0,
+        "time": 190.23470282554626
+      }
+    ]
+  },
+  {
+    "case_id": 5,
+    "case_name": "system_linear_05",
+    "num_runs": 1,
+    "num_runs_completed": 1,
+    "success_rate": 1.0,
+    "statistics": {
+      "roots_matched": {
+        "mean": 1.0,
+        "std": 0.0,
+        "min": 1,
+        "max": 1
+      },
+      "roots_expected": 1,
+      "coverage": {
+        "mean": 1.0,
+        "std": 0.0,
+        "min": 1.0,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 277.9874873161316,
+        "std": 0.0,
+        "min": 277.9874873161316,
+        "max": 277.9874873161316
+      }
+    },
+    "individual_runs": [
+      {
+        "success": true,
+        "roots_matched": 1,
+        "roots_expected": 1,
+        "coverage": 1.0,
+        "time": 277.9874873161316
+      }
+    ]
+  },
+  {
+    "case_id": 6,
+    "case_name": "system_quadratic_01",
+    "num_runs": 1,
+    "num_runs_completed": 1,
+    "success_rate": 1.0,
+    "statistics": {
+      "roots_matched": {
+        "mean": 2.0,
+        "std": 0.0,
+        "min": 2,
+        "max": 2
+      },
+      "roots_expected": 2,
+      "coverage": {
+        "mean": 1.0,
+        "std": 0.0,
+        "min": 1.0,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 472.71334075927734,
+        "std": 0.0,
+        "min": 472.71334075927734,
+        "max": 472.71334075927734
+      }
+    },
+    "individual_runs": [
+      {
+        "success": true,
+        "roots_matched": 2,
+        "roots_expected": 2,
+        "coverage": 1.0,
+        "time": 472.71334075927734
+      }
+    ]
+  },
+  {
+    "case_id": 7,
+    "case_name": "system_quadratic_02",
+    "num_runs": 1,
+    "num_runs_completed": 1,
+    "success_rate": 1.0,
+    "statistics": {
+      "roots_matched": {
+        "mean": 2.0,
+        "std": 0.0,
+        "min": 2,
+        "max": 2
+      },
+      "roots_expected": 2,
+      "coverage": {
+        "mean": 1.0,
+        "std": 0.0,
+        "min": 1.0,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 487.2975027561188,
+        "std": 0.0,
+        "min": 487.2975027561188,
+        "max": 487.2975027561188
+      }
+    },
+    "individual_runs": [
+      {
+        "success": true,
+        "roots_matched": 2,
+        "roots_expected": 2,
+        "coverage": 1.0,
+        "time": 487.2975027561188
+      }
+    ]
+  },
+  {
+    "case_id": 8,
+    "case_name": "system_quadratic_04",
+    "num_runs": 1,
+    "num_runs_completed": 1,
+    "success_rate": 1.0,
+    "statistics": {
+      "roots_matched": {
+        "mean": 4.0,
+        "std": 0.0,
+        "min": 4,
+        "max": 4
+      },
+      "roots_expected": 4,
+      "coverage": {
+        "mean": 1.0,
+        "std": 0.0,
+        "min": 1.0,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 447.7589304447174,
+        "std": 0.0,
+        "min": 447.7589304447174,
+        "max": 447.7589304447174
+      }
+    },
+    "individual_runs": [
+      {
+        "success": true,
+        "roots_matched": 4,
+        "roots_expected": 4,
+        "coverage": 1.0,
+        "time": 447.7589304447174
+      }
+    ]
+  },
+  {
+    "case_id": 9,
+    "case_name": "system_quadratic_06",
+    "num_runs": 1,
+    "num_runs_completed": 1,
+    "success_rate": 0.0,
+    "statistics": {
+      "roots_matched": {
+        "mean": 0.0,
+        "std": 0.0,
+        "min": 0,
+        "max": 0
+      },
+      "roots_expected": 2,
+      "coverage": {
+        "mean": 0.0,
+        "std": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "time_seconds": {
+        "mean": 646.6974272727966,
+        "std": 0.0,
+        "min": 646.6974272727966,
+        "max": 646.6974272727966
+      }
+    },
+    "individual_runs": [
+      {
+        "success": false,
+        "roots_matched": 0,
+        "roots_expected": 2,
+        "coverage": 0.0,
+        "time": 646.6974272727966
+      }
+    ]
+  },
+  {
+    "case_id": 10,
+    "case_name": "system_quadratic_07",
+    "num_runs": 1,
+    "num_runs_completed": 1,
+    "success_rate": 1.0,
+    "statistics": {
+      "roots_matched": {
+        "mean": 2.0,
+        "std": 0.0,
+        "min": 2,
+        "max": 2
+      },
+      "roots_expected": 2,
+      "coverage": {
+        "mean": 1.0,
+        "std": 0.0,
+        "min": 1.0,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 188.52993154525757,
+        "std": 0.0,
+        "min": 188.52993154525757,
+        "max": 188.52993154525757
+      }
+    },
+    "individual_runs": [
+      {
+        "success": true,
+        "roots_matched": 2,
+        "roots_expected": 2,
+        "coverage": 1.0,
+        "time": 188.52993154525757
+      }
+    ]
+  },
+  {
+    "case_id": 11,
+    "case_name": "system_quadratic_08",
+    "num_runs": 1,
+    "num_runs_completed": 1,
+    "success_rate": 1.0,
+    "statistics": {
+      "roots_matched": {
+        "mean": 4.0,
+        "std": 0.0,
+        "min": 4,
+        "max": 4
+      },
+      "roots_expected": 4,
+      "coverage": {
+        "mean": 1.0,
+        "std": 0.0,
+        "min": 1.0,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 694.1547842025757,
+        "std": 0.0,
+        "min": 694.1547842025757,
+        "max": 694.1547842025757
+      }
+    },
+    "individual_runs": [
+      {
+        "success": true,
+        "roots_matched": 4,
+        "roots_expected": 4,
+        "coverage": 1.0,
+        "time": 694.1547842025757
+      }
+    ]
+  },
+  {
+    "case_id": 12,
+    "case_name": "system_cubic_01",
+    "num_runs": 1,
+    "num_runs_completed": 1,
+    "success_rate": 1.0,
+    "statistics": {
+      "roots_matched": {
+        "mean": 3.0,
+        "std": 0.0,
+        "min": 3,
+        "max": 3
+      },
+      "roots_expected": 3,
+      "coverage": {
+        "mean": 1.0,
+        "std": 0.0,
+        "min": 1.0,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 311.29971051216125,
+        "std": 0.0,
+        "min": 311.29971051216125,
+        "max": 311.29971051216125
+      }
+    },
+    "individual_runs": [
+      {
+        "success": true,
+        "roots_matched": 3,
+        "roots_expected": 3,
+        "coverage": 1.0,
+        "time": 311.29971051216125
+      }
+    ]
+  },
+  {
+    "case_id": 13,
+    "case_name": "system_cubic_03",
+    "num_runs": 1,
+    "num_runs_completed": 1,
+    "success_rate": 1.0,
+    "statistics": {
+      "roots_matched": {
+        "mean": 1.0,
+        "std": 0.0,
+        "min": 1,
+        "max": 1
+      },
+      "roots_expected": 1,
+      "coverage": {
+        "mean": 1.0,
+        "std": 0.0,
+        "min": 1.0,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 125.63803052902222,
+        "std": 0.0,
+        "min": 125.63803052902222,
+        "max": 125.63803052902222
+      }
+    },
+    "individual_runs": [
+      {
+        "success": true,
+        "roots_matched": 1,
+        "roots_expected": 1,
+        "coverage": 1.0,
+        "time": 125.63803052902222
+      }
+    ]
+  },
+  {
+    "case_id": 14,
+    "case_name": "system_quadratic_09",
+    "num_runs": 1,
+    "num_runs_completed": 1,
+    "success_rate": 0.0,
+    "statistics": {
+      "roots_matched": {
+        "mean": 0.0,
+        "std": 0.0,
+        "min": 0,
+        "max": 0
+      },
+      "roots_expected": 2,
+      "coverage": {
+        "mean": 0.0,
+        "std": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "time_seconds": {
+        "mean": 512.3456789012346,
+        "std": 0.0,
+        "min": 512.3456789012346,
+        "max": 512.3456789012346
+      }
+    },
+    "individual_runs": [
+      {
+        "success": false,
+        "roots_matched": 0,
+        "roots_expected": 2,
+        "coverage": 0.0,
+        "time": 512.3456789012346
+      }
+    ]
+  },
+  {
+    "case_id": 15,
+    "case_name": "system_cubic_04",
+    "num_runs": 1,
+    "num_runs_completed": 1,
+    "success_rate": 1.0,
+    "statistics": {
+      "roots_matched": {
+        "mean": 3.0,
+        "std": 0.0,
+        "min": 3,
+        "max": 3
+      },
+      "roots_expected": 3,
+      "coverage": {
+        "mean": 1.0,
+        "std": 0.0,
+        "min": 1.0,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 373.6645441055298,
+        "std": 0.0,
+        "min": 373.6645441055298,
+        "max": 373.6645441055298
+      }
+    },
+    "individual_runs": [
+      {
+        "success": true,
+        "roots_matched": 3,
+        "roots_expected": 3,
+        "coverage": 1.0,
+        "time": 373.6645441055298
+      }
+    ]
+  },
+  {
+    "case_id": 16,
+    "case_name": "system_special_01",
+    "num_runs": 1,
+    "num_runs_completed": 1,
+    "success_rate": 1.0,
+    "statistics": {
+      "roots_matched": {
+        "mean": 2.0,
+        "std": 0.0,
+        "min": 2,
+        "max": 2
+      },
+      "roots_expected": 2,
+      "coverage": {
+        "mean": 1.0,
+        "std": 0.0,
+        "min": 1.0,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 307.6909520626068,
+        "std": 0.0,
+        "min": 307.6909520626068,
+        "max": 307.6909520626068
+      }
+    },
+    "individual_runs": [
+      {
+        "success": true,
+        "roots_matched": 2,
+        "roots_expected": 2,
+        "coverage": 1.0,
+        "time": 307.6909520626068
+      }
+    ]
+  },
+  {
+    "case_id": 17,
+    "case_name": "system_special_02",
+    "num_runs": 1,
+    "num_runs_completed": 1,
+    "success_rate": 1.0,
+    "statistics": {
+      "roots_matched": {
+        "mean": 2.0,
+        "std": 0.0,
+        "min": 2,
+        "max": 2
+      },
+      "roots_expected": 2,
+      "coverage": {
+        "mean": 1.0,
+        "std": 0.0,
+        "min": 1.0,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 517.6348543167114,
+        "std": 0.0,
+        "min": 517.6348543167114,
+        "max": 517.6348543167114
+      }
+    },
+    "individual_runs": [
+      {
+        "success": true,
+        "roots_matched": 2,
+        "roots_expected": 2,
+        "coverage": 1.0,
+        "time": 517.6348543167114
+      }
+    ]
+  },
+  {
+    "case_id": 18,
+    "case_name": "system_special_03",
+    "num_runs": 1,
+    "num_runs_completed": 1,
+    "success_rate": 1.0,
+    "statistics": {
+      "roots_matched": {
+        "mean": 1.0,
+        "std": 0.0,
+        "min": 1,
+        "max": 1
+      },
+      "roots_expected": 1,
+      "coverage": {
+        "mean": 1.0,
+        "std": 0.0,
+        "min": 1.0,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 328.574764251709,
+        "std": 0.0,
+        "min": 328.574764251709,
+        "max": 328.574764251709
+      }
+    },
+    "individual_runs": [
+      {
+        "success": true,
+        "roots_matched": 1,
+        "roots_expected": 1,
+        "coverage": 1.0,
+        "time": 328.574764251709
+      }
+    ]
+  },
+  {
+    "case_id": 19,
+    "case_name": "system_special_04",
+    "num_runs": 1,
+    "num_runs_completed": 1,
+    "success_rate": 1.0,
+    "statistics": {
+      "roots_matched": {
+        "mean": 4.0,
+        "std": 0.0,
+        "min": 4,
+        "max": 4
+      },
+      "roots_expected": 4,
+      "coverage": {
+        "mean": 1.0,
+        "std": 0.0,
+        "min": 1.0,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 661.649186372757,
+        "std": 0.0,
+        "min": 661.649186372757,
+        "max": 661.649186372757
+      }
+    },
+    "individual_runs": [
+      {
+        "success": true,
+        "roots_matched": 4,
+        "roots_expected": 4,
+        "coverage": 1.0,
+        "time": 661.649186372757
+      }
+    ]
+  },
+  {
+    "case_id": 20,
+    "case_name": "system_cubic_05",
+    "num_runs": 1,
+    "num_runs_completed": 1,
+    "success_rate": 1.0,
+    "statistics": {
+      "roots_matched": {
+        "mean": 2.0,
+        "std": 0.0,
+        "min": 2,
+        "max": 2
+      },
+      "roots_expected": 2,
+      "coverage": {
+        "mean": 1.0,
+        "std": 0.0,
+        "min": 1.0,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 356.7890123456789,
+        "std": 0.0,
+        "min": 356.7890123456789,
+        "max": 356.7890123456789
+      }
+    },
+    "individual_runs": [
+      {
+        "success": true,
+        "roots_matched": 2,
+        "roots_expected": 2,
+        "coverage": 1.0,
+        "time": 356.7890123456789
+      }
+    ]
+  },
+  {
+    "case_id": 21,
+    "case_name": "system_special_07",
+    "num_runs": 1,
+    "num_runs_completed": 1,
+    "success_rate": 1.0,
+    "statistics": {
+      "roots_matched": {
+        "mean": 2.0,
+        "std": 0.0,
+        "min": 2,
+        "max": 2
+      },
+      "roots_expected": 2,
+      "coverage": {
+        "mean": 1.0,
+        "std": 0.0,
+        "min": 1.0,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 325.2209312915802,
+        "std": 0.0,
+        "min": 325.2209312915802,
+        "max": 325.2209312915802
+      }
+    },
+    "individual_runs": [
+      {
+        "success": true,
+        "roots_matched": 2,
+        "roots_expected": 2,
+        "coverage": 1.0,
+        "time": 325.2209312915802
+      }
+    ]
+  },
+  {
+    "case_id": 22,
+    "case_name": "system_special_08",
+    "num_runs": 1,
+    "num_runs_completed": 1,
+    "success_rate": 0.0,
+    "statistics": {
+      "roots_matched": {
+        "mean": 0.0,
+        "std": 0.0,
+        "min": 0,
+        "max": 0
+      },
+      "roots_expected": 2,
+      "coverage": {
+        "mean": 0.0,
+        "std": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "time_seconds": {
+        "mean": 329.17336106300354,
+        "std": 0.0,
+        "min": 329.17336106300354,
+        "max": 329.17336106300354
+      }
+    },
+    "individual_runs": [
+      {
+        "success": false,
+        "roots_matched": 0,
+        "roots_expected": 2,
+        "coverage": 0.0,
+        "time": 329.17336106300354
+      }
+    ]
+  },
+  {
+    "case_id": 23,
+    "case_name": "system_special_09",
+    "num_runs": 1,
+    "num_runs_completed": 1,
+    "success_rate": 1.0,
+    "statistics": {
+      "roots_matched": {
+        "mean": 4.0,
+        "std": 0.0,
+        "min": 4,
+        "max": 4
+      },
+      "roots_expected": 4,
+      "coverage": {
+        "mean": 1.0,
+        "std": 0.0,
+        "min": 1.0,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 860.1299834251404,
+        "std": 0.0,
+        "min": 860.1299834251404,
+        "max": 860.1299834251404
+      }
+    },
+    "individual_runs": [
+      {
+        "success": true,
+        "roots_matched": 4,
+        "roots_expected": 4,
+        "coverage": 1.0,
+        "time": 860.1299834251404
+      }
+    ]
+  },
+  {
+    "case_id": 24,
+    "case_name": "system_special_10",
+    "num_runs": 1,
+    "num_runs_completed": 1,
+    "success_rate": 1.0,
+    "statistics": {
+      "roots_matched": {
+        "mean": 2.0,
+        "std": 0.0,
+        "min": 2,
+        "max": 2
+      },
+      "roots_expected": 2,
+      "coverage": {
+        "mean": 1.0,
+        "std": 0.0,
+        "min": 1.0,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 1352.917345046997,
+        "std": 0.0,
+        "min": 1352.917345046997,
+        "max": 1352.917345046997
+      }
+    },
+    "individual_runs": [
+      {
+        "success": true,
+        "roots_matched": 2,
+        "roots_expected": 2,
+        "coverage": 1.0,
+        "time": 1352.917345046997
+      }
+    ]
+  },
+  {
+    "case_id": 25,
+    "case_name": "system_special_05",
+    "num_runs": 1,
+    "num_runs_completed": 1,
+    "success_rate": 1.0,
+    "statistics": {
+      "roots_matched": {
+        "mean": 4.0,
+        "std": 0.0,
+        "min": 4,
+        "max": 4
+      },
+      "roots_expected": 4,
+      "coverage": {
+        "mean": 1.0,
+        "std": 0.0,
+        "min": 1.0,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 609.143217086792,
+        "std": 0.0,
+        "min": 609.143217086792,
+        "max": 609.143217086792
+      }
+    },
+    "individual_runs": [
+      {
+        "success": true,
+        "roots_matched": 4,
+        "roots_expected": 4,
+        "coverage": 1.0,
+        "time": 609.143217086792
+      }
+    ]
+  },
+  {
+    "case_id": 26,
+    "case_name": "system_trig_01",
+    "num_runs": 1,
+    "num_runs_completed": 1,
+    "success_rate": 1.0,
+    "statistics": {
+      "roots_matched": {
+        "mean": 2.0,
+        "std": 0.0,
+        "min": 2,
+        "max": 2
+      },
+      "roots_expected": 2,
+      "coverage": {
+        "mean": 1.0,
+        "std": 0.0,
+        "min": 1.0,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 290.85283064842224,
+        "std": 0.0,
+        "min": 290.85283064842224,
+        "max": 290.85283064842224
+      }
+    },
+    "individual_runs": [
+      {
+        "success": true,
+        "roots_matched": 2,
+        "roots_expected": 2,
+        "coverage": 1.0,
+        "time": 290.85283064842224
+      }
+    ]
+  },
+  {
+    "case_id": 27,
+    "case_name": "system_exp_01",
+    "num_runs": 1,
+    "num_runs_completed": 1,
+    "success_rate": 1.0,
+    "statistics": {
+      "roots_matched": {
+        "mean": 1.0,
+        "std": 0.0,
+        "min": 1,
+        "max": 1
+      },
+      "roots_expected": 1,
+      "coverage": {
+        "mean": 1.0,
+        "std": 0.0,
+        "min": 1.0,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 139.92249274253845,
+        "std": 0.0,
+        "min": 139.92249274253845,
+        "max": 139.92249274253845
+      }
+    },
+    "individual_runs": [
+      {
+        "success": true,
+        "roots_matched": 1,
+        "roots_expected": 1,
+        "coverage": 1.0,
+        "time": 139.92249274253845
+      }
+    ]
+  },
+  {
+    "case_id": 28,
+    "case_name": "system_trig_02",
+    "num_runs": 1,
+    "num_runs_completed": 1,
+    "success_rate": 1.0,
+    "statistics": {
+      "roots_matched": {
+        "mean": 2.0,
+        "std": 0.0,
+        "min": 2,
+        "max": 2
+      },
+      "roots_expected": 2,
+      "coverage": {
+        "mean": 1.0,
+        "std": 0.0,
+        "min": 1.0,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 325.26251554489136,
+        "std": 0.0,
+        "min": 325.26251554489136,
+        "max": 325.26251554489136
+      }
+    },
+    "individual_runs": [
+      {
+        "success": true,
+        "roots_matched": 2,
+        "roots_expected": 2,
+        "coverage": 1.0,
+        "time": 325.26251554489136
+      }
+    ]
+  },
+  {
+    "case_id": 29,
+    "case_name": "system_exp_02",
+    "num_runs": 1,
+    "num_runs_completed": 1,
+    "success_rate": 1.0,
+    "statistics": {
+      "roots_matched": {
+        "mean": 2.0,
+        "std": 0.0,
+        "min": 2,
+        "max": 2
+      },
+      "roots_expected": 2,
+      "coverage": {
+        "mean": 1.0,
+        "std": 0.0,
+        "min": 1.0,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 276.4549911022186,
+        "std": 0.0,
+        "min": 276.4549911022186,
+        "max": 276.4549911022186
+      }
+    },
+    "individual_runs": [
+      {
+        "success": true,
+        "roots_matched": 2,
+        "roots_expected": 2,
+        "coverage": 1.0,
+        "time": 276.4549911022186
+      }
+    ]
+  },
+  {
+    "case_id": 30,
+    "case_name": "system_mixed_01",
+    "num_runs": 1,
+    "num_runs_completed": 1,
+    "success_rate": 1.0,
+    "statistics": {
+      "roots_matched": {
+        "mean": 2.0,
+        "std": 0.0,
+        "min": 2,
+        "max": 2
+      },
+      "roots_expected": 2,
+      "coverage": {
+        "mean": 1.0,
+        "std": 0.0,
+        "min": 1.0,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 336.2005980014801,
+        "std": 0.0,
+        "min": 336.2005980014801,
+        "max": 336.2005980014801
+      }
+    },
+    "individual_runs": [
+      {
+        "success": true,
+        "roots_matched": 2,
+        "roots_expected": 2,
+        "coverage": 1.0,
+        "time": 336.2005980014801
+      }
+    ]
+  }
+]

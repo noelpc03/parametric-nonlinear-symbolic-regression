@@ -1,0 +1,48 @@
+This is BibTeX, Version 0.99d (TeX Live 2023/Debian)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: introduccion.aux
+The style file: plain.bst
+Database file #1: referencias.bib
+Warning--empty publisher in eldred2009formulations
+You've used 19 entries,
+            2118 wiz_defined-function locations,
+            598 strings with 7128 characters,
+and the built_in function-call counts, 4966 in all, are:
+= -- 460
+> -- 246
+< -- 0
++ -- 100
+- -- 78
+* -- 265
+:= -- 895
+add.period$ -- 64
+call.type$ -- 19
+change.case$ -- 83
+chr.to.int$ -- 0
+cite$ -- 20
+duplicate$ -- 219
+empty$ -- 407
+format.name$ -- 78
+if$ -- 1025
+int.to.chr$ -- 0
+int.to.str$ -- 19
+missing$ -- 30
+newline$ -- 104
+num.names$ -- 38
+pop$ -- 128
+preamble$ -- 1
+purify$ -- 73
+quote$ -- 0
+skip$ -- 134
+stack$ -- 0
+substring$ -- 135
+swap$ -- 19
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 54
+warning$ -- 1
+while$ -- 41
+width$ -- 21
+write$ -- 209
+(There was 1 warning)
