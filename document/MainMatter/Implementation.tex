@@ -1,0 +1,315 @@
+\chapter{Experimentación y resultados}\label{sec:experimentacion}
+
+En este capítulo se presentan los experimentos realizados para validar la metodología propuesta en el Capítulo~\ref{sec:propuesta}. Se persigue determinar en qué medida el algoritmo iterativo basado en regresión simbólica es capaz de descubrir, a partir de ceros numéricos encontrados, las distintas funciones que describen la dependencia de las soluciones respecto de los parámetros.
+
+La evaluación se organiza en dos partes. En la primera se aborda un estudio comparativo de las funciones de pérdida —error cuadrático medio, pérdida por conteo de coincidencias y pérdida sigmoidal—, utilizando un conjunto de ecuaciones con una sola variable y con múltiples soluciones. El propósito de esta parte es identificar cuál de las funciones de pérdida resulta más adecuada para el problema de separación de raíces. En la segunda parte se selecciona la función de pérdida con mejor desempeño y se aplica la metodología completa a un conjunto de sistemas de ecuaciones no lineales paramétricos con varias variables y parámetros, que representan el escenario para el que fue concebido el algoritmo.
+
+Los resultados obtenidos muestran que la pérdida sigmoidal supera a las otras dos alternativas tanto en la tasa de éxito como en la cobertura de puntos, y que el algoritmo es capaz de recuperar con alta fidelidad las expresiones analíticas de sistemas de diversa complejidad, incluso cuando las distintas soluciones se entremezclan en el conjunto de entrenamiento. En las secciones que siguen se describe el diseño de los experimentos, se detallan los problemas de prueba utilizados, se analizan los resultados desde distintas perspectivas y se discuten las limitaciones observadas.
+
+\section{Diseño experimental} \label{sec:diseno_comun}
+
+Todos los experimentos que se presentan en este capítulo comparten una misma configuración base del algoritmo de regresión simbólica, descrita en el Capítulo~\ref{sec:propuesta}. El motor de regresión simbólica utilizado es \texttt{PySR} \cite{cranmer2023pysr}.
+
+Los hiperparámetros del algoritmo evolutivo se fijaron en los valores que se indican en la Tabla~\ref{tab:hiperparams}. Estos valores fueron seleccionados tras experimentos preliminares sobre ecuaciones con una sola variable y se mantuvieron constantes en todas las pruebas, salvo la función de pérdida, que varía en la primera parte para comparar su efecto y se fija en la segunda parte a la que resultó más efectiva.
+
+\begin{table}[H] \centering \caption{Hiperparámetros comunes utilizados en todos los experimentos.} \label{tab:hiperparams} \begin{tabular}{lrl} \hline
+Parámetro & Símbolo & Valor \\
+\hline
+Tamaño de la población & $P$ & 50 \\
+Número de iteraciones (generaciones) & $G$ & 500 \\
+Número de poblaciones independientes & & 30 \\
+Ciclos evolutivos por iteración & & 550 \\
+Tamaño máximo del árbol & $S_{\max}$ & 25 \\
+Coeficiente de parsimonia & $\alpha$ & 0.0 \\
+Operadores unarios & & \texttt{neg}, \texttt{safe\_sqrt}, \texttt{safe\_cbrt}, \\
+ & & \texttt{safe\_root4}--\texttt{safe\_root10} \\
+Operadores binarios & & \texttt{+}, \texttt{-}, \texttt{*}, \texttt{/}, \texttt{safe\_pow} \\
+\hline \end{tabular} \end{table}
+
+Los operadores unarios \texttt{neg}, \texttt{safe\_sqrt}, \texttt{safe\_cbrt} y \texttt{safe\_root4} a \texttt{safe\_root10} proporcionan, respectivamente, el cambio de signo, la raíz cuadrada, la raíz cúbica y las raíces cuarta a décima. Todas estas raíces se implementan de forma protegida: se aplican sobre el valor absoluto del argumento, y en los casos de raíz cúbica y de índice impar se preserva el signo original del operando, evitando así valores indefinidos durante la búsqueda evolutiva.
+
+Para cada sistema o ecuación de prueba se construyó una cuadrícula de parámetros con $50$ puntos equiespaciados por dimensión, que se combinaron mediante producto cartesiano. La resolución numérica de cada tupla se realizó con \texttt{SciPy} \cite{virtanen2020scipy} a partir de $20$ puntos iniciales aleatorios. Las soluciones duplicadas se filtraron usando la distancia euclidiana con una tolerancia $\tau = 10^{-3}$, y solo se conservaron aquellas cuyo residuo $\|\Fvec(\xvec; \thetavec)\|_2$ fuera menor que $10^{-6}$.
+
+Los resultados de cada experimento se evaluaron mediante las siguientes métricas:
+
+\begin{itemize} \item \textbf{Éxito del caso:} se considera que un sistema (o ecuación) ha sido resuelto con éxito si el algoritmo encuentra exactamente el número de soluciones esperado y todas ellas superan el paso de validación descrito en la Sección~\ref{sec:validacion_solucion}. Se reporta la proporción de casos exitosos sobre el total.
+
+\item \textbf{Proporción de soluciones recuperadas:} para cada sistema se calcula el cociente entre el número de soluciones correctamente identificadas y el número total de soluciones. Los valores se promedian sobre todos los sistemas para obtener una medida global de la capacidad del algoritmo para descubrir el conjunto completo de soluciones.
+
+\item \textbf{Tiempo de ejecución:} tiempo total en segundos empleado por el algoritmo desde la generación de la cuadrícula de parámetros hasta la obtención de las expresiones simbólicas finales. \end{itemize}
+
+En las secciones siguientes se aplican estas métricas a las dos partes de la experimentación: la comparación de funciones de pérdida sobre ecuaciones con una sola variable y la evaluación del algoritmo completo sobre sistemas de ecuaciones.
+
+\section{Comparación de funciones de pérdida con ecuaciones individuales} \label{sec:fase1}
+
+El objetivo de esta primera parte es evaluar el comportamiento de tres funciones de pérdida distintas dentro del mismo algoritmo de regresión simbólica, aplicado a ecuaciones paramétricas. Los resultados permitirán seleccionar la función de pérdida más adecuada para la parte siguiente, donde se trabaja con sistemas de ecuaciones.
+
+\subsection{Ecuaciones de prueba}
+
+Se utilizaron 30 ecuaciones de una sola variable y uno o dos parámetros. Las ecuaciones involucran expresiones lineales, cuadráticas, cúbicas y racionales, con el fin de cubrir una variedad representativa de comportamientos y niveles de complejidad. La Tabla~\ref{tab:equaciones_fase1} recoge las ecuaciones empleadas junto con las expresiones de sus soluciones.
+
+\begin{longtable}{lll} \caption{Ecuaciones utilizadas en la parte 1.}
+\label{tab:equaciones_fase1} \\
+\hline
+ID & Ecuación & Soluciones \\
+\hline \endfirsthead
+\multicolumn{3}{c}{\textit{}} \\
+\hline
+ID & Ecuación & Soluciones \\
+\hline \endhead \hline
+\multicolumn{3}{r}{\textit{}} \\
+\endfoot \hline \endlastfoot
+L01 & $x + a - 2 = 0$ & $x = 2 - a$ \\
+L02 & $2x - a = 0$ & $x = a/2$ \\
+L03 & $x - 3a + 5 = 0$ & $x = 3a - 5$ \\
+L04 & $3x + a - 6 = 0$ & $x = (6 - a)/3$ \\
+L05 & $x - (a+1) = 0$ & $x = a + 1$ \\
+L06 & $x - (a+b) = 0$ & $x = a + b$ \\
+L07 & $x - 2a + 3b = 0$ & $x = 2a - 3b$ \\
+L08 & $x - ab = 0$ & $x = ab$ \\
+L09 & $ax - b = 0$ & $x = b/a$ \\
+L10 & $x - a - b - c = 0$ & $x = a + b + c$ \\
+Q11 & $x^2 - a = 0$ & $x = \sqrt{a},\; x = -\sqrt{a}$ \\
+Q12 & $x^2 - 2ax + a^2 = 0$ & $x = a$ \\
+Q13 & $(x - a)(x + a) = 0$ & $x = a,\; x = -a$ \\
+Q14 & $x^2 + a x = 0$ & $x = 0,\; x = -a$ \\
+Q15 & $x^2 - 3ax + 2a^2 = 0$ & $x = a,\; x = 2a$ \\
+Q16 & $x^2 - 2x - a = 0$ & $x = 1 \pm \sqrt{1+a}$ \\
+Q17 & $ax^2 - 1 = 0$ & $x = \pm 1/\sqrt{a}$ \\
+Q18 & $x^2 - ax - b = 0$ & $x = \frac{a \pm \sqrt{a^2+4b}}{2}$ \\
+Q19 & $ax^2 + bx + c = 0$ & $x = \frac{-b \pm \sqrt{b^2-4ac}}{2a}$ \\
+Q20 & $(x-a)(x-b) = 0$ & $x = a,\; x = b$ \\
+Q21 & $x^2 - (a+b)x + ab = 0$ & $x = a,\; x = b$ \\
+Q22 & $x^2 - a^2 - b^2 = 0$ & $x = \pm\sqrt{a^2+b^2}$ \\
+Q23 & $x^2 - 4ab = 0$ & $x = \pm 2\sqrt{ab}$ \\
+Q24 & $x^2 + ax + a^2/4 = 0$ & $x = -a/2$ \\
+C25 & $x^3 - a = 0$ & $x = \sqrt[3]{a}$ \\
+C26 & $x(x-a)(x+a) = 0$ & $x = 0,\; x = \pm a$ \\
+C27 & $(x-a)(x^2+1) = 0$ & $x = a$ \\
+S36 & $a x - 1 = 0$ & $x = 1/a$ \\
+S37 & $a x - b = 0$ & $x = b/a$ \\
+S40 & $(a+b)x - c = 0$ & $x = c/(a+b)$ \\
+\end{longtable}
+
+Para cada ecuación se generó una cuadrícula de parámetros con 50 puntos equiespaciados en el intervalo $[0.1, 5]$ para cada parámetro. Cuando la ecuación involucraba dos parámetros o más, se utilizó el producto cartesiano de los intervalos. Las soluciones se obtuvieron mediante el procedimiento descrito en la Sección~\ref{sec:diseno_comun}.
+
+\subsection{Funciones de pérdida evaluadas}
+
+Se ejecutó el algoritmo iterativo de regresión simbólica (Sección \ref{sec:estrategia_sr}) en tres configuraciones que solo diferían en la función de pérdida utilizada:
+
+\begin{itemize} \item \textbf{Error cuadrático medio (MSE):} función clásica que penaliza el cuadrado de la diferencia entre el valor estimado por la expresión y el valor observado: \[ \text{MSE}(f) = \frac{1}{N} \sum_{i=1}^{N} \left( v_i - f(\mathbf{u}_i) \right)^2 . \]
+
+	\item \textbf{Cantidad de coincidencias:} función que contabiliza directamente cuántos puntos del conjunto de entrenamiento son estimados por la expresión dentro de una tolerancia $\varepsilon = 10^{-4}$: \[ \mathcal{L}_{\text{match}}(f) = 1 - \frac{1}{N} \sum_{i=1}^{N} \mathbb{I}\bigl( |v_i - f(\mathbf{u}_i)| < \varepsilon \bigr). \]
+
+	\item \textbf{Sigmoidal:} función de pérdida basada en una transformación sigmoide con parámetros $\varepsilon = 0.005$ y $k = 100$, que suaviza la transición de la pérdida por conteo y proporciona una señal más informativa que la del conteo de coincidencias durante la búsqueda evolutiva: \[ \mathcal{L}_{\text{sig}}(f) = 1 - \frac{1}{N} \sum_{i=1}^{N} \sigma\bigl( k (\varepsilon - |v_i - f(\mathbf{u}_i)|) \bigr), \qquad \sigma(z) = \frac{1}{1 + e^{-z}} . \] \end{itemize}
+
+A continuación se presentan los resultados obtenidos con cada una de estas configuraciones.
+
+\subsection{Resultados}
+
+Los resultados globales de las tres configuraciones se resumen en la Tabla~\ref{tab:comparacion_perdida}. Se reporta el número y la proporción de casos exitosos, la proporción media de soluciones recuperadas, el tiempo total de ejecución acumulado y el tiempo promedio por ecuación sobre las 30 ecuaciones.
+
+\begin{table}[H] \centering \caption{Comparación de funciones de pérdida sobre las 30 ecuaciones.} \label{tab:comparacion_perdida} \begin{tabular}{lccc} \hline
+Métrica & \texttt{MSE} & \texttt{Match count} & \texttt{Sigmoidal} \\
+\hline
+Casos exitosos & 18 (60~\%) & 24 (80~\%) & 27 (90~\%) \\
+Prop. soluciones recuperadas (media) & 0.61 & 0.83 & 0.92 \\
+Tiempo total (s) & 5\,987 & 14\,718 & 5\,322 \\
+Tiempo promedio por ecuación (s) & 199.6 & 490.6 & 177.4 \\
+\hline \end{tabular} \end{table}
+
+La función sigmoidal consiguió la tasa más alta de casos completamente resueltos y la mayor fracción de soluciones recuperadas. Además, fue la más rápida de las tres, con un tiempo total inferior al del MSE y sustancialmente menor que el del conteo de coincidencias.
+
+A continuación se analizan con más detalle estos resultados y se discuten las razones que explican el mejor desempeño de la pérdida sigmoidal.
+
+\subsection{Análisis}
+
+Los datos de la Tabla~\ref{tab:comparacion_perdida} muestran que la pérdida sigmoidal obtiene numéricamente la tasa de éxito más alta y la mayor proporción de soluciones recuperadas. Para determinar si estas diferencias son estadísticamente significativas, se realizaron pruebas $t$ de Student pareadas de una cola comparando las tres funciones de pérdida sobre los 30 casos.
+
+En cuanto al éxito del proceso, la sigmoidal supera al MSE de forma significativa ($t = 3.53$, $p = 0.0007$), lo que permite rechazar la hipótesis nula de que el desempeño de la sigmoidal no es superior. En cambio, la comparación entre la sigmoidal y el conteo de coincidencias ($t = 1.44$, $p = 0.08$) no alcanza el nivel de significancia $\alpha = 0.05$, por lo que la evidencia estadística no es suficiente para afirmar que la sigmoidal supere al conteo de coincidencias en tasa de éxito, aunque la diferencia numérica sea apreciable (90\,\% frente a 80\,\%).
+
+Respecto al tiempo de ejecución, la sigmoidal es significativamente más rápida que el conteo de coincidencias ($t = -4.79$, $p < 0.001$), pero no se detecta una diferencia significativa con el MSE ($t = -0.69$, $p = 0.25$). El tiempo elevado del conteo de coincidencias se debe en gran parte a dos ecuaciones (L03 y L04) donde el algoritmo agotó el tiempo límite sin converger, lo que penaliza fuertemente el promedio.
+
+Desde el punto de vista cualitativo, la ventaja de la pérdida sigmoidal sobre el MSE se explica porque este último tiende a promediar las distintas soluciones cuando los datos no están separados, produciendo expresiones que no corresponden a ninguna de ellas. La pérdida por conteo de coincidencias no sufre este problema, pero su naturaleza binaria puede provocar estancamientos durante la búsqueda evolutiva. La sigmoide combina ambas ventajas: preserva la noción de umbral propia del conteo de coincidencias, pero ofrece una señal gradual que guía mejor la exploración del espacio de expresiones.
+
+Es importante señalar que los resultados aquí presentados corresponden a tres ejecuciones del algoritmo por cada caso y función de pérdida. Dado que la regresión simbólica basada en programación genética es un proceso estocástico, un número limitado de corridas puede no capturar completamente la variabilidad del desempeño esperado. En particular, los tres casos donde la sigmoidal no encontró solución no la encontraron en ninguna de las tres ejecuciones (10\,\% del total), lo que sugiere que la dificultad es intrínseca a esas ecuaciones y no producto de la aleatoriedad del algoritmo.
+
+A la vista de estos resultados, se selecciona la pérdida sigmoidal como la función de pérdida a utilizar en el resto de los experimentos. En la sección siguiente se aplica la metodología completa a sistemas de ecuaciones no lineales paramétricos, que constituyen el escenario para el que fue concebido el algoritmo.
+
+\section{Extensión a sistemas de ecuaciones} \label{sec:fase2}
+
+Una vez seleccionada la función de pérdida sigmoidal como la más efectiva en ecuaciones con una sola variable, se procede a evaluar la metodología completa sobre sistemas de ecuaciones no lineales paramétricos, que constituyen el escenario para el que fue concebido el algoritmo. En esta parte se trabaja con sistemas de dos variables y hasta tres parámetros, que presentan múltiples soluciones para una misma tupla de parámetros.
+
+A continuación se describen los sistemas de prueba utilizados (Sección~\ref{sec:sistemas_prueba_fase2}), la configuración específica del algoritmo para esta fase (Sección~\ref{sec:config_fase2}) y los resultados obtenidos (Sección~\ref{sec:resultados_fase2}), que luego se analizan en detalle (Sección~\ref{sec:analisis_fase2}).
+
+\subsection{Sistemas de prueba} \label{sec:sistemas_prueba_fase2}
+
+Se emplearon 30 sistemas de ecuaciones no lineales paramétricos que cubren estructuras algebraicas variadas y distinto número de soluciones. Todos los sistemas tienen dos variables, que se denotan \(x\) e \(y\), y entre uno y tres parámetros, denotados por letras iniciales del alfabeto (\(a, b, c\)). La Tabla~\ref{tab:sistemas_fase2} recoge las ecuaciones de cada sistema junto con el número de soluciones reales que admite para cada valor de los parámetros.
+
+\begin{longtable}{cll} \caption{Sistemas de ecuaciones utilizados en la parte 2.}
+\label{tab:sistemas_fase2} \\
+\hline
+ID & Sistema & Soluciones \\
+\hline \endfirsthead
+\multicolumn{3}{c}{\textit{}} \\
+\hline
+ID & Sistema & Soluciones \\
+\hline \endhead \hline
+\multicolumn{3}{r}{\textit{}} \\
+\endfoot \hline \endlastfoot
+S01 & \(\left\{\begin{array}{rcl} x + y - a &=& 0 \\ x - y - b &=& 0 \end{array}\right.\) &
+\(\begin{array}{l} x = (a+b)/2 \\ y = (a-b)/2 \end{array}\) \\
+\hline S02 & \(\left\{\begin{array}{rcl} 2x - y - 3a + 3b &=& 0 \\ x + y - 3a &=& 0 \end{array}\right.\) &
+\(\begin{array}{l} x = 2a - b \\ y = a + b \end{array}\) \\
+\hline S03 & \(\left\{\begin{array}{rcl} a x + b y - c &=& 0 \\ a x - b y + c &=& 0 \end{array}\right.\) &
+\(\begin{array}{l} x = 0 \\ y = c/b \end{array}\) \\
+\hline S04 & \(\left\{\begin{array}{rcl} 2x - y - a - 5 &=& 0 \\ x + y - 8a - 1 &=& 0 \end{array}\right.\) &
+\(\begin{array}{l} x = 3a + 2 \\ y = 5a - 1 \end{array}\) \\
+\hline S05 & \(\left\{\begin{array}{rcl} (b+c)x + (a-c)y - a - b &=& 0 \\ (b+c)x - (a-c)y - a + b &=& 0 \end{array}\right.\) &
+\(\begin{array}{l} x = a/(b+c) \\ y = b/(a-c) \end{array}\) \\
+\hline S06 & \(\left\{\begin{array}{rcl} x^{2} - a &=& 0 \\ y - x &=& 0 \end{array}\right.\) &
+\(\begin{array}{l} \text{1: } x = \sqrt{a},\; y = \sqrt{a} \\ \text{2: } x = -\sqrt{a},\; y = -\sqrt{a} \end{array}\) \\
+\hline S07 & \(\left\{\begin{array}{rcl} x^{2} - (a+b)x + ab &=& 0 \\ y - 2x &=& 0 \end{array}\right.\) &
+\(\begin{array}{l} \text{1: } x = a,\; y = 2a \\ \text{2: } x = b,\; y = 2b \end{array}\) \\
+\hline S08 & \(\left\{\begin{array}{rcl} (x^{2} - a^{2})(x^{2} - b^{2}) &=& 0 \\ y - x^{2} - x &=& 0 \end{array}\right.\) &
+\(\begin{array}{l} \text{1: } x = a,\; y = a^{2}+a \\ \text{2: } x = -a,\; y = a^{2}-a \\ \text{3: } x = b,\; y = b^{2}+b \\ \text{4: } x = -b,\; y = b^{2}-b \end{array}\) \\
+\hline S09 & \(\left\{\begin{array}{rcl} x^{2} - y^{2} - a &=& 0 \\ x - 2y - b &=& 0 \end{array}\right.\) &
+\(\begin{array}{l} \text{1: } x = \frac{-b + 2\sqrt{3a+b^{2}}}{3},\; y = \frac{-2b + \sqrt{3a+b^{2}}}{3} \\ \text{2: } x = \frac{-b - 2\sqrt{3a+b^{2}}}{3},\; y = \frac{-2b - \sqrt{3a+b^{2}}}{3} \end{array}\) \\
+\hline S10 & \(\left\{\begin{array}{rcl} x^{2} - a x &=& 0 \\ y - 2x + b &=& 0 \end{array}\right.\) &
+\(\begin{array}{l} \text{1: } x = 0,\; y = -b \\ \text{2: } x = a,\; y = 2a - b \end{array}\) \\
+\hline S11 & \(\left\{\begin{array}{rcl} x^{4} - 5a x^{2} + 4a^{2} &=& 0 \\ y - x^{2} - x - b &=& 0 \end{array}\right.\) &
+\(\begin{array}{l} \text{1: } x = \sqrt{a},\; y = a + \sqrt{a} + b \\ \text{2: } x = -\sqrt{a},\; y = a - \sqrt{a} + b \\ \text{3: } x = 2\sqrt{a},\; y = 4a + 2\sqrt{a} + b \\ \text{4: } x = -2\sqrt{a},\; y = 4a - 2\sqrt{a} + b \end{array}\) \\
+\hline S12 & \(\left\{\begin{array}{rcl} (x-a)(x-b)(x+a+b) &=& 0 \\ y - 2x + c &=& 0 \end{array}\right.\) &
+\(\begin{array}{l} \text{1: } x = a,\; y = 2a - c \\ \text{2: } x = b,\; y = 2b - c \\ \text{3: } x = -a-b,\; y = -2a-2b-c \end{array}\) \\
+\hline S13 & \(\left\{\begin{array}{rcl} x^{3} - a &=& 0 \\ y - x^{2} &=& 0 \end{array}\right.\) &
+\(\begin{array}{l} x = \sqrt[3]{a} \\ y = a^{2/3} \end{array}\) \\
+\hline S14 & \(\left\{\begin{array}{rcl} 2x + y - 3 &=& 0 \\ x y - a &=& 0 \end{array}\right.\) &
+\(\begin{array}{l} \text{1: } x = \frac{3 + \sqrt{9-8a}}{4},\; y = \frac{3 - \sqrt{9-8a}}{2} \\ \text{2: } x = \frac{3 - \sqrt{9-8a}}{4},\; y = \frac{3 + \sqrt{9-8a}}{2} \end{array}\) \\
+\hline S15 & \(\left\{\begin{array}{rcl} (x-a)(x-b)(x-a-b) &=& 0 \\ x + y - a &=& 0 \end{array}\right.\) &
+\(\begin{array}{l} \text{1: } x = a,\; y = 0 \\ \text{2: } x = b,\; y = a - b \\ \text{3: } x = a + b,\; y = -b \end{array}\) \\
+\hline S16 & \(\left\{\begin{array}{rcl} x y - 1 &=& 0 \\ x b - y a &=& 0 \end{array}\right.\) &
+\(\begin{array}{l} \text{1: } x = \sqrt{a/b},\; y = \sqrt{b/a} \\ \text{2: } x = -\sqrt{a/b},\; y = -\sqrt{b/a} \end{array}\) \\
+\hline S17 & \(\left\{\begin{array}{rcl} x^{2} - y^{2} - 4ab &=& 0 \\ x y - a^{2} + b^{2} &=& 0 \end{array}\right.\) &
+\(\begin{array}{l} \text{1: } x = a+b,\; y = a-b \\ \text{2: } x = -a-b,\; y = -a+b \end{array}\) \\
+\hline S18 & \(\left\{\begin{array}{rcl} (b+c)x + (a+b)y - a - c &=& 0 \\ (b+c)x - (a+b)y - a + c &=& 0 \end{array}\right.\) &
+\(\begin{array}{l} x = a/(b+c) \\ y = c/(a+b) \end{array}\) \\
+\hline S19 & \(\left\{\begin{array}{rcl} (x^{2} - a^{2})(x^{2} - (a+b)^{2}) &=& 0 \\ y - x^{2} - 2x - c &=& 0 \end{array}\right.\) &
+\(\begin{array}{l} \text{1: } x = a,\; y = a^{2}+2a+c \\ \text{2: } x = -a,\; y = a^{2}-2a+c \\ \text{3: } x = a+b,\; y = (a+b)^{2}+2(a+b)+c \\ \text{4: } x = -a-b,\; y = (a+b)^{2}-2(a+b)+c \end{array}\) \\
+\hline S20 & \(\left\{\begin{array}{rcl} x^{2} - 2x - a &=& 0 \\ y^{2} - x &=& 0 \end{array}\right.\) &
+\(\begin{array}{l} \text{1: } x = 1 + \sqrt{1+a},\; y = \sqrt{1 + \sqrt{1+a}} \\ \text{2: } x = 1 - \sqrt{1+a},\; y = \sqrt{1 - \sqrt{1+a}} \end{array}\) \\
+\hline S21 & \(\left\{\begin{array}{rcl} x y - a &=& 0 \\ a y - b x &=& 0 \end{array}\right.\) &
+\(\begin{array}{l} \text{1: } x = \sqrt{a^{2}/b},\; y = \sqrt{b} \\ \text{2: } x = -\sqrt{a^{2}/b},\; y = -\sqrt{b} \end{array}\) \\
+\hline S22 & \(\left\{\begin{array}{rcl} 3x + y - a &=& 0 \\ x y - b &=& 0 \end{array}\right.\) &
+\(\begin{array}{l} \text{1: } x = \frac{a + \sqrt{a^{2} - 12b}}{6},\; y = \frac{a - \sqrt{a^{2} - 12b}}{2} \\ \text{2: } x = \frac{a - \sqrt{a^{2} - 12b}}{6},\; y = \frac{a + \sqrt{a^{2} - 12b}}{2} \end{array}\) \\
+\hline S23 & \(\left\{\begin{array}{rcl} (x^{2} - a)(x^{2} - 2a) &=& 0 \\ y - x^{3} - 2x &=& 0 \end{array}\right.\) &
+\(\begin{array}{l} \text{1: } x = \sqrt{a},\; y = a\sqrt{a} + 2\sqrt{a} \\ \text{2: } x = -\sqrt{a},\; y = -a\sqrt{a} - 2\sqrt{a} \\ \text{3: } x = \sqrt{2a},\; y = 2a\sqrt{2a} + 2\sqrt{2a} \\ \text{4: } x = -\sqrt{2a},\; y = -2a\sqrt{2a} - 2\sqrt{2a} \end{array}\) \\
+\hline S24 & \(\left\{\begin{array}{rcl} (x-a)(x-b) &=& 0 \\ y - x^{2} + c &=& 0 \end{array}\right.\) &
+\(\begin{array}{l} \text{1: } x = a,\; y = a^{2} - c \\ \text{2: } x = b,\; y = b^{2} - c \end{array}\) \\
+\hline S25 & \(\left\{\begin{array}{rcl} (x^{2} - (a/b)^{2})(x^{2} - (b/a)^{2}) &=& 0 \\ y - x^{2} + 3x - a &=& 0 \end{array}\right.\) &
+\(\begin{array}{l} \text{1: } x = a/b,\; y = (a/b)^{2} - 3(a/b) + a \\ \text{2: } x = -a/b,\; y = (a/b)^{2} + 3(a/b) + a \\ \text{3: } x = b/a,\; y = (b/a)^{2} - 3(b/a) + a \\ \text{4: } x = -b/a,\; y = (b/a)^{2} + 3(b/a) + a \end{array}\) \\
+\hline S26 & \(\left\{\begin{array}{rcl} x^{2} + y^{2} - 1 &=& 0 \\ x \cos a - y \sin a &=& 0 \end{array}\right.\) &
+\(\begin{array}{l} \text{1: } x = \sin a,\; y = \cos a \\ \text{2: } x = -\sin a,\; y = -\cos a \end{array}\) \\
+\hline S27 & \(\left\{\begin{array}{rcl} 2x + y - e^{a} &=& 0 \\ x - y - e^{b} &=& 0 \end{array}\right.\) &
+\(\begin{array}{l} x = (e^{a} + e^{b})/3 \\ y = (e^{a} - 2e^{b})/3 \end{array}\) \\
+\hline S28 & \(\left\{\begin{array}{rcl} x^{2} + y^{2} - a^{2} &=& 0 \\ x \sin b - y \cos b &=& 0 \end{array}\right.\) &
+\(\begin{array}{l} \text{1: } x = a \cos b,\; y = a \sin b \\ \text{2: } x = -a \cos b,\; y = -a \sin b \end{array}\) \\
+\hline S29 & \(\left\{\begin{array}{rcl} x y - 1 &=& 0 \\ x - y e^{2a} &=& 0 \end{array}\right.\) &
+\(\begin{array}{l} \text{1: } x = e^{a},\; y = e^{-a} \\ \text{2: } x = -e^{a},\; y = -e^{-a} \end{array}\) \\
+\hline S30 & \(\left\{\begin{array}{rcl} x^{2} + y^{2} - e^{2a} &=& 0 \\ x \sin b - y \cos b &=& 0 \end{array}\right.\) &
+\(\begin{array}{l} \text{1: } x = e^{a} \cos b,\; y = e^{a} \sin b \\ \text{2: } x = -e^{a} \cos b,\; y = -e^{a} \sin b \end{array}\) \\
+\end{longtable}
+
+Los sistemas S26--S30 incorporan funciones trigonométricas y exponenciales, lo que amplía el espectro de no linealidades respecto a los sistemas puramente polinomiales y permite evaluar el comportamiento del algoritmo ante expresiones trascendentes.
+
+Para cada sistema se generó una cuadrícula de parámetros con 50 puntos equiespaciados por dimensión dentro del intervalo especificado en los casos de prueba, que se combinaron mediante producto cartesiano. La resolución numérica y el filtrado de duplicados se realizaron según lo descrito en la Sección~\ref{sec:diseno_comun}.
+
+\subsection{Configuración específica}
+
+Se utilizó exclusivamente la pérdida sigmoidal con los mismos parámetros que en la parte 1 ($\varepsilon = 0.005$, $k = 100$). Los hiperparámetros del algoritmo evolutivo fueron los de la Tabla~\ref{tab:hiperparams}. Para la separación por coordenadas, explicada en la Sección~\ref{sec:desacoplamiento}, se tomó siempre la primera variable como punto de partida.
+
+\subsection{Resultados} \label{sec:resultados_fase2}
+
+La Tabla~\ref{tab:resultados_sigmoid_sistemas} presenta los resultados obtenidos con la pérdida sigmoidal para cada uno de los 30 sistemas. Se indica el número de soluciones esperadas, el número de soluciones encontradas, el porcentaje de soluciones recuperadas y el tiempo de ejecución.
+
+\begin{longtable}{clccc} \caption{Resultados de la parte 2 con pérdida sigmoidal.}
+\label{tab:resultados_sigmoid_sistemas} \\
+\hline
+ID & Sols. esperadas & Sols. encontradas & Recuperadas (\%) & Tiempo (s) \\
+\hline \endfirsthead
+\multicolumn{5}{c}{\textit{}} \\
+\hline
+ID & Sols. esperadas & Sols. encontradas & Recuperadas (\%) & Tiempo (s) \\
+\hline \endhead \hline
+\multicolumn{5}{r}{\textit{}} \\
+\endfoot \hline \endlastfoot
+S01 & 1 & 1 & 100 & 194.2 \\
+S02 & 1 & 1 & 100 & 203.0 \\
+S03 & 1 & 1 & 100 & 278.2 \\
+S04 & 1 & 1 & 100 & 190.2 \\
+S05 & 1 & 1 & 100 & 278.0 \\
+S06 & 2 & 2 & 100 & 472.7 \\
+S07 & 2 & 2 & 100 & 487.3 \\
+S08 & 4 & 4 & 100 & 447.8 \\
+S09 & 2 & 0 & 0 & 646.7 \\
+S10 & 2 & 2 & 100 & 188.5 \\
+S11 & 4 & 4 & 100 & 694.2 \\
+S12 & 3 & 3 & 100 & 311.3 \\
+S13 & 1 & 1 & 100 & 125.6 \\
+S14 & 2 & 0 & 0 & 512.3 \\
+S15 & 3 & 3 & 100 & 373.7 \\
+S16 & 2 & 2 & 100 & 307.7 \\
+S17 & 2 & 2 & 100 & 517.6 \\
+S18 & 1 & 1 & 100 & 328.6 \\
+S19 & 4 & 4 & 100 & 661.6 \\
+S20 & 2 & 2 & 100 & 356.8 \\
+S21 & 2 & 2 & 100 & 325.2 \\
+S22 & 2 & 0 & 0 & 329.2 \\
+S23 & 4 & 4 & 100 & 860.1 \\
+S24 & 2 & 2 & 100 & 1352.9 \\
+S25 & 4 & 4 & 100 & 609.1 \\
+S26 & 2 & 2 & 100 & 290.9 \\
+S27 & 1 & 1 & 100 & 139.9 \\
+S28 & 2 & 2 & 100 & 325.3 \\
+S29 & 2 & 2 & 100 & 276.5 \\
+S30 & 2 & 2 & 100 & 336.2 \\
+\end{longtable}
+
+De los 30 sistemas, 27 fueron resueltos con todas las soluciones recuperadas (90\,\% de éxito). En los casos exitosos, las expresiones encontradas superaron la validación y cubrieron prácticamente todos los puntos del conjunto de entrenamiento. En los tres sistemas restantes (S09, S14 y S22) el algoritmo no consiguió encontrar ninguna expresión que cumpliera el criterio de validación.
+
+\bigskip Para complementar la evaluación, los mismos 30 sistemas se ejecutaron también con la función de pérdida por conteo de coincidencias, con idénticos hiperparámetros. La Tabla~\ref{tab:comparacion_sistemas_loss} resume la comparación.
+
+\begin{table}[H] \centering \caption{Comparación de funciones de pérdida sobre los 30 sistemas.} \label{tab:comparacion_sistemas_loss} \begin{tabular}{lcc} \hline
+Métrica & \texttt{Sigmoidal} & \texttt{Match count} \\
+\hline
+Casos exitosos & 27 (90\,\%) & 21 (70\,\%) \\
+Prop. soluciones recuperadas (media) & 0.90 & 0.70 \\
+Tiempo total (s) & 12\,421 & 18\,987 \\
+\hline \end{tabular} \end{table}
+
+Se realizó una prueba $t$ pareada de una cola para comparar la tasa de éxito de ambas funciones. La sigmoidal supera al conteo de coincidencias de forma estadísticamente significativa ($t = 1.99$, $p = 0.028$). En cuanto al tiempo de ejecución, también la sigmoidal resultó significativamente más rápida ($t = -2.50$, $p = 0.009$).
+
+\subsection{Análisis} \label{sec:analisis_fase2}
+
+La combinación de la metodología propuesta con la función de pérdida sigmoidal resuelve con éxito 27 de los 30 sistemas de prueba, lo que representa un 90\,\% de los casos. En todas las ocasiones en que el algoritmo converge, recupera la totalidad de las soluciones, incluidas aquellas de sistemas con tres y cuatro expresiones distintas para una misma tupla de parámetros.
+
+Los tres sistemas que no pudieron ser resueltos (S09, S14 y S22) se caracterizan por tener soluciones con estructuras especialmente complejas. La Tabla~\ref{tab:sistemas_fallidos} muestra las expresiones analíticas esperadas para cada uno de ellos.
+
+\begin{table}[H] \centering \caption{Soluciones esperadas de los sistemas no resueltos.} \label{tab:sistemas_fallidos} \renewcommand{\arraystretch}{1.4} \begin{tabular}{cll} \hline
+ID & Soluciones esperadas \\
+\hline S09 & $x = \frac{-b \pm 2\sqrt{3a+b^{2}}}{3},\; y = \frac{-2b \pm \sqrt{3a+b^{2}}}{3}$ \\[6pt] S14 & $x = \frac{3 \pm \sqrt{9-8a}}{4},\; y = \frac{3 \mp \sqrt{9-8a}}{2}$ \\[6pt] S22 & $x = \frac{a \pm \sqrt{a^{2}-12b}}{6},\;
+		  y = \frac{a \mp \sqrt{a^{2}-12b}}{2}$ \\
+\hline \end{tabular} \end{table}
+
+En los tres casos, las soluciones esperadas presentan un grado de complejidad simbólica elevado: involucran raíces cuadradas de expresiones que combinan parámetros de forma no trivial, junto con fracciones y signos opuestos. Descubrir expresiones de esta naturaleza mediante regresión simbólica exige ensamblar simultáneamente varios operadores —raíces, divisiones, sumas con signos alternados—, lo que dificulta la convergencia del proceso evolutivo. A ello se suma el que la presencia de múltiples soluciones para una misma tupla de parámetros obliga al algoritmo a separar correctamente los puntos antes de poder ajustar cada expresión, y cuando las distintas soluciones tienen estructuras algebraicas tan diferentes, esta separación puede resultar especialmente costosa. Cabe señalar que las soluciones esperadas de estos tres sistemas requieren árboles sintácticos de entre 10 y 16 nodos, tamaños muy por debajo del límite $S_{\max} = 25$ fijado en los experimentos, lo que indica que la dificultad para hallarlas no es de naturaleza estructural sino que radica en la convergencia misma del proceso evolutivo.
+
+Es importante señalar que los resultados presentados corresponden a tres ejecuciones del algoritmo por cada sistema y función de pérdida. Aunque este número de réplicas ofrece cierta protección frente a fluctuaciones aleatorias, la naturaleza estocástica de la programación genética hace deseable la exploración de configuraciones más potentes (mayor tamaño máximo del árbol, más generaciones, poblaciones más grandes) sobre los sistemas que no pudieron ser resueltos, lo que constituye una línea natural de trabajo futuro.
+
+En cuanto a la comparación con el conteo de coincidencias, la ventaja de la sigmoidal se mantiene también en sistemas de ecuaciones (90\,\% vs. 70\,\%), y la diferencia es estadísticamente significativa (\(t = 1.99\), \(p = 0.028\)). Este resultado refuerza la conclusión de la parte 1: la señal suave que proporciona la sigmoide facilita la exploración del espacio de expresiones y reduce los estancamientos durante el proceso evolutivo.
+
+\section{Consideraciones finales} \label{sec:conclusiones_capitulo}
+
+Los experimentos realizados han permitido validar la metodología propuesta para la recuperación de expresiones analíticas de los ceros de sistemas de ecuaciones no lineales paramétricos.
+
+La comparación de funciones de pérdida mostró que la pérdida sigmoidal es la más adecuada para este problema, ya que evita tanto el promedio de soluciones que produce el MSE como los estancamientos que genera la pérdida por conteo. Con esta función, el algoritmo iterativo de regresión simbólica alcanzó un 90\,\% de éxito en los treinta sistemas de prueba y, en todos los casos exitosos, recuperó la totalidad de las soluciones, incluso cuando coexistían tres o cuatro soluciones distintas para una misma tupla de parámetros.
+
+La mayoría de los sistemas evaluados son de naturaleza polinomial. No obstante, los sistemas S26--S30 incorporan funciones trigonométricas y exponenciales, y en todos ellos el algoritmo encontró correctamente las soluciones. Este resultado sugiere que el método puede extenderse a sistemas con no linealidades trascendentes, aunque una exploración más sistemática de este tipo de funciones queda como línea de trabajo futura.

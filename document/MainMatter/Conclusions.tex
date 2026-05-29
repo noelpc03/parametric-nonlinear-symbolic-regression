@@ -1,0 +1,33 @@
+\chapter{Conclusiones}\label{chap:conclusiones}
+
+El presente trabajo tuvo como objetivo diseñar e implementar un algoritmo que, a partir de la definición de un sistema de ecuaciones no lineales paramétricas, recupere automáticamente las expresiones analíticas de todas sus soluciones mediante regresión simbólica. A continuación se resumen los principales resultados y aportes alcanzados.
+
+Se construyó un procedimiento automático para generar el conjunto de datos de entrada para la regresión simbólica, basado en el producto cartesiano de los intervalos de los parámetros y la resolución numérica con múltiples puntos iniciales. El filtrado de soluciones duplicadas, realizado mediante un criterio de distancia euclidiana, garantiza que todas las soluciones distintas queden registradas sin repeticiones.
+
+Se desarrolló un algoritmo iterativo que emplea regresión simbólica para descubrir, de manera iterativa, las expresiones analíticas que componen la solución de un sistema de ecuaciones paramétrico. Partiendo del conjunto de datos sin separar, el algoritmo identifica secuencialmente cada una de las soluciones y valida cada expresión frente al sistema original, retirando los puntos ya explicados antes de continuar con los restantes.
+
+Se evaluaron tres funciones de pérdida —MSE, conteo de coincidencias y sigmoidal— sobre un conjunto de $30$ ecuaciones univariadas con múltiples soluciones. Los resultados mostraron que la pérdida sigmoidal alcanza un 90~\% de éxito, superando al MSE y al conteo de coincidencias, tanto en tasa de casos resueltos como en cobertura de puntos.
+
+La metodología completa se aplicó a $30$ sistemas de ecuaciones no lineales paramétricos con dos variables y hasta tres parámetros. El algoritmo resolvió con éxito $27$ de los $30$ sistemas (90~\%), recuperando la totalidad de las soluciones en todos los casos exitosos, incluidos sistemas con tres y cuatro expresiones distintas para una misma tupla de parámetros.
+
+Los tres sistemas que no pudieron ser resueltos presentan soluciones con raíces anidadas o combinaciones de cocientes. Las expresiones analíticas correspondientes requieren árboles sintácticos cuyo tamaño está dentro del límite fijado en los experimentos, lo que indica que la dificultad para hallarlas no es de naturaleza estructural sino que radica en la convergencia misma del proceso evolutivo. Esto sugiere que el algoritmo es robusto para una amplia clase de sistemas, pero que ciertas configuraciones de parámetros evolutivos pueden dificultar el descubrimiento de expresiones con estructuras algebraicas particularmente complejas.
+
+La arquitectura modular de la implementación facilita la extensibilidad del sistema y su aplicación a nuevos problemas sin modificar los módulos existentes.
+
+En conjunto, los resultados experimentales validan la metodología propuesta y demuestran que la combinación de un algoritmo iterativo con la función de pérdida sigmoidal permite recuperar las expresiones analíticas que describen los ceros de sistemas de ecuaciones no lineales paramétricos.
+
+\begin{recomendations}
+\label{sec:recomendaciones}
+
+A partir de los resultados obtenidos y de las limitaciones observadas, se proponen las siguientes líneas de trabajo futuro:
+
+\begin{itemize}
+    \item Relajar las restricciones computacionales —aumentando el tamaño máximo del árbol, el número de iteraciones y la diversidad de la población— para abordar sistemas con soluciones de mayor complejidad.
+
+    \item Explorar el comportamiento del algoritmo en sistemas con funciones trascendentes (trigonométricas, exponenciales) de forma más sistemática, ampliando los resultados obtenidos en los sistemas S26--S30.
+
+    \item Explorar el uso de otras variantes de regresión simbólica y comparar su desempeño con el motor PySR empleado en este trabajo.
+
+    \item Integrar el sistema desarrollado en una interfaz gráfica o en un flujo de trabajo automatizado que facilite su uso por parte de investigadores sin experiencia en programación.
+\end{itemize}
+\end{recomendations}

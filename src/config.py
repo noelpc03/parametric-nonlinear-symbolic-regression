@@ -31,18 +31,23 @@ EXPERIMENT_NAME = "test_1"
 
 # Sistema de ecuaciones no lineales paramétricas: F(x; θ) = 0
 # Formato: lista de strings, una ecuación por elemento
-# Ejemplo (desde la tesis, capítulo de Propuesta de solución):
-#   (x1 - a)*(x2 - a*b) = 0
-#   x1*x2 - a*b**2 = 0
-# Espera dos soluciones: (x1=a, x2=a*b) y (x1=b, x2=a*b)
+# Ejemplo (caso 1: system_linear_01):
+#   x + y - a = 0
+#   x - y - b = 0
 
 EQUATIONS = [
-    "(x1 - a)*(x2 - a*b)",
-    "x1*x2 - a*b**2"
+  "x + y - a",
+  "x - y - b"
 ]
 
+# Caso 7 (system_quadratic_02), dejado como referencia:
+# EQUATIONS = [
+#     "x**2 - (a + b)*x + a*b",
+#     "y - 2*x"
+# ]
+
 # Variables (incógnitas del sistema)
-VARIABLES = ["x1", "x2"]
+VARIABLES = ["x", "y"]
 
 # Parámetros (fijos durante la resolución de cada tupla)
 PARAMETERS = ["a", "b"]
@@ -54,8 +59,8 @@ PARAMETERS = ["a", "b"]
 # Rangos para cada parámetro
 # Formato: {nombre_parametro: (min, max, num_puntos)}
 PARAMETER_RANGES = {
-  "a": (0.1, 3, 4),  # [0.1, 1.1, 2.1, 3.0]
-  "b": (0.1, 3, 4),  # [0.1, 1.1, 2.1, 3.0]
+  "a": (0.1, 3, 10),
+  "b": (0.1, 3, 10),
 }
 
 # Método: producto cartesiano (grid regular)
@@ -75,8 +80,8 @@ NUM_INITIAL_GUESSES = 20
 
 # Rangos para generar puntos iniciales aleatorios
 GUESS_RANGES = {
-    "x1": (-10.0, 10.0),
-    "x2": (-10.0, 10.0),
+  "x": (-10.0, 10.0),
+  "y": (-10.0, 10.0),
 }
 
 # Tolerancia euclidiana para filtrar soluciones duplicadas
@@ -134,7 +139,7 @@ MATCH_COUNT_EPSILON = 1e-4
 # ── Parámetros del anclaje (estrategia de regresión simbólica multidimensional) ──
 
 # Índice de la coordenada "ancla" (usada para guiar la separación de ramas)
-ANCHOR_COORDINATE = 0  # Usar x1 como ancla
+ANCHOR_COORDINATE = 0  # Usar x como ancla
 
 # Tolerancia para validar una rama completa
 VALIDATION_TOL = 1e-4
