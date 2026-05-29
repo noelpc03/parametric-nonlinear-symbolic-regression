@@ -19,23 +19,41 @@
 \newlabel{sec:generacion_datos}{{1.2}{2}{Generación de datos de entrenamiento}{subsection.1.2}{}}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {1.2.1}Muestreo del espacio de parámetros}{2}{subsubsection.1.2.1}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {1.2.2}Resolución numérica del sistema}{3}{subsubsection.1.2.2}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Soluciones numéricas obtenidas para \((a,b) = (2,3)\) antes del filtrado.}}{3}{table.1}\protected@file@percent }
+\newlabel{tab:soluciones_brutas}{{1}{3}{Soluciones numéricas obtenidas para \((a,b) = (2,3)\) antes del filtrado}{table.1}{}}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {1.2.3}Filtrado de soluciones duplicadas}{3}{subsubsection.1.2.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {1.3}Estrategia de regresión simbólica}{3}{subsection.1.3}\protected@file@percent }
-\newlabel{sec:estrategia_sr}{{1.3}{3}{Estrategia de regresión simbólica}{subsection.1.3}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.3.1}Separación por coordenadas}{4}{subsubsection.1.3.1}\protected@file@percent }
-\newlabel{sec:desacoplamiento}{{1.3.1}{4}{Separación por coordenadas}{subsubsection.1.3.1}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Soluciones después del filtrado para \((a,b) = (2,3)\).}}{4}{table.2}\protected@file@percent }
+\newlabel{tab:soluciones_filtradas}{{2}{4}{Soluciones después del filtrado para \((a,b) = (2,3)\)}{table.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {1.3}Estrategia de regresión simbólica}{4}{subsection.1.3}\protected@file@percent }
+\newlabel{sec:estrategia_sr}{{1.3}{4}{Estrategia de regresión simbólica}{subsection.1.3}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.3.1}Separación por coordenadas}{5}{subsubsection.1.3.1}\protected@file@percent }
+\newlabel{sec:desacoplamiento}{{1.3.1}{5}{Separación por coordenadas}{subsubsection.1.3.1}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Al agrupar los puntos según la expresión que describe a \(x_1\), las filas con \(x_1 = 2\) pasan al grupo~1 y las filas con \(x_1 = 3\) pasan al grupo~2. En cada grupo, la variable \(x_2\) queda determinada de manera única.}}{6}{figure.1}\protected@file@percent }
+\newlabel{fig:agrupacion_coordenadas}{{1}{6}{Al agrupar los puntos según la expresión que describe a \(x_1\), las filas con \(x_1 = 2\) pasan al grupo~1 y las filas con \(x_1 = 3\) pasan al grupo~2. En cada grupo, la variable \(x_2\) queda determinada de manera única}{figure.1}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Organización de los datos tras identificar dos expresiones para \(x_1\): \(g_1^{(1)}(a) = a\) y \(g_1^{(2)}(a) = a + 1\).}}{6}{figure.2}\protected@file@percent }
+\newlabel{fig:tabla_organizada}{{2}{6}{Organización de los datos tras identificar dos expresiones para \(x_1\): \(g_1^{(1)}(a) = a\) y \(g_1^{(2)}(a) = a + 1\)}{figure.2}{}}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {1.3.2}Búsqueda iterativa sobre \(x_1\)}{6}{subsubsection.1.3.2}\protected@file@percent }
 \newlabel{sec:busqueda_ancla}{{1.3.2}{6}{Búsqueda iterativa sobre \(x_1\)}{subsubsection.1.3.2}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.3.3}Extensión a las demás coordenadas}{7}{subsubsection.1.3.3}\protected@file@percent }
-\newlabel{sec:extension_coordenadas}{{1.3.3}{7}{Extensión a las demás coordenadas}{subsubsection.1.3.3}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.3.4}Validación de una solución completa}{8}{subsubsection.1.3.4}\protected@file@percent }
-\newlabel{sec:validacion_solucion}{{1.3.4}{8}{Validación de una solución completa}{subsubsection.1.3.4}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.3.5}Funciones de pérdida utilizadas}{9}{subsubsection.1.3.5}\protected@file@percent }
-\newlabel{sec:funciones_perdida}{{1.3.5}{9}{Funciones de pérdida utilizadas}{subsubsection.1.3.5}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {1.4}Pseudocódigo del proceso principal}{10}{subsection.1.4}\protected@file@percent }
-\newlabel{sec:pseudocodigo_principal}{{1.4}{10}{Pseudocódigo del proceso principal}{subsection.1.4}{}}
-\newlabel{alg:proceso_principal}{{1}{10}{Pseudocódigo del proceso principal}{pseudocode.1}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Sub-tabla de \(x_1\) antes de la primera iteración.}}{7}{figure.3}\protected@file@percent }
+\newlabel{fig:busqueda_iterativa_tabla}{{3}{7}{Sub-tabla de \(x_1\) antes de la primera iteración}{figure.3}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Subconjuntos de parámetros asociados a cada expresión para \(x_1\).}}{8}{figure.4}\protected@file@percent }
+\newlabel{fig:subconjuntos_ejemplo6}{{4}{8}{Subconjuntos de parámetros asociados a cada expresión para \(x_1\)}{figure.4}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.3.3}Extensión a las demás coordenadas}{8}{subsubsection.1.3.3}\protected@file@percent }
+\newlabel{sec:extension_coordenadas}{{1.3.3}{8}{Extensión a las demás coordenadas}{subsubsection.1.3.3}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Puntos de \(\mathcal  {S}^{(1)}\) usados para obtener \(g_2^{(1)}(a)\).}}{9}{figure.5}\protected@file@percent }
+\newlabel{fig:extension_tabla}{{5}{9}{Puntos de \(\mathcal {S}^{(1)}\) usados para obtener \(g_2^{(1)}(a)\)}{figure.5}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Funciones que describen cada solución del sistema.}}{10}{table.3}\protected@file@percent }
+\newlabel{tab:tabla_funciones_solucion}{{3}{10}{Funciones que describen cada solución del sistema}{table.3}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.3.4}Validación de una solución completa}{10}{subsubsection.1.3.4}\protected@file@percent }
+\newlabel{sec:validacion_solucion}{{1.3.4}{10}{Validación de una solución completa}{subsubsection.1.3.4}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Validación de la primera solución candidata.}}{11}{figure.6}\protected@file@percent }
+\newlabel{fig:validacion_ejemplo8}{{6}{11}{Validación de la primera solución candidata}{figure.6}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.3.5}Funciones de pérdida utilizadas}{11}{subsubsection.1.3.5}\protected@file@percent }
+\newlabel{sec:funciones_perdida}{{1.3.5}{11}{Funciones de pérdida utilizadas}{subsubsection.1.3.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {1.4}Pseudocódigo del proceso principal}{12}{subsection.1.4}\protected@file@percent }
+\newlabel{sec:pseudocodigo_principal}{{1.4}{12}{Pseudocódigo del proceso principal}{subsection.1.4}{}}
+\newlabel{alg:proceso_principal}{{1}{12}{Pseudocódigo del proceso principal}{pseudocode.1}{}}
 \bibstyle{plain}
 \bibdata{referencias}
 \bibcite{burden2010numerical}{1}
-\gdef \@abspage@last{12}
+\gdef \@abspage@last{14}

@@ -1,15 +1,15 @@
 # Fdb version 4
-["bibtex capitulo_2"] 1779859026.54037 "capitulo_2.aux" "capitulo_2.bbl" "capitulo_2" 1779861441.94393 0
-  "./referencias.bib" 1779856946.20127 8757 5f5d493b48df65e0cb15e60d01aea26e ""
+["bibtex capitulo_2"] 1780023626.77391 "capitulo_2.aux" "capitulo_2.bbl" "capitulo_2" 1780023627.74659 0
+  "./referencias.bib" 1779927411.66082 8980 22db92b921a1f5cc220f2cdd59a71441 ""
   "/usr/share/texlive/texmf-dist/bibtex/bst/base/plain.bst" 1292289607 20613 bd3fbfa9f64872b81ac57a0dd2ed855f ""
-  "capitulo_2.aux" 1779861441.88228 3480 77d3ee225dafbf5f227bafb3b170ceb9 "pdflatex"
+  "capitulo_2.aux" 1780023627.5698 6522 50db1fe0842722711ce50c66cfdf48c3 "pdflatex"
   (generated)
   "capitulo_2.bbl"
   "capitulo_2.blg"
   (rewritten before read)
-["pdflatex"] 1779861441.60482 "/home/noel/Disco D/4to_Anno/tesis/Tesis/partes/capitulo_2.tex" "capitulo_2.pdf" "capitulo_2" 1779861441.94408 0
+["pdflatex"] 1780023626.81651 "/home/noel/Disco D/4to_Anno/tesis/Tesis/partes/capitulo_2.tex" "capitulo_2.pdf" "capitulo_2" 1780023627.74711 0
   "/etc/texmf/web2c/texmf.cnf" 1747000772.35796 475 c0e671620eb5563b2130f56340a5fde8 ""
-  "/home/noel/Disco D/4to_Anno/tesis/Tesis/partes/capitulo_2.tex" 1779861328.45019 29548 ed016bb8f1c6073cc644c901929db52a ""
+  "/home/noel/Disco D/4to_Anno/tesis/Tesis/partes/capitulo_2.tex" 1780023625.46873 34329 8c9d4956929a0e2584211a267661e7b7 ""
   "/usr/share/texlive/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmbsy5.tfm" 1246382020 1120 1e8878807317373affa7f7bba4cf2f6a ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmbsy6.tfm" 1246382020 1124 14ccf5552bc7f77ca02a8a402bea8bfb ""
@@ -117,12 +117,12 @@
   "/usr/share/texlive/texmf-dist/tex/latex/url/url.sty" 1388531844 12796 8edb7d69a20b857904dd0ea757c14ec9 ""
   "/usr/share/texlive/texmf-dist/web2c/texmf.cnf" 1707919699 40399 f2c302f7d2af602abb742093540a5834 ""
   "/usr/share/texmf/web2c/texmf.cnf" 1707919699 40399 f2c302f7d2af602abb742093540a5834 ""
-  "/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map" 1750216227.57549 128028 f533b797fba58d231669ea19e894e23e ""
-  "/var/lib/texmf/web2c/pdftex/pdflatex.fmt" 1750228799 6822886 9fd1f77629413c1e482b60c05f14f5e4 ""
-  "capitulo_2.aux" 1779861441.88228 3480 77d3ee225dafbf5f227bafb3b170ceb9 "pdflatex"
-  "capitulo_2.bbl" 1779859026.55077 200 08fa2b8c943c7085b4aecbafde0cb23f "bibtex capitulo_2"
-  "capitulo_2.out" 1779861441.88328 3019 8d95e1c4a7279d737d25a20316305316 "pdflatex"
-  "capitulo_2.tex" 1779861328.45019 29548 ed016bb8f1c6073cc644c901929db52a ""
+  "/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map" 1780005515.91841 165012 f177baa1c39a3ebd62c3096a43521a0d ""
+  "/var/lib/texmf/web2c/pdftex/pdflatex.fmt" 1780005538 6852317 54b14819434785581504ba75fc9775a2 ""
+  "capitulo_2.aux" 1780023627.5698 6522 50db1fe0842722711ce50c66cfdf48c3 "pdflatex"
+  "capitulo_2.bbl" 1780023626.81078 200 08fa2b8c943c7085b4aecbafde0cb23f "bibtex capitulo_2"
+  "capitulo_2.out" 1780023627.5738 3019 8d95e1c4a7279d737d25a20316305316 "pdflatex"
+  "capitulo_2.tex" 1780023625.46873 34329 8c9d4956929a0e2584211a267661e7b7 ""
   (generated)
   "capitulo_2.aux"
   "capitulo_2.log"

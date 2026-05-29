@@ -1,15 +1,15 @@
 # Fdb version 4
-["bibtex preliminares"] 1779927413.18555 "preliminares.aux" "preliminares.bbl" "preliminares" 1779927414.31749 0
+["bibtex preliminares"] 1780017912.73129 "preliminares.aux" "preliminares.bbl" "preliminares" 1780017914.03709 0
   "./referencias.bib" 1779927411.66082 8980 22db92b921a1f5cc220f2cdd59a71441 ""
   "/usr/share/texlive/texmf-dist/bibtex/bst/base/plain.bst" 1292289607 20613 bd3fbfa9f64872b81ac57a0dd2ed855f ""
-  "preliminares.aux" 1779927414.14991 3794 d03ab111bcb52e35787d0b7d4566bbbf "pdflatex"
+  "preliminares.aux" 1780017913.83864 4163 2473aa303e814c5c4c2a1e08c1783139 "pdflatex"
   (generated)
   "preliminares.bbl"
   "preliminares.blg"
   (rewritten before read)
-["pdflatex"] 1779927413.22374 "/home/noel/Disco D/4to_Anno/tesis/Tesis/partes/preliminares.tex" "preliminares.pdf" "preliminares" 1779927414.31799 0
+["pdflatex"] 1780017912.77851 "/home/noel/Disco D/4to_Anno/tesis/Tesis/partes/preliminares.tex" "preliminares.pdf" "preliminares" 1780017914.0374 0
   "/etc/texmf/web2c/texmf.cnf" 1747000772.35796 475 c0e671620eb5563b2130f56340a5fde8 ""
-  "/home/noel/Disco D/4to_Anno/tesis/Tesis/partes/preliminares.tex" 1779927366.70118 27851 f7388f0a8df747d8837a883246a77fde ""
+  "/home/noel/Disco D/4to_Anno/tesis/Tesis/partes/preliminares.tex" 1780017911.27047 29606 8fd902c614d712502dd6df0a45b30a82 ""
   "/usr/share/texlive/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmbsy5.tfm" 1246382020 1120 1e8878807317373affa7f7bba4cf2f6a ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmbsy6.tfm" 1246382020 1124 14ccf5552bc7f77ca02a8a402bea8bfb ""
@@ -193,12 +193,12 @@
   "/usr/share/texlive/texmf-dist/tex/latex/xcolor/xcolor.sty" 1700082560 55487 80a65caedd3722f4c20a14a69e785d8f ""
   "/usr/share/texlive/texmf-dist/web2c/texmf.cnf" 1707919699 40399 f2c302f7d2af602abb742093540a5834 ""
   "/usr/share/texmf/web2c/texmf.cnf" 1707919699 40399 f2c302f7d2af602abb742093540a5834 ""
-  "/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map" 1750216227.57549 128028 f533b797fba58d231669ea19e894e23e ""
-  "/var/lib/texmf/web2c/pdftex/pdflatex.fmt" 1750228799 6822886 9fd1f77629413c1e482b60c05f14f5e4 ""
-  "preliminares.aux" 1779927414.14991 3794 d03ab111bcb52e35787d0b7d4566bbbf "pdflatex"
-  "preliminares.bbl" 1779927413.21588 3355 426cd92a463a096a02ea8e7e2e9a6758 "bibtex preliminares"
-  "preliminares.out" 1779927414.15191 2305 8b8ad958dc08250df979056756519686 "pdflatex"
-  "preliminares.tex" 1779927366.70118 27851 f7388f0a8df747d8837a883246a77fde ""
+  "/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map" 1780005515.91841 165012 f177baa1c39a3ebd62c3096a43521a0d ""
+  "/var/lib/texmf/web2c/pdftex/pdflatex.fmt" 1780005538 6852317 54b14819434785581504ba75fc9775a2 ""
+  "preliminares.aux" 1780017913.83864 4163 2473aa303e814c5c4c2a1e08c1783139 "pdflatex"
+  "preliminares.bbl" 1780017912.76757 3355 426cd92a463a096a02ea8e7e2e9a6758 "bibtex preliminares"
+  "preliminares.out" 1780017913.84164 2305 8b8ad958dc08250df979056756519686 "pdflatex"
+  "preliminares.tex" 1780017911.27047 29606 8fd902c614d712502dd6df0a45b30a82 ""
   (generated)
   "preliminares.aux"
   "preliminares.log"

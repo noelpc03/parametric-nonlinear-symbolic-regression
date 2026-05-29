@@ -1,0 +1,216 @@
+\chapter{Propuesta de solución}\label{sec:propuesta}
+
+En este capítulo se desarrolla la metodología propuesta para recuperar las expresiones analíticas de los ceros de sistemas de ecuaciones no lineales paramétricos. A diferencia de una resolución puramente numérica, que proporciona valores puntuales para cada tupla de parámetros, se busca descubrir las funciones que relacionan dichos parámetros con las raíces del sistema. Este propósito requiere resolver dos tareas: obtener un conjunto de datos que represente adecuadamente el comportamiento del sistema e inferir, a partir de esos datos, las expresiones analíticas que subyacen.
+
+En la Sección~\ref{sec:generacion_datos} se aborda la primera tarea. Allí se explica cómo se construye el conjunto de entrenamiento a partir de una malla de parámetros, es decir, un conjunto finito de tuplas obtenidas al elegir puntos equiespaciados para cada parámetro y combinarlos mediante producto cartesiano. Sobre esa malla se resuelve el sistema numéricamente y se filtran las soluciones duplicadas. La segunda tarea se aborda en la Sección~\ref{sec:estrategia_sr}, donde se presenta la estrategia de regresión simbólica multidimensional. Esta estrategia emplea una búsqueda iterativa que descubre progresivamente las distintas expresiones que componen la solución, validando cada una frente a los datos restantes. Como parte de la estrategia se describen tres variantes de función de pérdida —error cuadrático medio, conteo de coincidencias y sigmoidal—, cuya comparación experimental permitirá elegir la más adecuada. El capítulo concluye con el pseudocódigo completo del algoritmo (Sección~\ref{sec:pseudocodigo_principal}).
+
+\section{Planteamiento general del problema} \label{sec:planteamiento}
+
+El objetivo central de este trabajo es encontrar las expresiones analíticas que describen todas las soluciones del sistema \begin{equation} \Fvec(\xvec; \thetavec) = \mathbf{0}, \label{eq:problema_original} \end{equation} definido en la Sección~\ref{sec:sistemas}.
+
+Para un valor fijo de los parámetros \(\thetavec\), el sistema puede tener más de una solución. En lugar de calcular numéricamente esas soluciones para cada \(\thetavec\) por separado, lo que se persigue es obtener una aproximación simbólica que, para cualquier \(\thetavec\) dentro de una región de interés \(\Omega \subset \R^p\), permita estimar cada una de las soluciones sin necesidad de repetir el proceso numérico. No se exige una expresión exacta válida para todos los valores imaginables de los parámetros, sino una descripción funcional que reproduzca fielmente el comportamiento del sistema en la región donde se han tomado los datos.
+
+Como estas soluciones forman naturalmente grupos que varían de manera continua con los parámetros, las organizamos en una lista indexada: \[ \xvec = \mathbf{g}^{(1)}(\thetavec),\quad \xvec = \mathbf{g}^{(2)}(\thetavec),\quad \dots \] Aquí, \(\mathbf{g}^{(k)}\) es una función que toma parámetros y devuelve un vector con los valores de todas las variables de la solución \(k\)-ésima. El superíndice \(k\) simplemente distingue las distintas soluciones que pueden coexistir para una misma \(\thetavec\). Con este planteamiento, el problema queda reducido a descubrir automáticamente, a partir de datos, las expresiones matemáticas de esas funciones \(\mathbf{g}^{(k)}\).
+
+Mientras que los métodos numéricos tradicionales proporcionan soluciones puntuales para valores fijos de los parámetros \cite{burden2010numerical}, el método que se propone busca describir cómo varía cada solución en función de los parámetros. Esto permite evaluar las soluciones para nuevos valores de los parámetros sin necesidad de repetir el proceso numérico, y facilita el análisis cuantitativo del sistema al hacer explícita la relación entre parámetros y raíces.
+
+La estrategia para lograr este objetivo se apoya en dos pilares: la generación sistemática de un conjunto de datos representativo del sistema y la aplicación de regresión simbólica sobre esos datos. La primera de estas tareas se aborda en la sección siguiente.
+
+\section{Generación de datos de entrenamiento} \label{sec:generacion_datos}
+
+La primera etapa del método consiste en construir un conjunto de datos que relacione los parámetros del sistema con sus soluciones. Este conjunto se obtiene muestreando el espacio de parámetros, resolviendo el sistema para cada tupla y filtrando las soluciones duplicadas.
+
+\subsection{Muestreo del espacio de parámetros}
+
+Para cada parámetro \(\theta_i\) se elige un conjunto finito \(\Theta_i\) de valores equiespaciados dentro de un intervalo \([\theta_i^{\min}, \theta_i^{\max}]\). El producto cartesiano \[ \mathcal{G} = \Theta_1 \times \Theta_2 \times \cdots \times \Theta_p \] genera todas las combinaciones posibles de parámetros. Esta construcción se apoya en la definición de producto cartesiano presentada en la Sección~\ref{sec:sistemas} y produce una cuadrícula regular que cubre uniformemente la región de interés.
+
+\bigskip \noindent\textbf{Ejemplo 2.} Para un sistema con un solo parámetro \(a \in [0.1, 5]\) y \(50\) puntos, se tiene \(\Theta_a = \{0.1, 0.2, \dots, 5.0\}\) y la cuadrícula es \(\mathcal{G} = \Theta_a\). Si el sistema tuviera dos parámetros \(a\) y \(b\) en el mismo intervalo con \(50\) puntos cada uno, la cuadrícula \(\mathcal{G} = \Theta_a \times \Theta_b\) contendría \(2\,500\) tuplas.
+
+\subsection{Resolución numérica del sistema}
+
+Para cada tupla \(\thetavec \in \mathcal{G}\) se resuelve el sistema \(\Fvec(\xvec; \thetavec) = \mathbf{0}\) mediante un método numérico iterativo. Puesto que pueden existir varias soluciones reales para un mismo valor de los parámetros, se ejecuta el método desde múltiples puntos iniciales aleatorios, cada uno de ellos generado eligiendo cada coordenada \(x_i\) dentro de un intervalo predefinido \([x_i^{\min}, x_i^{\max}]\).
+
+Una ejecución del método numérico se considera exitosa si converge y el residuo \(\|\Fvec(\xvec; \thetavec)\|_2\) está por debajo de una tolerancia preestablecida. Cuando esto ocurre, el vector \(\xvec\) obtenido se agrega a la lista de soluciones encontradas para la tupla \(\thetavec\). Los valores concretos del número de intentos, los intervalos de búsqueda y las tolerancias se fijan durante la experimentación (Capítulo~\ref{sec:experimentacion}).
+
+Una vez calculadas las soluciones para cada tupla de parámetros, el paso siguiente es eliminar aquellas que aparecen repetidas debido a que distintos puntos iniciales convergieron al mismo cero.
+
+\subsection{Filtrado de soluciones duplicadas}
+
+Distintos puntos iniciales pueden conducir a la misma solución real. Para evitar que una misma raíz aparezca repetida, se aplica un filtro basado en la distancia euclidiana (Sección~\ref{sec:sistemas}): dos vectores solución \(\mathbf{u}\) y \(\mathbf{v}\) se consideran idénticos si \(\|\mathbf{u} - \mathbf{v}\|_2 < \tau\), donde \(\tau\) es una tolerancia que depende de la escala del problema y de la precisión numérica.
+
+\bigskip \noindent\textbf{Ejemplo 3.} Supóngase que para un cierto \(\thetavec\) se ejecuta el método desde tres puntos iniciales y se obtienen los vectores \(\mathbf{u} = (1.0002, 2.0001)^T\), \(\mathbf{v} = (0.9998, 1.9999)^T\) y \(\mathbf{w} = (3.1415, 2.7182)^T\). Con una tolerancia \(\tau = 10^{-3}\), los vectores \(\mathbf{u}\) y \(\mathbf{v}\) se consideran la misma solución (su distancia es menor que \(\tau\)), mientras que \(\mathbf{w}\) es una solución distinta.
+
+\bigskip Tras este proceso se dispone de un conjunto de pares \((\thetavec, \xvec^*)\), donde cada \(\xvec^*\) es una de las soluciones reales del sistema para los parámetros \(\thetavec\). Es importante notar que, para una misma tupla \(\thetavec\), pueden existir varios pares en el conjunto de datos, cada uno con un vector \(\xvec^*\) distinto. En otras palabras, cuando el sistema admite más de una solución para un mismo valor de los parámetros, la tabla de datos contiene múltiples filas con idéntico \(\thetavec\) y diferente \(\xvec^*\). Este conjunto constituye la entrada para la etapa de regresión simbólica que se describe en la sección siguiente.
+
+
+\section{Estrategia de regresión simbólica} \label{sec:estrategia_sr}
+
+Una vez construido el conjunto de datos —en el que cada tupla de parámetros puede aparecer en varias filas, cada una con un vector solución \(\xvec\) distinto—, el paso siguiente es extraer, a partir de esos datos, las expresiones analíticas subyacentes.
+
+La dificultad principal para aplicar regresión simbólica a estos datos es doble. Por un lado, el conjunto contiene múltiples soluciones para una misma tupla de parámetros; por otro, cada solución está formada por varias variables interdependientes. Abordar directamente el problema como un ajuste vectorial no es viable, porque el algoritmo tendería a predecir valores intermedios que no corresponden a ninguna solución real. En su lugar, se sigue una estrategia en tres fases. Primero, como se describe en la Sección~\ref{sec:desacoplamiento}, se descompone el problema tratando cada coordenada de la solución de forma independiente y se elige una de ellas para guiar la separación de las distintas soluciones. A continuación, mediante un proceso iterativo que se presenta en la Sección~\ref{sec:busqueda_ancla}, se identifican secuencialmente las distintas funciones solución para la coordenada elegida y, a partir de ellas, se obtienen expresiones para las demás variables de la misma solución, como se explica en la Sección~\ref{sec:extension_coordenadas}. Finalmente, cada solución completa se valida comprobando que satisface el sistema original dentro de una tolerancia preestablecida, según el procedimiento que se detalla en la Sección~\ref{sec:validacion_solucion}.
+
+En los apartados que siguen se desarrolla cada una de estas fases.
+
+\subsection{Separación por coordenadas} \label{sec:desacoplamiento}
+
+El conjunto de datos generado en la etapa anterior asocia cada tupla de parámetros \(\thetavec\) con una o varias soluciones del sistema: cuando hay más de una solución para el mismo \(\thetavec\), se añaden varias filas a la tabla de datos, una por cada solución. Esta característica impide abordar el problema como un simple ajuste funcional: si para un mismo \(\thetavec\) existen varios valores de \(\xvec\), cualquier función que intente predecir \(\xvec\) a partir de \(\thetavec\) estará mal definida, pues a una misma entrada le corresponderían varias salidas. Un modelo de regresión entrenado directamente sobre estos datos tendería a producir un valor intermedio entre las distintas soluciones, que no corresponde a ninguna de ellas.
+
+Para evitar tener que construir una función vectorial que asigne directamente \(\thetavec\) al vector completo \(\xvec\), se trata cada coordenada por separado. Así, el objetivo pasa a ser encontrar \(n\) funciones escalares \[ x_k = g_k(\thetavec), \quad k = 1, \dots, n, \] todas ellas definidas sobre el mismo espacio de parámetros. La notación \(g_k\) representa la función que describe cómo la \(k\)-ésima coordenada de la solución depende de los parámetros. Esta separación por coordenadas reduce el problema a hallar expresiones algebraicas para cada variable de forma independiente, pero no resuelve por sí sola la dificultad de la multiplicidad de soluciones: incluso considerando una única coordenada, los datos de esa columna de la tabla pueden contener varios valores para un mismo \(\thetavec\), ya que proceden de soluciones distintas.
+
+\bigskip \noindent\textbf{Ejemplo 4.} Considérese el sistema definido por \(x_1^2 - x_2 = 0\) y \(x_1 + x_2 = 6\) con un parámetro \(a \equiv 2\). Para este valor, el sistema admite dos soluciones: \((x_1, x_2) = (2, 4)\) y \((x_1, x_2) = (3, 9)\). Las filas correspondientes de la tabla de datos serían: \[ \begin{array}{c|c|c}
+a & x_1 & x_2 \\
+\hline
+2 & 2 & 4 \\
+2 & 3 & 9 \\
+\vdots & \vdots & \vdots \end{array} \] En la columna de \(x_1\) aparecen dos valores (\(2\) y \(3\)) asociados al mismo \(a = 2\), lo que impide aplicar directamente regresión simbólica para predecir \(x_1\) a partir de \(a\).
+
+Para poder separar estos valores, se elige una de las coordenadas como guía para agrupar los puntos. Sin pérdida de generalidad, se toma \(x_1\) como punto de partida. La idea es la siguiente: una vez que se identifiquen las distintas funciones que describen a \(x_1\) y se asigne cada fila de la tabla a una de ellas, los valores de las demás coordenadas quedarán automáticamente asociados a cada grupo, porque en los datos originales cada fila contiene el vector completo \(\xvec\). Así, para un mismo \(\thetavec\), el valor de cada \(x_k\) pertenece a la misma solución que el valor de \(x_1\).
+
+De esta manera, el proceso se organiza en dos etapas. Primero se aplica regresión simbólica sobre los datos de \(x_1\) para descubrir, mediante un procedimiento iterativo, cuántas expresiones diferentes para \(x_1\) están presentes en los datos y a qué subconjunto de filas —es decir, el conjunto de filas de la tabla cuyos valores de \(x_1\) una misma expresión aproxima bien— corresponde cada una. A continuación, se obtienen expresiones para las coordenadas restantes aprovechando los grupos ya formados.
+
+Nótese que este procedimiento asume que, una vez fijada la expresión para \(x_1\), las demás coordenadas quedan determinadas sin ambigüedad dentro de cada grupo. Si las soluciones no fueran separables por coordenadas —es decir, si dos soluciones distintas compartieran la misma expresión para \(x_1\) pero difirieran en \(x_2\)— sería necesario un paso adicional de verificación de compatibilidad entre coordenadas. Esta verificación se realiza durante la validación final de la solución completa, que se describe en la Sección~\ref{sec:validacion_solucion}.
+
+\bigskip \noindent\textbf{Ejemplo (organización tras el proceso).} Para el sistema del Ejemplo 4, una vez identificadas dos funciones para \(x_1\), la tabla se reorganiza en dos grupos: \[ \begin{array}{c|c|c|c}
+\text{Grupo} & a & x_1 & x_2 \\
+\hline
+1 & 2 & 2 & 4 \\
+1 & 4 & 4 & 16 \\
+\vdots & \vdots & \vdots & \vdots \\[4pt]
+2 & 2 & 3 & 9 \\
+2 & 5 & 5 & 25 \\
+\vdots & \vdots & \vdots & \vdots \end{array} \]
+
+Los detalles de cada etapa se exponen en las secciones siguientes.
+
+\subsection{Búsqueda iterativa sobre \(x_1\)} \label{sec:busqueda_ancla}
+
+Una vez organizados los datos, se aplica el algoritmo de regresión simbólica descrito en la Sección~\ref{sec:regresion} a la primera coordenada. Para ello, de la tabla completa —que tiene columnas para cada parámetro y cada variable— se extrae una sub-tabla que contiene únicamente las columnas de los parámetros \(\thetavec\) y la columna de \(x_1\). El objetivo de esta etapa es identificar, de manera iterativa, las distintas funciones que describen la primera coordenada de las soluciones.
+
+El proceso iterativo es necesario porque en los datos de \(x_1\) conviven puntos que responden a funciones diferentes, y la regresión simbólica estándar solo puede ajustar una de ellas en cada ejecución. El algoritmo comienza con el conjunto completo de puntos de la sub-tabla y, en cada iteración, entrena un modelo de regresión simbólica que busca una expresión \(g_1^{(j)}(\thetavec)\) tal que \[ |\,x_{1,i} - g_1^{(j)}(\thetavec_i)\,| < \varepsilon \] para la mayor cantidad posible de puntos, donde \(\varepsilon\) es una tolerancia preestablecida y el subíndice \(i\) indexa las filas de la tabla. El superíndice \((j)\) indica que se trata de la \(j\)-ésima solución descubierta para \(x_1\).
+
+Los puntos que satisfacen la desigualdad anterior para la expresión \(g_1^{(j)}\) se retiran del conjunto de datos, y la iteración siguiente trabaja exclusivamente con los puntos restantes. Este procedimiento se repite hasta que el número de puntos sin explicar es menor que un umbral mínimo, momento en el cual se considera que todas las soluciones relevantes han sido identificadas.
+
+\bigskip \noindent\textbf{Ejemplo 5.} Retomando el Ejemplo 4, la sub-tabla de \(x_1\) contiene los siguientes datos:
+
+\begin{center} \begin{tabular}{c|c}
+\(a\) & \(x_1\) \\
+\hline
+2 & 2 \\
+2 & 3 \\
+4 & 4 \\
+5 & 5 \\
+5 & 6 \\
+\vdots & \vdots \end{tabular} \end{center}
+
+En la primera iteración, el modelo de regresión simbólica descubre la expresión \(g_1^{(1)}(a) = a\), que ajusta los puntos donde \(x_1 = a\) (por ejemplo, \(a = 2 \to 2,\; a = 4 \to 4,\; a = 5 \to 5\)). Estos puntos se retiran. En la segunda iteración, trabajando solo con los puntos restantes, el modelo encuentra \(g_1^{(2)}(a) = a + 1\), que ajusta los puntos donde \(x_1 = a + 1\) (por ejemplo, \(a = 2 \to 3,\; a = 5 \to 6\)). Tras esta segunda iteración no quedarían puntos, y el algoritmo concluiría que existen dos expresiones para \(x_1\): \(g_1^{(1)}(a) = a\) y \(g_1^{(2)}(a) = a + 1\).
+
+Los puntos que permanecen sin explicar al finalizar el proceso pueden deberse a soluciones cuya expresión es demasiado compleja para ser descubierta con los recursos de cómputo disponibles, a errores numéricos en la resolución del sistema, o a que el número de iteraciones fue insuficiente. En el capítulo de experimentación se analiza este fenómeno con los datos obtenidos.
+
+Cada expresión \(g_1^{(j)}\) queda asociada al subconjunto de parámetros para los que la predicción es correcta dentro de la tolerancia \(\varepsilon\). Formalmente, se define \[ \mathcal{S}^{(j)} = \{\,\thetavec \in \mathcal{G} \mid |\,x_1 - g_1^{(j)}(\thetavec)\,| < \varepsilon \,\}, \] es decir, el conjunto de tuplas de parámetros para las cuales la expresión \(g_1^{(j)}\) ajusta el valor observado de \(x_1\).
+
+\bigskip \noindent\textbf{Ejemplo 6.} En el Ejemplo 5, la expresión \(g_1^{(1)}(a) = a\) estaría asociada al subconjunto \(\mathcal{S}^{(1)} = \{2, 4, 5, \dots\}\) (los valores de \(a\) para los que \(x_1 = a\)), mientras que \(g_1^{(2)}(a) = a + 1\) lo estaría a \(\mathcal{S}^{(2)} = \{2, 5, \dots\}\) (los valores de \(a\) para los que \(x_1 = a + 1\)).
+
+\begin{center} \begin{tabular}{c|c}
+\(\mathcal{S}^{(1)}\) & \(\mathcal{S}^{(2)}\) \\
+\hline
+2 & 2 \\
+4 & 5 \\
+5 & \vdots \\
+\vdots & \end{tabular} \end{center}
+
+Puesto que los valores de \(x_1\) para una misma tupla de parámetros pueden provenir de soluciones distintas, cada una de estas funciones identifica una solución del sistema. Al finalizar esta etapa se cuenta con una lista de funciones para \(x_1\), cada una con su subconjunto de parámetros asociado, lo que proporciona la base para obtener expresiones para las coordenadas restantes, como se describe en la sección siguiente.
+
+\subsection{Extensión a las demás coordenadas} \label{sec:extension_coordenadas}
+
+Una vez que la búsqueda iterativa ha proporcionado una lista de expresiones \(g_1^{(1)}, g_1^{(2)}, \dots\) para la primera coordenada, junto con los subconjuntos de parámetros \(\mathcal{S}^{(1)}, \mathcal{S}^{(2)}, \dots\) que cada una explica, el paso siguiente es completar la descripción de cada solución del sistema. Para ello se obtienen expresiones simbólicas para las coordenadas restantes \(x_2, x_3, \dots, x_n\).
+
+Para una solución particular, identificada por el índice \(j\), se dispone del subconjunto \(\mathcal{S}^{(j)}\). Para cada \(\thetavec \in \mathcal{S}^{(j)}\) se conoce el valor correspondiente de cada variable \(x_k\), ya que los datos originales contienen el vector completo \(\xvec\). Con estos pares \((\thetavec, x_k)\) se entrena un modelo de regresión simbólica para cada coordenada \(k = 2, \dots, n\). La función obtenida para la coordenada \(k\) de la solución \(j\) se denota como \(g_k^{(j)}(\thetavec)\).
+
+\bigskip \noindent\textbf{Ejemplo 7.} Retomando el Ejemplo 4, supóngase que la búsqueda iterativa sobre \(x_1\) ha producido dos expresiones: \(g_1^{(1)}(a) = a\) con \(\mathcal{S}^{(1)} = \{2, 4, \dots\}\), y \(g_1^{(2)}(a) = a + 1\) con \(\mathcal{S}^{(2)} = \{2, 5, \dots\}\). Para completar la primera solución, se toman los puntos de \(\mathcal{S}^{(1)}\):
+
+\begin{center} \begin{tabular}{c|c}
+\(a\) & \(x_2\) \\
+\hline
+2 & 4 \\
+4 & 16 \\
+\vdots & \vdots \end{tabular} \end{center}
+
+Con estos pares \((a, x_2)\) se entrena regresión simbólica, que podría descubrir \(g_2^{(1)}(a) = a^2\). Para la segunda solución, los puntos de \(\mathcal{S}^{(2)}\) dan pares como \((a = 2, x_2 = 9)\) y \((a = 5, x_2 = 36)\), de donde se obtendría \(g_2^{(2)}(a) = (a+1)^2\).
+
+Este procedimiento es posible porque, por construcción, dentro de un mismo subconjunto \(\mathcal{S}^{(j)}\) cada \(\thetavec\) aparece una sola vez: todos los puntos que están en \(\mathcal{S}^{(j)}\) han sido explicados por la misma expresión \(g_1^{(j)}\), y por tanto corresponden a la misma solución del sistema. En consecuencia, no existe la ambigüedad de múltiples valores de \(x_k\) para un mismo \(\thetavec\) dentro de \(\mathcal{S}^{(j)}\), y la regresión simbólica puede aplicarse sin necesidad de estrategias iterativas adicionales. Si excepcionalmente dos soluciones distintas compartieran el mismo valor de \(x_1\) para algún \(\thetavec\), esta inconsistencia sería detectada en la fase de validación (Sección~\ref{sec:validacion_solucion}).
+
+Una vez completado este proceso para todos los subconjuntos, se dispone de un conjunto de funciones que describen cada solución del sistema. Para la solución \(j\), las expresiones son \[ \begin{aligned}
+x_1 &= g_1^{(j)}(\thetavec), \\
+x_2 &= g_2^{(j)}(\thetavec), \\
+	&\;\;\vdots \\
+x_n &= g_n^{(j)}(\thetavec). \end{aligned} \] Estas funciones constituyen un candidato a descripción analítica de la solución, que debe ser validado antes de ser aceptado definitivamente, como se explica en la sección siguiente.
+
+\subsection{Validación de una solución completa} \label{sec:validacion_solucion}
+
+Una vez obtenidas las expresiones simbólicas para todas las coordenadas de una candidata a solución, es necesario verificar que el conjunto de funciones \[ \mathbf{g}^{(j)}(\thetavec) = \bigl( g_1^{(j)}(\thetavec),\, g_2^{(j)}(\thetavec),\, \dots,\, g_n^{(j)}(\thetavec) \bigr) \] realmente satisface el sistema original \(\Fvec(\xvec; \thetavec) = \mathbf{0}\) sobre el subconjunto de parámetros \(\mathcal{S}^{(j)}\) que la generó. Esta comprobación es imprescindible, ya que las expresiones se han obtenido por ajuste independiente de cada coordenada y podrían no ser compatibles entre sí al ser evaluadas conjuntamente en el sistema.
+
+Para realizar la validación se sustituyen las funciones simbólicas en el sistema y se evalúa el valor \[ \Fvec\bigl( \mathbf{g}^{(j)}(\thetavec); \thetavec \bigr) \] para cada tupla \(\thetavec \in \mathcal{S}^{(j)}\). A continuación se calcula el promedio de las normas euclidianas de estos valores sobre todo el subconjunto: \[ E^{(j)} = \frac{1}{|\mathcal{S}^{(j)}|} \sum_{\thetavec \in \mathcal{S}^{(j)}} \bigl\| \Fvec\bigl( \mathbf{g}^{(j)}(\thetavec); \thetavec \bigr) \bigr\|_2. \]
+
+Si el error medio \(E^{(j)}\) es menor que una tolerancia predefinida \(\varepsilon_{\text{val}}\), la solución se considera válida y se incorpora a la lista de resultados definitivos. Los puntos del subconjunto \(\mathcal{S}^{(j)}\) se retiran del conjunto de datos, ya que han sido explicados por una expresión analítica aceptada.
+
+\bigskip \noindent\textbf{Ejemplo 8.} En el Ejemplo 7, la primera solución candidata es \(x_1 = a,\; x_2 = a^2\), obtenida a partir de \(\mathcal{S}^{(1)}\). Para validarla, se evalúa el sistema original \(x_1^2 - x_2 = 0\) y \(x_2 - a x_1 = 0\) en los puntos de \(\mathcal{S}^{(1)}\):
+
+\begin{center} \begin{tabular}{c|c|c|c}
+\(a\) & \(x_1 = a\) & \(x_2 = a^2\) & \(E^{(1)}\) \\
+\hline
+2 & 2 & 4 & 0 \\
+4 & 4 & 16 & 0 \\
+\vdots & \vdots & \vdots & \vdots \end{tabular} \end{center}
+
+Al sustituir las expresiones se obtiene \(a^2 - a^2 = 0\) y \(a^2 - a \cdot a = 0\), por lo que \(E^{(1)} \approx 0\) y la solución se acepta.
+
+Si, por el contrario, el error medio supera la tolerancia, la solución se descarta y los puntos del subconjunto \(\mathcal{S}^{(j)}\) vuelven al conjunto de datos. De esta forma, el algoritmo iterativo descrito en el paso~5 del pseudocódigo podrá considerarlos de nuevo en iteraciones posteriores, dando la oportunidad de descubrir otras expresiones que sí los expliquen satisfactoriamente.
+
+De esta manera, el proceso de validación actúa como un filtro que garantiza que solo se conservan las descripciones que reproducen fielmente el comportamiento del sistema original. En el siguiente apartado se presentan las funciones de pérdida con las que se guía la búsqueda de las expresiones que luego se validan.
+
+\subsection{Funciones de pérdida utilizadas} \label{sec:funciones_perdida}
+
+La regresión simbólica emplea una función de pérdida que mide la discrepancia entre las predicciones y los valores observados. En este trabajo se evaluaron tres alternativas.
+
+\begin{itemize} \item \textbf{Error cuadrático medio (MSE).} Definido en la sección correspondiente, penaliza con mayor peso las desviaciones grandes. \item \textbf{Conteo de coincidencias.} Función discreta que asigna el mismo valor a todas las predicciones cuya diferencia con el dato observado esté por debajo de una tolerancia \(\varepsilon\), y un valor constante mayor en caso contrario. \item \textbf{Sigmoidal.} Variante suave de la pérdida por conteo que transforma la diferencia absoluta mediante una sigmoide parametrizada para conservar la noción de umbral y, al mismo tiempo, ofrecer un gradiente útil para la búsqueda evolutiva. \end{itemize}
+
+La comparación experimental de estas tres variantes y la elección de la más adecuada se presentan en el Capítulo~\ref{sec:experimentacion}, junto con el resto de los experimentos realizados. En la sección siguiente se recoge el pseudocódigo completo del algoritmo, que integra todas las fases descritas hasta aquí. Los detalles de la implementación en Python, incluyendo la descripción de los módulos que componen el sistema y el formato de entrada y salida, se recogen en el Anexo.
+
+
+\section{Pseudocódigo del proceso principal} \label{sec:pseudocodigo_principal}
+
+El procedimiento descrito en las secciones anteriores se integra en un algoritmo que toma como punto de partida la definición del sistema de ecuaciones y devuelve las expresiones analíticas para cada variable en cada una de las soluciones encontradas. A continuación se presenta el pseudocódigo global.
+
+\medskip \refstepcounter{pseudocode}\label{alg:proceso_principal} \noindent\textbf{Pseudocódigo \thepseudocode:} \begin{tabbing} \qquad \= \qquad \= \qquad \= \kill
+\textbf{Entrada:} \>\>\> sistema \(\Fvec(\xvec; \thetavec) = \mathbf{0}\), \\
+\>\>\> variables \(\xvec\), \\
+\>\>\> parámetros \(\thetavec\), \\
+\>\>\> intervalos para parámetros y para puntos iniciales, \\
+\>\>\> tolerancias, \\
+\>\>\> hiperparámetros de PySR. \\
+\textbf{Salida:} \>\>\> lista de soluciones, cada una con una expresión \\
+\>\>\> simbólica por variable. \\[4pt]
+\textbf{1.} \> Definir cuadrícula de parámetros \(\mathcal{G}\) mediante producto \\
+\> cartesiano. \\
+\textbf{2.} \> Para cada \(\thetavec \in \mathcal{G}\): \\
+\> \qquad Resolver numéricamente con múltiples puntos iniciales. \\
+\> \qquad Filtrar soluciones duplicadas usando distancia euclidiana. \\
+\textbf{3.} \> Combinar todos los pares \((\thetavec, \xvec)\) en un solo \\
+\> conjunto de datos. \\
+\textbf{4.} \> Tomar \(x_1\) como guía para separar las soluciones. \\
+\textbf{5.} \> Aplicar búsqueda iterativa sobre \(x_1\) para obtener una \\
+\> lista de expresiones \(g_1^{(1)}, g_1^{(2)}, \dots\) y los subconjuntos \\
+\> de parámetros que cada una cubre. \\
+\textbf{6.} \> Para cada expresión \(g_1^{(j)}\) y su subconjunto de \\
+\> parámetros \(\mathcal{S}^{(j)}\): \\
+\> \qquad Para cada coordenada restante \(x_k\) con \(k \neq 1\): \\
+\> \qquad \qquad Entrenar regresión simbólica sobre \(\mathcal{S}^{(j)}\). \\
+\> \qquad Construir la función completa \(\mathbf{g}^{(j)}(\thetavec)\). \\
+\> \qquad Validar calculando el error medio. \\
+\> \qquad Si la validación es satisfactoria, añadir la solución a \\
+\> \qquad la salida y retirar los puntos de \(\mathcal{S}^{(j)}\) \\
+\> \qquad del conjunto de datos. \\
+\textbf{7.} \> Repetir los pasos 5--6 hasta que el número de puntos \\
+\> restantes sea menor que un umbral mínimo. \end{tabbing} \medskip
+
+Los hiperparámetros mencionados (tolerancias, número de intentos, parámetros de PySR) se detallan en el próximo capítulo, donde se justifican los valores seleccionados.
